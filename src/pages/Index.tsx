@@ -139,11 +139,11 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <div className="relative">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-3">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 via-transparent to-gray-50/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100/30 via-transparent to-gray-100/30"></div>
           <div 
             className="absolute inset-0" 
             style={{
@@ -161,7 +161,7 @@ const Index = () => {
               <div className="lg:col-span-4 space-y-8">
                 <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-md">
                   <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-4">
-                    <div className="bg-blue-800 p-3 rounded-xl">
+                    <div className="bg-blue-900 p-3 rounded-xl">
                       <Target className="h-7 w-7 text-white" />
                     </div>
                     Prospecção
