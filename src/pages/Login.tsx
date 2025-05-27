@@ -34,15 +34,15 @@ const Login = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700"></div>
         <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}}></div>
         
-        <div className="relative z-10 flex flex-col justify-center px-12 py-24 text-white">
+        <div className="relative z-10 flex flex-col justify-center px-8 xl:px-12 py-24 text-white">
           <div className="mb-12">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-3xl mb-6 border border-white/20">
               <Target className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+            <h1 className="text-4xl xl:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
               PrimeLead
             </h1>
-            <p className="text-xl text-blue-100 leading-relaxed">
+            <p className="text-lg xl:text-xl text-blue-100 leading-relaxed">
               Transforme leads em oportunidades reais com nossa plataforma inteligente de prospecção
             </p>
           </div>
@@ -82,13 +82,13 @@ const Login = () => {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 xl:px-12 py-8 sm:py-12">
         <div className="w-full max-w-md">
           {/* Back to Sales Button */}
           <div className="mb-6">
             <Link 
               to="/" 
-              className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+              className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors text-sm sm:text-base"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar para página inicial
@@ -100,20 +100,20 @@ const Login = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl mb-4 shadow-lg">
               <Target className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent">
               PrimeLead
             </h1>
           </div>
 
           {/* Login Card */}
           <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Bem-vindo de volta!</h2>
-                <p className="text-gray-600">Entre na sua conta para continuar</p>
+            <CardContent className="p-6 sm:p-8">
+              <div className="text-center mb-6 sm:mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Bem-vindo de volta!</h2>
+                <p className="text-sm sm:text-base text-gray-600">Entre na sua conta para continuar</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 {/* Email Field */}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700 font-medium text-sm">
@@ -127,7 +127,7 @@ const Login = () => {
                       placeholder="seu@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-12 h-12 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50 transition-all duration-200 hover:bg-white focus:bg-white"
+                      className="pl-12 h-12 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50 transition-all duration-200 hover:bg-white focus:bg-white w-full"
                       required
                     />
                   </div>
@@ -146,7 +146,7 @@ const Login = () => {
                       placeholder="Digite sua senha"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-12 pr-12 h-12 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50 transition-all duration-200 hover:bg-white focus:bg-white"
+                      className="pl-12 pr-12 h-12 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50 transition-all duration-200 hover:bg-white focus:bg-white w-full"
                       required
                     />
                     <button
@@ -164,7 +164,7 @@ const Login = () => {
                 </div>
 
                 {/* Remember Me & Forgot Password */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex items-center space-x-3">
                     <input
                       id="remember"
@@ -201,7 +201,7 @@ const Login = () => {
               </form>
 
               {/* Divider */}
-              <div className="relative my-8">
+              <div className="relative my-6 sm:my-8">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
@@ -212,7 +212,7 @@ const Login = () => {
 
               {/* Sign Up Link */}
               <div className="text-center">
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Não tem uma conta?{' '}
                   <Link
                     to="/signup"
@@ -226,8 +226,8 @@ const Login = () => {
           </Card>
 
           {/* Footer */}
-          <div className="text-center mt-8">
-            <p className="text-sm text-gray-500">
+          <div className="text-center mt-6 sm:mt-8">
+            <p className="text-xs sm:text-sm text-gray-500">
               © 2024 PrimeLead. Todos os direitos reservados.
             </p>
           </div>
