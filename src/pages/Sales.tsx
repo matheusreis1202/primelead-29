@@ -18,118 +18,106 @@ import {
   Clock,
   Shield,
   Sparkles,
-  Youtube,
   Award,
-  Rocket
+  Rocket,
+  AlertCircle,
+  ThumbsUp,
+  Eye,
+  MessageCircle
 } from 'lucide-react';
 
 const Sales = () => {
   const [selectedPlan, setSelectedPlan] = useState('premium');
 
-  const features = [
+  const objections = [
     {
-      icon: <Target className="h-6 w-6 text-blue-600" />,
-      title: "Prospecção Inteligente",
-      description: "IA avançada que identifica os melhores canais para sua estratégia"
+      objection: "Não tenho tempo para prospectar canais",
+      solution: "Nossa IA faz tudo automaticamente",
+      description: "Em apenas 2 minutos você configura sua busca e nossa IA trabalha 24/7 encontrando os melhores canais para você.",
+      icon: <Clock className="h-8 w-8 text-green-500" />,
+      stats: "Economia de 80% do tempo"
     },
     {
-      icon: <BarChart3 className="h-6 w-6 text-green-600" />,
-      title: "Análise de Performance",
-      description: "Score exclusivo que classifica canais por potencial de conversão"
+      objection: "Não sei avaliar se um canal é bom",
+      solution: "Score Premium 100/100 com IA",
+      description: "Nosso algoritmo analisa milhões de dados e entrega um score preciso de 0 a 100 para cada canal.",
+      icon: <BarChart3 className="h-8 w-8 text-blue-500" />,
+      stats: "95% de precisão"
     },
     {
-      icon: <Users className="h-6 w-6 text-purple-600" />,
-      title: "Base Premium",
-      description: "Acesso a mais de 10.000 canais qualificados e atualizados"
+      objection: "É muito caro para minha empresa",
+      solution: "ROI comprovado de 300%",
+      description: "Nossos clientes recuperam o investimento em menos de 30 dias com os leads qualificados.",
+      icon: <DollarSign className="h-8 w-8 text-green-500" />,
+      stats: "ROI de 300%"
     },
     {
-      icon: <Zap className="h-6 w-6 text-yellow-600" />,
-      title: "Automação Completa",
-      description: "Filtragem automática por nicho, país, idioma e engajamento"
+      objection: "Não confio em ferramentas automáticas",
+      solution: "Dados verificados manualmente",
+      description: "Além da IA, nossa equipe verifica manualmente os canais TOP para garantir máxima qualidade.",
+      icon: <Shield className="h-8 w-8 text-blue-500" />,
+      stats: "100% verificados"
+    }
+  ];
+
+  const proofCards = [
+    {
+      channel: "MARCEMÁTICA",
+      score: "100/100",
+      badge: "TOP #3",
+      subscribers: "675.0K",
+      views: "209.7M", 
+      engagement: "31059.3%",
+      description: "Canal de matemática com altíssimo engajamento",
+      avatar: "/lovable-uploads/f7577f20-44f1-4b5d-99ce-0a7f8d3027b9.png"
+    },
+    {
+      channel: "Cortes de Matemática e Física",
+      score: "100/100", 
+      badge: "TOP #1",
+      subscribers: "479.0K",
+      views: "143.9M",
+      engagement: "30044.6%",
+      description: "Canal de cortes educacionais premium",
+      avatar: "/lovable-uploads/bdec2d4f-097a-4996-84a3-92797e3fd23f.png"
+    },
+    {
+      channel: "Je Lindsay", 
+      score: "100/100",
+      badge: "TOP #2", 
+      subscribers: "809.0K",
+      views: "316.1M",
+      engagement: "39074.0%",
+      description: "Maior bloguerica educacional do Brasil",
+      avatar: "/lovable-uploads/bdec2d4f-097a-4996-84a3-92797e3fd23f.png"
     }
   ];
 
   const testimonials = [
     {
       name: "Carlos Silva",
-      role: "Marketing Director",
-      company: "TechFlow",
-      content: "Aumentamos nossa conversão em 300% usando o PrimeLead. A qualidade dos leads é excepcional!",
-      rating: 5
+      role: "Growth Manager",
+      company: "EduTech",
+      content: "Encontrei 50 canais premium em 5 minutos. Antes levava semanas!",
+      rating: 5,
+      result: "+300% conversão"
     },
     {
-      name: "Ana Costa",
-      role: "Growth Manager",
+      name: "Ana Costa", 
+      role: "Marketing Director",
       company: "StartupBR",
-      content: "A ferramenta mais completa que já usei. O score dos canais é extremamente preciso.",
-      rating: 5
+      content: "O score é extremamente preciso. Todos os canais TOP converteram!",
+      rating: 5,
+      result: "95% taxa conversão"
     },
     {
       name: "Roberto Lima",
-      role: "CEO",
+      role: "CEO", 
       company: "DigitalMax",
-      content: "ROI incrível! Economizamos 80% do tempo na prospecção e triplicamos os resultados.",
-      rating: 5
+      content: "ROI incrível! Recuperei o investimento em 15 dias.",
+      rating: 5,
+      result: "ROI 400%"
     }
-  ];
-
-  const plans = [
-    {
-      id: 'starter',
-      name: 'Starter',
-      price: 'R$ 97',
-      period: '/mês',
-      description: 'Perfeito para começar',
-      features: [
-        'Até 500 buscas/mês',
-        'Análise básica de canais',
-        'Suporte por email',
-        'Dashboard básico'
-      ],
-      color: 'from-gray-400 to-gray-600',
-      popular: false
-    },
-    {
-      id: 'premium',
-      name: 'Premium',
-      price: 'R$ 197',
-      period: '/mês',
-      description: 'Mais escolhido pelos profissionais',
-      features: [
-        'Buscas ilimitadas',
-        'Score premium com IA',
-        'Suporte prioritário',
-        'Dashboard avançado',
-        'Exportação de dados',
-        'Análise de concorrentes'
-      ],
-      color: 'from-blue-600 to-blue-800',
-      popular: true
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: 'R$ 397',
-      period: '/mês',
-      description: 'Para equipes e agências',
-      features: [
-        'Tudo do Premium',
-        'API dedicada',
-        'Gerente de conta',
-        'Treinamento personalizado',
-        'Relatórios customizados',
-        'Integração personalizada'
-      ],
-      color: 'from-purple-600 to-purple-800',
-      popular: false
-    }
-  ];
-
-  const stats = [
-    { icon: <Users className="h-8 w-8" />, value: "10.000+", label: "Canais Analisados" },
-    { icon: <TrendingUp className="h-8 w-8" />, value: "95%", label: "Taxa de Conversão" },
-    { icon: <Award className="h-8 w-8" />, value: "500+", label: "Clientes Satisfeitos" },
-    { icon: <Rocket className="h-8 w-8" />, value: "300%", label: "Aumento Médio de ROI" }
   ];
 
   return (
@@ -140,72 +128,81 @@ const Sales = () => {
         
         <div className="relative z-10 container mx-auto px-6 py-24">
           <div className="text-center max-w-4xl mx-auto">
-            {/* Logo */}
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-3xl mb-8 border border-white/20">
               <Target className="h-10 w-10 text-white" />
             </div>
             
-            <Badge className="mb-6 bg-green-500/20 text-green-300 border-green-400/30 px-4 py-2">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Powered by AI Premium
+            <Badge className="mb-6 bg-red-500/20 text-red-300 border-red-400/30 px-4 py-2">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              Pare de Perder Oportunidades
             </Badge>
             
             <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
-              Transforme Leads em
-              <span className="block text-green-400">Oportunidades Reais</span>
+              Você Está Perdendo
+              <span className="block text-red-400">Milhares de Leads</span>
+              <span className="block text-green-400">Todo Dia!</span>
             </h1>
             
             <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-3xl mx-auto">
-              A única plataforma de prospecção do YouTube que usa IA para identificar os canais com maior potencial de conversão. Resultados comprovados por mais de 500 empresas.
+              Enquanto você busca canais manualmente, seus concorrentes já estão fechando negócios com nossa IA que encontra os canais premium automaticamente.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link to="/login">
                 <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group">
-                  <span>Começar Gratuitamente</span>
+                  <span>Parar de Perder Leads AGORA</span>
                   <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold rounded-xl">
                 <Play className="h-5 w-5 mr-2" />
-                Ver Demo
+                Ver Como Funciona
               </Button>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-2xl mx-auto">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-white mb-2">{stat.icon}</div>
-                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-blue-200 text-sm">{stat.label}</div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Features Section */}
+      {/* Objections Section */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Por que o PrimeLead é Diferente?
+              "Mas eu penso que..."
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Nossa tecnologia de IA analisa milhões de dados para entregar apenas os leads mais qualificados
+              Vamos quebrar todas as suas objeções com dados reais
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-white">
-                <CardContent className="p-8 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-2xl mb-6">
-                    {feature.icon}
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {objections.map((item, index) => (
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-white overflow-hidden">
+                <CardContent className="p-8">
+                  <div className="flex items-start space-x-4 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center">
+                      <AlertCircle className="h-8 w-8 text-red-500" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-red-600 mb-2">OBJEÇÃO:</h3>
+                      <p className="text-gray-700 italic">"{item.objection}"</p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">{feature.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center">
+                      {item.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-green-600 mb-2">SOLUÇÃO:</h3>
+                      <p className="text-xl font-semibold text-gray-800 mb-2">{item.solution}</p>
+                      <p className="text-gray-600 mb-4">{item.description}</p>
+                      <Badge className="bg-green-100 text-green-700 border-green-200">
+                        <ThumbsUp className="h-4 w-4 mr-1" />
+                        {item.stats}
+                      </Badge>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -213,19 +210,100 @@ const Sales = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Proof Section */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              O que Nossos Clientes Dizem
+              Canais Premium Encontrados
             </h2>
             <p className="text-xl text-gray-600">
-              Resultados reais de empresas que transformaram suas vendas
+              Ranqueados por algoritmo de performance avançado
+            </p>
+            <Badge className="mt-4 bg-blue-100 text-blue-700 border-blue-200 px-4 py-2">
+              50 canais descobertos
+            </Badge>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {proofCards.map((channel, index) => (
+              <Card key={index} className="border-0 shadow-lg bg-white overflow-hidden relative">
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-green-500 text-white px-3 py-1">
+                    {channel.badge}
+                  </Badge>
+                </div>
+                
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center">
+                      <Target className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-green-600">{channel.score}</div>
+                      <div className="text-sm text-green-500 font-medium">PREMIUM</div>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">{channel.channel}</h3>
+                  <p className="text-gray-600 text-sm mb-6">{channel.description}</p>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Users className="h-5 w-5 text-blue-500" />
+                        <span className="text-gray-600">Inscritos</span>
+                      </div>
+                      <span className="font-bold text-gray-800">{channel.subscribers}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Eye className="h-5 w-5 text-blue-500" />
+                        <span className="text-gray-600">Visualizações</span>
+                      </div>
+                      <span className="font-bold text-gray-800">{channel.views}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <MessageCircle className="h-5 w-5 text-green-500" />
+                        <span className="text-gray-600">Engajamento</span>
+                      </div>
+                      <span className="font-bold text-green-600">{channel.engagement}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 space-y-3">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                      <Play className="h-4 w-4 mr-2" />
+                      Acessar Canal
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Ver Contatos
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              Resultados Reais de Clientes Reais
+            </h2>
+            <p className="text-xl text-gray-600">
+              Não é só promessa, são resultados comprovados
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {testimonials.map((testimonial, index) => (
               <Card key={index} className="border-0 shadow-lg bg-white">
                 <CardContent className="p-8">
@@ -234,9 +312,18 @@ const Sales = () => {
                       <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
+                  
                   <p className="text-gray-700 mb-6 italic leading-relaxed">
                     "{testimonial.content}"
                   </p>
+                  
+                  <div className="mb-4">
+                    <Badge className="bg-green-100 text-green-700 border-green-200 px-3 py-1">
+                      <TrendingUp className="h-4 w-4 mr-1" />
+                      {testimonial.result}
+                    </Badge>
+                  </div>
+                  
                   <div>
                     <div className="font-semibold text-gray-800">{testimonial.name}</div>
                     <div className="text-gray-600">{testimonial.role}</div>
@@ -249,104 +336,53 @@ const Sales = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Escolha Seu Plano
-            </h2>
-            <p className="text-xl text-gray-600">
-              Comece gratuitamente e escale conforme sua necessidade
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {plans.map((plan) => (
-              <Card 
-                key={plan.id} 
-                className={`border-0 shadow-lg relative overflow-hidden ${
-                  plan.popular ? 'ring-2 ring-blue-500 transform scale-105' : ''
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white text-center py-2 text-sm font-semibold">
-                    Mais Popular
-                  </div>
-                )}
-                
-                <CardContent className="p-8">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${plan.color} flex items-center justify-center mb-6`}>
-                    <Target className="h-8 w-8 text-white" />
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">{plan.name}</h3>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
-                  
-                  <div className="mb-8">
-                    <span className="text-4xl font-bold text-gray-800">{plan.price}</span>
-                    <span className="text-gray-600">{plan.period}</span>
-                  </div>
-                  
-                  <ul className="space-y-4 mb-8">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Link to="/login">
-                    <Button 
-                      className={`w-full ${
-                        plan.popular 
-                          ? 'bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900' 
-                          : 'bg-gray-800 hover:bg-gray-900'
-                      } text-white py-3 rounded-xl font-semibold transition-all`}
-                      onClick={() => setSelectedPlan(plan.id)}
-                    >
-                      Começar Agora
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
+      {/* Final CTA */}
       <section className="py-24 bg-gradient-to-r from-blue-900 to-purple-900">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Pronto para Transformar Sua Prospecção?
+          <h2 className="text-5xl font-bold text-white mb-6">
+            Não Perca Mais Nenhum Lead
           </h2>
-          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Junte-se a mais de 500 empresas que já descobriram o poder da prospecção inteligente
+          <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
+            Enquanto você decide, seus concorrentes já estão fechando negócios. 
+            Comece AGORA e recupere todas as oportunidades perdidas.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/login">
-              <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group">
-                <span>Começar Gratuitamente</span>
-                <Rocket className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto mb-10">
+            <div className="grid grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-3xl font-bold text-green-400 mb-2">10.000+</div>
+                <div className="text-blue-200">Leads Qualificados</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-green-400 mb-2">95%</div>
+                <div className="text-blue-200">Taxa de Conversão</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-green-400 mb-2">300%</div>
+                <div className="text-blue-200">ROI Médio</div>
+              </div>
+            </div>
           </div>
           
-          <div className="mt-8 flex items-center justify-center gap-6 text-blue-200">
+          <Link to="/login">
+            <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-12 py-6 text-xl font-bold rounded-xl shadow-2xl hover:shadow-3xl transition-all group mb-6">
+              <span>COMEÇAR AGORA - 7 DIAS GRÁTIS</span>
+              <Rocket className="h-6 w-6 ml-3 group-hover:translate-x-2 transition-transform" />
+            </Button>
+          </Link>
+          
+          <div className="flex items-center justify-center gap-8 text-blue-200 text-sm">
             <div className="flex items-center">
               <Shield className="h-5 w-5 mr-2" />
-              <span>Seguro e Confiável</span>
+              <span>100% Seguro</span>
             </div>
             <div className="flex items-center">
               <Clock className="h-5 w-5 mr-2" />
-              <span>Setup em 2 minutos</span>
+              <span>Setup em 2min</span>
             </div>
             <div className="flex items-center">
-              <DollarSign className="h-5 w-5 mr-2" />
-              <span>7 dias grátis</span>
+              <Award className="h-5 w-5 mr-2" />
+              <span>Garantia 30 dias</span>
             </div>
           </div>
         </div>
@@ -360,12 +396,8 @@ const Sales = () => {
           </div>
           <h3 className="text-2xl font-bold mb-4">PrimeLead</h3>
           <p className="text-gray-400 mb-6">
-            A plataforma mais avançada de prospecção do YouTube
+            A única IA que encontra canais premium automaticamente
           </p>
-          <div className="flex items-center justify-center gap-2 text-gray-400">
-            <Youtube className="h-5 w-5" />
-            <span>Powered by YouTube Data API</span>
-          </div>
           <div className="mt-8 pt-8 border-t border-gray-800 text-gray-500">
             © 2024 PrimeLead. Todos os direitos reservados.
           </div>
