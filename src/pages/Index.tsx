@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { SearchForm } from '@/components/SearchForm';
 import { ChannelResults } from '@/components/ChannelResults';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { PremiumHeader } from '@/components/PremiumHeader';
 import { Search, Youtube } from 'lucide-react';
 
 export interface SearchFilters {
@@ -23,12 +24,22 @@ export interface Channel {
   viewCount: number;
   thumbnail: string;
   description: string;
+  score: number; // Added score property
 }
 
 const Index = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const calculateChannelScore = (channel: any): number => {
+    // Premium scoring algorithm
+    const subscriberScore = Math.min((channel.subscriberCount / 100000) * 20, 40);
+    const viewScore = Math.min((channel.viewCount / 1000000) * 30, 30);
+    const engagementScore = Math.min((channel.viewCount / channel.subscriberCount) * 30, 30);
+    
+    return Math.round(subscriberScore + viewScore + engagementScore);
+  };
 
   const searchChannels = async (filters: SearchFilters) => {
     setIsLoading(true);
@@ -91,14 +102,16 @@ const Index = () => {
             }
 
             if (atendeFrequencia) {
-              foundChannels.push({
+              const channelWithScore = {
                 id: canal.id,
                 title: canal.snippet.title,
                 subscriberCount: inscritoCount,
                 viewCount: viewCount,
                 thumbnail: canal.snippet.thumbnails?.default?.url || '',
-                description: canal.snippet.description || ''
-              });
+                description: canal.snippet.description || '',
+                score: calculateChannelScore({ subscriberCount: inscritoCount, viewCount: viewCount })
+              };
+              foundChannels.push(channelWithScore);
             }
           }
 
@@ -109,6 +122,8 @@ const Index = () => {
         nextPageToken = searchData.nextPageToken;
       }
 
+      // Sort by score (highest first)
+      foundChannels.sort((a, b) => b.score - a.score);
       setChannels(foundChannels);
       
       if (foundChannels.length === 0) {
@@ -124,52 +139,46 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="bg-red-600 p-3 rounded-xl">
-              <Youtube className="h-8 w-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="relative">
+        {/* Premium Background Pattern */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="4"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        
+        <div className="relative z-10">
+          <PremiumHeader />
+          
+          <div className="container mx-auto px-4 py-8">
+            {/* Search Form */}
+            <div className="mb-8">
+              <SearchForm onSearch={searchChannels} isLoading={isLoading} />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
-              YouTube Channel Finder
-            </h1>
-          </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Encontre canais do YouTube por nicho, país, idioma e critérios específicos de audiência
-          </p>
-        </div>
 
-        {/* Search Form */}
-        <div className="mb-8">
-          <SearchForm onSearch={searchChannels} isLoading={isLoading} />
-        </div>
-
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-12">
-            <LoadingSpinner />
-            <p className="text-gray-600 mt-4">Buscando canais...</p>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-            <div className="flex items-center gap-3">
-              <div className="bg-red-100 p-2 rounded-full">
-                <Search className="h-5 w-5 text-red-600" />
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <LoadingSpinner />
+                <p className="text-white/70 mt-4 text-lg">Analisando canais premium...</p>
               </div>
-              <p className="text-red-800 font-medium">{error}</p>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Results */}
-        {channels.length > 0 && (
-          <ChannelResults channels={channels} />
-        )}
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 mb-8 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-500/20 p-2 rounded-full">
+                    <Search className="h-5 w-5 text-red-400" />
+                  </div>
+                  <p className="text-red-300 font-medium">{error}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Results */}
+            {channels.length > 0 && (
+              <ChannelResults channels={channels} />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

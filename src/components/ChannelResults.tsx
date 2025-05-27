@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Users, Eye, MessageCircle } from 'lucide-react';
+import { ExternalLink, Users, Eye, MessageCircle, Star, Crown, TrendingUp } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
 interface ChannelResultsProps {
@@ -19,100 +19,168 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
     return num.toLocaleString();
   };
 
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'from-green-500 to-emerald-500';
+    if (score >= 60) return 'from-blue-500 to-cyan-500';
+    if (score >= 40) return 'from-yellow-500 to-orange-500';
+    return 'from-red-500 to-pink-500';
+  };
+
+  const getScoreLabel = (score: number) => {
+    if (score >= 80) return 'Premium';
+    if (score >= 60) return 'Excelente';
+    if (score >= 40) return 'Bom';
+    return 'Regular';
+  };
+
+  const getScoreIcon = (score: number) => {
+    if (score >= 80) return Crown;
+    if (score >= 60) return Star;
+    return TrendingUp;
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Resultados Encontrados
-        </h2>
-        <Badge variant="secondary" className="text-lg px-3 py-1">
+        <div>
+          <h2 className="text-3xl font-bold text-white mb-2">
+            Canais Premium Encontrados
+          </h2>
+          <p className="text-white/60">Ordenados por score de performance</p>
+        </div>
+        <Badge 
+          variant="secondary" 
+          className="text-lg px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border-purple-500/30 text-purple-300"
+        >
           {channels.length} canais
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {channels.map((channel) => (
-          <Card key={channel.id} className="bg-white shadow-md border-0 hover:shadow-lg transition-shadow duration-200">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4 mb-4">
-                {channel.thumbnail && (
-                  <img 
-                    src={channel.thumbnail} 
-                    alt={channel.title}
-                    className="w-16 h-16 rounded-full border-2 border-gray-200"
-                  />
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {channels.map((channel, index) => {
+          const ScoreIcon = getScoreIcon(channel.score);
+          return (
+            <Card 
+              key={channel.id} 
+              className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-sm group"
+            >
+              <CardContent className="p-6">
+                {/* Ranking Badge */}
+                {index < 3 && (
+                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    #{index + 1}
+                  </div>
                 )}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-lg leading-tight mb-2 line-clamp-2">
-                    {channel.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-1">ID: {channel.id}</p>
-                </div>
-              </div>
 
-              {channel.description && (
-                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                  {channel.description}
-                </p>
-              )}
-
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Users className="h-4 w-4" />
-                    <span>Inscritos</span>
+                {/* Score Section */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-3 rounded-xl text-white`}>
+                    <ScoreIcon className="h-6 w-6" />
                   </div>
-                  <span className="font-semibold text-gray-900">
-                    {formatNumber(channel.subscriberCount)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Eye className="h-4 w-4" />
-                    <span>Visualizações</span>
+                  <div className="text-right">
+                    <div className={`text-2xl font-bold bg-gradient-to-r ${getScoreColor(channel.score)} bg-clip-text text-transparent`}>
+                      {channel.score}/100
+                    </div>
+                    <div className={`text-xs font-medium bg-gradient-to-r ${getScoreColor(channel.score)} bg-clip-text text-transparent`}>
+                      {getScoreLabel(channel.score)}
+                    </div>
                   </div>
-                  <span className="font-semibold text-gray-900">
-                    {formatNumber(channel.viewCount)}
-                  </span>
                 </div>
-              </div>
 
-              <div className="flex flex-col gap-2">
-                <Button 
-                  asChild 
-                  className="w-full bg-red-600 hover:bg-red-700 text-white"
-                >
-                  <a 
-                    href={`https://www.youtube.com/channel/${channel.id}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Ver Canal
-                  </a>
-                </Button>
+                {/* Channel Info */}
+                <div className="flex items-start gap-4 mb-4">
+                  {channel.thumbnail && (
+                    <img 
+                      src={channel.thumbnail} 
+                      alt={channel.title}
+                      className="w-16 h-16 rounded-full border-2 border-slate-600 group-hover:border-purple-400 transition-colors"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-white text-lg leading-tight mb-2 line-clamp-2 group-hover:text-purple-300 transition-colors">
+                      {channel.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 mb-1">ID: {channel.id}</p>
+                  </div>
+                </div>
 
-                <Button 
-                  asChild 
-                  variant="outline" 
-                  className="w-full border-gray-300 hover:bg-gray-50"
-                >
-                  <a 
-                    href={`https://www.youtube.com/channel/${channel.id}/about`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
+                {channel.description && (
+                  <p className="text-sm text-slate-300 mb-6 line-clamp-3">
+                    {channel.description}
+                  </p>
+                )}
+
+                {/* Stats */}
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <Users className="h-4 w-4" />
+                      <span>Inscritos</span>
+                    </div>
+                    <span className="font-bold text-white">
+                      {formatNumber(channel.subscriberCount)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <Eye className="h-4 w-4" />
+                      <span>Visualizações</span>
+                    </div>
+                    <span className="font-bold text-white">
+                      {formatNumber(channel.viewCount)}
+                    </span>
+                  </div>
+
+                  {/* Engagement Rate */}
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>Engajamento</span>
+                    </div>
+                    <span className="font-bold text-purple-400">
+                      {((channel.viewCount / channel.subscriberCount) * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3">
+                  <Button 
+                    asChild 
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                   >
-                    <MessageCircle className="h-4 w-4" />
-                    Contato
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                    <a 
+                      href={`https://www.youtube.com/channel/${channel.id}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Ver Canal
+                    </a>
+                  </Button>
+
+                  <Button 
+                    asChild 
+                    variant="outline" 
+                    className="w-full border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-purple-500/50"
+                  >
+                    <a 
+                      href={`https://www.youtube.com/channel/${channel.id}/about`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Contato
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
