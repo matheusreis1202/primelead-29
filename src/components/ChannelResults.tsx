@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Users, Eye, MessageCircle, Star, Crown, TrendingUp } from 'lucide-react';
+import { ExternalLink, Users, Eye, MessageCircle, Star, Crown, TrendingUp, Target } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
 interface ChannelResultsProps {
@@ -20,11 +20,11 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'from-green-500 to-emerald-500';
-    if (score >= 70) return 'from-blue-500 to-cyan-500';
-    if (score >= 55) return 'from-yellow-500 to-orange-500';
-    if (score >= 40) return 'from-orange-500 to-red-500';
-    return 'from-red-500 to-pink-500';
+    if (score >= 85) return 'from-red-500 to-red-600';
+    if (score >= 70) return 'from-white to-gray-200';
+    if (score >= 55) return 'from-gray-400 to-gray-500';
+    if (score >= 40) return 'from-red-800 to-red-900';
+    return 'from-black to-gray-800';
   };
 
   const getScoreLabel = (score: number) => {
@@ -42,11 +42,11 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
   };
 
   const getScoreBorderColor = (score: number) => {
-    if (score >= 85) return 'border-green-500/30';
-    if (score >= 70) return 'border-blue-500/30';
-    if (score >= 55) return 'border-yellow-500/30';
-    if (score >= 40) return 'border-orange-500/30';
-    return 'border-red-500/30';
+    if (score >= 85) return 'border-red-500/50';
+    if (score >= 70) return 'border-white/30';
+    if (score >= 55) return 'border-gray-500/30';
+    if (score >= 40) return 'border-red-800/30';
+    return 'border-gray-700/30';
   };
 
   return (
@@ -56,11 +56,11 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
           <h2 className="text-3xl font-bold text-white mb-2">
             Canais Premium Encontrados
           </h2>
-          <p className="text-white/60">Ordenados por score de performance</p>
+          <p className="text-gray-400">Ordenados por score de performance</p>
         </div>
         <Badge 
           variant="secondary" 
-          className="text-lg px-4 py-2 bg-purple-500/20 border-purple-500/30 text-purple-300"
+          className="text-lg px-4 py-2 bg-red-600/20 border-red-500/30 text-red-300"
         >
           {channels.length} canais
         </Badge>
@@ -72,19 +72,19 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
           return (
             <Card 
               key={channel.id} 
-              className={`bg-white/5 backdrop-blur-sm border ${getScoreBorderColor(channel.score)} hover:border-purple-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/10 group relative`}
+              className={`bg-black/80 backdrop-blur-sm border ${getScoreBorderColor(channel.score)} hover:border-red-500/70 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 group relative`}
             >
               <CardContent className="p-6">
                 {/* Ranking Badge */}
                 {index < 3 && (
-                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-600 to-red-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-red-400/30">
                     #{index + 1}
                   </div>
                 )}
 
                 {/* Score Section */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-3 rounded-xl text-white`}>
+                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-3 rounded-xl text-white shadow-lg`}>
                     <ScoreIcon className="h-6 w-6" />
                   </div>
                   <div className="text-right">
@@ -103,19 +103,19 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                     <img 
                       src={channel.thumbnail} 
                       alt={channel.title}
-                      className="w-16 h-16 rounded-full border-2 border-white/20 group-hover:border-purple-400/50 transition-colors"
+                      className="w-16 h-16 rounded-full border-2 border-red-800/30 group-hover:border-red-500/50 transition-colors"
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-white text-lg leading-tight mb-2 line-clamp-2 group-hover:text-purple-300 transition-colors">
+                    <h3 className="font-bold text-white text-lg leading-tight mb-2 line-clamp-2 group-hover:text-red-300 transition-colors">
                       {channel.title}
                     </h3>
-                    <p className="text-xs text-white/40 mb-1">ID: {channel.id}</p>
+                    <p className="text-xs text-gray-500 mb-1">ID: {channel.id}</p>
                   </div>
                 </div>
 
                 {channel.description && (
-                  <p className="text-sm text-white/60 mb-6 line-clamp-3">
+                  <p className="text-sm text-gray-400 mb-6 line-clamp-3">
                     {channel.description}
                   </p>
                 )}
@@ -123,7 +123,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                 {/* Stats */}
                 <div className="space-y-4 mb-6">
                   <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-white/60">
+                    <div className="flex items-center gap-2 text-gray-400">
                       <Users className="h-4 w-4" />
                       <span>Inscritos</span>
                     </div>
@@ -133,7 +133,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-white/60">
+                    <div className="flex items-center gap-2 text-gray-400">
                       <Eye className="h-4 w-4" />
                       <span>Visualizações</span>
                     </div>
@@ -144,11 +144,11 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
 
                   {/* Engagement Rate */}
                   <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-white/60">
+                    <div className="flex items-center gap-2 text-gray-400">
                       <TrendingUp className="h-4 w-4" />
                       <span>Engajamento</span>
                     </div>
-                    <span className="font-bold text-purple-400">
+                    <span className="font-bold text-red-400">
                       {((channel.viewCount / channel.subscriberCount) * 100).toFixed(1)}%
                     </span>
                   </div>
@@ -158,7 +158,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                 <div className="flex flex-col gap-3">
                   <Button 
                     asChild 
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg"
                   >
                     <a 
                       href={`https://www.youtube.com/channel/${channel.id}`} 
@@ -174,7 +174,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                   <Button 
                     asChild 
                     variant="outline" 
-                    className="w-full border-white/20 bg-white/5 text-white/80 hover:bg-white/10 hover:border-purple-500/50"
+                    className="w-full border-red-800/50 bg-black/50 text-gray-300 hover:bg-red-950/50 hover:border-red-500/50 hover:text-white"
                   >
                     <a 
                       href={`https://www.youtube.com/channel/${channel.id}/about`} 
