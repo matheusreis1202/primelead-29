@@ -161,7 +161,9 @@ const Index = () => {
               <div className="lg:col-span-4 space-y-6">
                 <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                    <Target className="h-6 w-6 text-gray-700" />
+                    <div className="bg-indigo-600 p-2 rounded-lg">
+                      <Target className="h-6 w-6 text-white" />
+                    </div>
                     Buscar Canais
                   </h2>
                   <SearchForm onSearch={searchChannels} isLoading={isLoading} />
@@ -171,25 +173,25 @@ const Index = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Tabela de Scores</h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-gray-900 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-lg border border-emerald-200">
                       <span className="text-white font-medium">85 - 100</span>
                       <span className="text-white font-bold">Premium</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-700 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg border border-blue-200">
                       <span className="text-white font-medium">70 - 84</span>
                       <span className="text-white font-bold">Ótimo</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-500 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg border border-amber-200">
                       <span className="text-white font-medium">55 - 69</span>
                       <span className="text-white font-bold">Bom</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-400 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg border border-orange-200">
                       <span className="text-white font-medium">40 - 54</span>
                       <span className="text-white font-bold">Razoável</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-300 rounded-lg border border-gray-200">
-                      <span className="text-gray-800 font-medium">0 - 39</span>
-                      <span className="text-gray-800 font-bold">Ruim</span>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-lg border border-red-200">
+                      <span className="text-white font-medium">0 - 39</span>
+                      <span className="text-white font-bold">Ruim</span>
                     </div>
                   </div>
                 </div>
@@ -201,7 +203,7 @@ const Index = () => {
                 {isLoading && (
                   <div className="flex flex-col items-center justify-center py-20">
                     <LoadingSpinner />
-                    <p className="text-gray-600 mt-4 text-lg">Analisando canais premium...</p>
+                    <p className="text-slate-600 mt-4 text-lg">Analisando canais premium...</p>
                   </div>
                 )}
 
@@ -225,11 +227,11 @@ const Index = () => {
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="bg-gray-100 p-6 rounded-full mb-6 border border-gray-200">
-                      <Target className="h-12 w-12 text-gray-600" />
+                    <div className="bg-slate-100 p-6 rounded-full mb-6 border border-slate-200">
+                      <Target className="h-12 w-12 text-slate-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Pronto para buscar</h3>
-                    <p className="text-gray-600 max-w-md">
+                    <p className="text-slate-600 max-w-md">
                       Configure os filtros à esquerda e clique em "Buscar Canais" para encontrar os melhores canais premium.
                     </p>
                   </div>

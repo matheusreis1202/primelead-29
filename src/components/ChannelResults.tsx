@@ -20,11 +20,11 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'from-gray-900 to-black';
-    if (score >= 70) return 'from-gray-700 to-gray-800';
-    if (score >= 55) return 'from-gray-500 to-gray-600';
-    if (score >= 40) return 'from-gray-400 to-gray-500';
-    return 'from-gray-300 to-gray-400';
+    if (score >= 85) return 'from-emerald-600 to-emerald-700';
+    if (score >= 70) return 'from-blue-600 to-blue-700';
+    if (score >= 55) return 'from-amber-500 to-amber-600';
+    if (score >= 40) return 'from-orange-500 to-orange-600';
+    return 'from-red-500 to-red-600';
   };
 
   const getScoreLabel = (score: number) => {
@@ -42,11 +42,19 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
   };
 
   const getScoreBorderColor = (score: number) => {
-    if (score >= 85) return 'border-gray-900/50';
-    if (score >= 70) return 'border-gray-700/30';
-    if (score >= 55) return 'border-gray-500/30';
-    if (score >= 40) return 'border-gray-400/30';
-    return 'border-gray-300/30';
+    if (score >= 85) return 'border-emerald-200';
+    if (score >= 70) return 'border-blue-200';
+    if (score >= 55) return 'border-amber-200';
+    if (score >= 40) return 'border-orange-200';
+    return 'border-red-200';
+  };
+
+  const getScoreTextColor = (score: number) => {
+    if (score >= 85) return 'text-emerald-700';
+    if (score >= 70) return 'text-blue-700';
+    if (score >= 55) return 'text-amber-700';
+    if (score >= 40) return 'text-orange-700';
+    return 'text-red-700';
   };
 
   return (
@@ -56,11 +64,11 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Canais Premium Encontrados
           </h2>
-          <p className="text-gray-600">Ordenados por score de performance</p>
+          <p className="text-slate-600">Ordenados por score de performance</p>
         </div>
         <Badge 
           variant="secondary" 
-          className="text-lg px-4 py-2 bg-gray-100 border-gray-200 text-gray-700"
+          className="text-lg px-4 py-2 bg-slate-100 border-slate-200 text-slate-700"
         >
           {channels.length} canais
         </Badge>
@@ -77,7 +85,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
               <CardContent className="p-6">
                 {/* Ranking Badge */}
                 {index < 3 && (
-                  <div className="absolute -top-2 -right-2 bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-gray-200">
+                  <div className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border-2 border-white">
                     #{index + 1}
                   </div>
                 )}
@@ -88,10 +96,10 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                     <ScoreIcon className="h-6 w-6" />
                   </div>
                   <div className="text-right">
-                    <div className={`text-2xl font-bold bg-gradient-to-r ${getScoreColor(channel.score)} bg-clip-text text-transparent`}>
+                    <div className={`text-2xl font-bold ${getScoreTextColor(channel.score)}`}>
                       {channel.score}/100
                     </div>
-                    <div className={`text-xs font-medium bg-gradient-to-r ${getScoreColor(channel.score)} bg-clip-text text-transparent`}>
+                    <div className={`text-xs font-medium ${getScoreTextColor(channel.score)}`}>
                       {getScoreLabel(channel.score)}
                     </div>
                   </div>
@@ -110,45 +118,47 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                     <h3 className="font-bold text-gray-900 text-lg leading-tight mb-2 line-clamp-2 group-hover:text-gray-700 transition-colors">
                       {channel.title}
                     </h3>
-                    <p className="text-xs text-gray-500 mb-1">ID: {channel.id}</p>
+                    <p className="text-xs text-slate-500 mb-1">ID: {channel.id}</p>
                   </div>
                 </div>
 
                 {channel.description && (
-                  <p className="text-sm text-gray-600 mb-6 line-clamp-3">
-                    {channel.description}
-                  </p>
+                  <div className="mb-6">
+                    <p className="text-sm text-slate-600 line-clamp-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                      {channel.description}
+                    </p>
+                  </div>
                 )}
 
                 {/* Stats */}
                 <div className="space-y-4 mb-6">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center justify-between text-sm bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <div className="flex items-center gap-2 text-blue-700">
                       <Users className="h-4 w-4" />
-                      <span>Inscritos</span>
+                      <span className="font-medium">Inscritos</span>
                     </div>
-                    <span className="font-bold text-gray-900">
+                    <span className="font-bold text-blue-800">
                       {formatNumber(channel.subscriberCount)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center justify-between text-sm bg-purple-50 p-3 rounded-lg border border-purple-100">
+                    <div className="flex items-center gap-2 text-purple-700">
                       <Eye className="h-4 w-4" />
-                      <span>Visualizações</span>
+                      <span className="font-medium">Visualizações</span>
                     </div>
-                    <span className="font-bold text-gray-900">
+                    <span className="font-bold text-purple-800">
                       {formatNumber(channel.viewCount)}
                     </span>
                   </div>
 
                   {/* Engagement Rate */}
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center justify-between text-sm bg-teal-50 p-3 rounded-lg border border-teal-100">
+                    <div className="flex items-center gap-2 text-teal-700">
                       <TrendingUp className="h-4 w-4" />
-                      <span>Engajamento</span>
+                      <span className="font-medium">Engajamento</span>
                     </div>
-                    <span className="font-bold text-gray-700">
+                    <span className="font-bold text-teal-800">
                       {((channel.viewCount / channel.subscriberCount) * 100).toFixed(1)}%
                     </span>
                   </div>
@@ -174,7 +184,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                   <Button 
                     asChild 
                     variant="outline" 
-                    className="w-full border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-900"
+                    className="w-full border-indigo-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-400 hover:text-indigo-800"
                   >
                     <a 
                       href={`https://www.youtube.com/channel/${channel.id}/about`} 
