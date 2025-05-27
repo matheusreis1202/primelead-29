@@ -4,14 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, EyeOff, Lock, Mail, Target, ArrowRight, Users, TrendingUp, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Eye, EyeOff, Lock, Mail, Target, ArrowRight, Users, TrendingUp, Zap, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +22,8 @@ const Login = () => {
     setTimeout(() => {
       setIsLoading(false);
       console.log('Login attempt:', { email, password });
+      // Redirect to app after successful login
+      navigate('/app');
     }, 1000);
   };
 
@@ -81,6 +84,17 @@ const Login = () => {
       {/* Right Side - Login Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12">
         <div className="w-full max-w-md">
+          {/* Back to Sales Button */}
+          <div className="mb-6">
+            <Link 
+              to="/" 
+              className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar para página inicial
+            </Link>
+          </div>
+
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl mb-4 shadow-lg">
