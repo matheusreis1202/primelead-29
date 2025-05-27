@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -196,7 +195,7 @@ const Sales = () => {
               <Target className="h-8 w-8 text-white" />
             </div>
             
-            <Badge className="mb-4 bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 px-4 py-2 text-lg font-bold animate-bounce">
+            <Badge className="mb-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white border-0 px-4 py-2 text-lg font-bold animate-bounce">
               <Sparkles className="h-4 w-4 mr-2" />
               Nova Era da Captação
             </Badge>
@@ -223,16 +222,15 @@ const Sales = () => {
                   <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
-              <a href="#demonstracao">
+              <Link to="/login">
                 <Button 
                   size="lg" 
-                  variant="outline" 
-                  className="border-white/30 text-white hover:bg-white/20 hover:text-white hover:border-white/50 px-8 py-4 text-lg font-semibold rounded-xl transition-all hover:scale-105"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-xl transition-all hover:scale-105"
                 >
                   <Play className="h-5 w-5 mr-2" />
-                  Ver Demonstração
+                  Login
                 </Button>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -321,7 +319,7 @@ const Sales = () => {
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {steps.map((step, index) => (
               <div key={index} className="text-center group hover:scale-105 transition-transform duration-300">
-                <div className="w-14 h-14 bg-gradient-to-r from-slate-800 to-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-4 shadow-lg group-hover:shadow-xl">
+                <div className="w-14 h-14 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-4 shadow-lg group-hover:shadow-xl">
                   {step.number}
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 mb-3">{step.title}</h3>
@@ -342,10 +340,6 @@ const Sales = () => {
             <p className="text-lg text-slate-600 mb-4">
               Ranqueados por algoritmo de performance avançado
             </p>
-            <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-6 py-2 text-lg">
-              <Eye className="h-4 w-4 mr-2" />
-              DEMONSTRAÇÃO - Resultados Reais
-            </Badge>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
