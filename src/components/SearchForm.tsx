@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Globe, Users, Eye, Calendar, Zap, Target } from 'lucide-react';
+import { Search, Globe, Users, Eye, Calendar, Zap, Target, Play } from 'lucide-react';
 import { SearchFilters } from '@/pages/Index';
 
 interface SearchFormProps {
@@ -36,25 +36,28 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
   };
 
   return (
-    <Card className="shadow-lg border-gray-200 bg-white">
-      <CardHeader className="pb-6 border-b border-gray-100">
-        <CardTitle className="flex items-center gap-3 text-xl text-gray-900">
-          <div className="bg-indigo-600 p-2 rounded-lg">
-            <Target className="h-5 w-5 text-white" />
+    <Card className="shadow-2xl border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900">
+      <CardHeader className="pb-6 border-b border-gray-700 bg-gradient-to-r from-red-600/10 to-yellow-600/10">
+        <CardTitle className="flex items-center gap-4 text-2xl text-white">
+          <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl shadow-lg">
+            <Target className="h-6 w-6 text-white" />
           </div>
-          Busca Premium
-          <div className="bg-amber-100 px-2 py-1 rounded-full border border-amber-200">
-            <Zap className="h-3 w-3 text-amber-600 inline" />
+          Busca Inteligente
+          <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 px-3 py-1.5 rounded-full border border-yellow-300">
+            <div className="flex items-center gap-1">
+              <Play className="h-3 w-3 text-black fill-current" />
+              <span className="text-black font-bold text-xs">PRO</span>
+            </div>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <CardContent className="p-8 space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* API Key */}
-          <div className="space-y-2">
-            <Label htmlFor="apiKey" className="text-sm font-medium text-gray-900 flex items-center gap-2">
+          <div className="space-y-3">
+            <Label htmlFor="apiKey" className="text-sm font-semibold text-gray-200 flex items-center gap-3">
               🔑 Chave da API do YouTube *
-              <span className="text-slate-500 text-xs bg-slate-100 px-2 py-1 rounded-full border border-slate-200">(Premium Access)</span>
+              <span className="text-red-400 text-xs bg-red-500/20 px-3 py-1 rounded-full border border-red-500/30">YouTube Data API</span>
             </Label>
             <Input
               id="apiKey"
@@ -62,44 +65,44 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
               placeholder="Cole sua chave da API aqui..."
               value={filters.apiKey}
               onChange={(e) => updateFilter('apiKey', e.target.value)}
-              className="bg-white border-gray-200 focus:border-indigo-400 focus:ring-indigo-400/20 text-gray-900 placeholder:text-gray-400"
+              className="bg-gray-900 border-gray-600 focus:border-red-500 focus:ring-red-500/20 text-white placeholder:text-gray-400 h-12"
               required
             />
-            <p className="text-xs text-slate-500 bg-slate-50 p-2 rounded border border-slate-200">
-              Obtenha sua chave em: Google Cloud Console → YouTube Data API v3
+            <p className="text-xs text-gray-400 bg-gray-800 p-3 rounded-lg border border-gray-700">
+              💡 Obtenha gratuitamente em: console.cloud.google.com → YouTube Data API v3
             </p>
           </div>
 
           {/* Nicho */}
-          <div className="space-y-2">
-            <Label htmlFor="nicho" className="text-sm font-medium text-gray-900 flex items-center gap-2">
+          <div className="space-y-3">
+            <Label htmlFor="nicho" className="text-sm font-semibold text-gray-200 flex items-center gap-3">
               🎯 Nicho/Palavra-chave *
-              <span className="text-purple-600 text-xs bg-purple-50 px-2 py-1 rounded-full border border-purple-200">(IA Enhanced)</span>
+              <span className="text-blue-400 text-xs bg-blue-500/20 px-3 py-1 rounded-full border border-blue-500/30">IA Enhanced</span>
             </Label>
             <Input
               id="nicho"
-              placeholder="Ex: culinária, tecnologia, fitness..."
+              placeholder="Ex: tecnologia, culinária, fitness, empreendedorismo..."
               value={filters.nicho}
               onChange={(e) => updateFilter('nicho', e.target.value)}
-              className="bg-white border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 text-gray-900 placeholder:text-gray-400"
+              className="bg-gray-900 border-gray-600 focus:border-blue-500 focus:ring-blue-500/20 text-white placeholder:text-gray-400 h-12"
               required
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* País */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                <div className="bg-blue-100 p-1 rounded">
-                  <Globe className="h-4 w-4 text-blue-600" />
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-200 flex items-center gap-3">
+                <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-lg">
+                  <Globe className="h-4 w-4 text-white" />
                 </div>
-                País
+                País de Origem
               </Label>
               <Select value={filters.pais} onValueChange={(value) => updateFilter('pais', value)}>
-                <SelectTrigger className="bg-white border-gray-200 text-gray-900 focus:ring-blue-400/20">
+                <SelectTrigger className="bg-gray-900 border-gray-600 text-white focus:ring-green-500/20 h-12">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-200 text-gray-900">
+                <SelectContent className="bg-gray-800 border-gray-600 text-white">
                   <SelectItem value="BR">🇧🇷 Brasil</SelectItem>
                   <SelectItem value="US">🇺🇸 Estados Unidos</SelectItem>
                   <SelectItem value="PT">🇵🇹 Portugal</SelectItem>
@@ -113,15 +116,18 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
             </div>
 
             {/* Idioma */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900">
-                🗣️ Idioma
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-200 flex items-center gap-3">
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-2 rounded-lg">
+                  <span className="text-white text-sm">🗣️</span>
+                </div>
+                Idioma Principal
               </Label>
               <Select value={filters.idioma} onValueChange={(value) => updateFilter('idioma', value)}>
-                <SelectTrigger className="bg-white border-gray-200 text-gray-900 focus:ring-green-400/20">
+                <SelectTrigger className="bg-gray-900 border-gray-600 text-white focus:ring-purple-500/20 h-12">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-200 text-gray-900">
+                <SelectContent className="bg-gray-800 border-gray-600 text-white">
                   <SelectItem value="pt">Português</SelectItem>
                   <SelectItem value="en">Inglês</SelectItem>
                   <SelectItem value="es">Espanhol</SelectItem>
@@ -133,66 +139,66 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Inscritos */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                <div className="bg-blue-100 p-1 rounded">
-                  <Users className="h-4 w-4 text-blue-600" />
+            <div className="space-y-4">
+              <Label className="text-sm font-semibold text-gray-200 flex items-center gap-3">
+                <div className="bg-gradient-to-br from-red-500 to-red-600 p-2 rounded-lg">
+                  <Users className="h-4 w-4 text-white" />
                 </div>
                 Número de Inscritos
-                <span className="bg-indigo-50 px-2 py-1 rounded text-xs border border-indigo-200 text-indigo-700">Premium</span>
+                <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 px-2 py-1 rounded text-xs font-bold text-black">PREMIUM</span>
               </Label>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div>
-                  <Label htmlFor="minInscritos" className="text-xs text-slate-500">Mínimo</Label>
+                  <Label htmlFor="minInscritos" className="text-xs text-gray-400 mb-1 block">Mínimo</Label>
                   <Input
                     id="minInscritos"
                     type="number"
-                    placeholder="1000"
+                    placeholder="1,000"
                     value={filters.minInscritos}
                     onChange={(e) => updateFilter('minInscritos', parseInt(e.target.value) || 0)}
-                    className="bg-white border-gray-200 focus:border-blue-400 focus:ring-blue-400/20 text-gray-900"
+                    className="bg-gray-900 border-gray-600 focus:border-red-500 focus:ring-red-500/20 text-white h-11"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="maxInscritos" className="text-xs text-slate-500">Máximo</Label>
+                  <Label htmlFor="maxInscritos" className="text-xs text-gray-400 mb-1 block">Máximo</Label>
                   <Input
                     id="maxInscritos"
                     type="number"
-                    placeholder="1000000"
+                    placeholder="1,000,000"
                     value={filters.maxInscritos}
                     onChange={(e) => updateFilter('maxInscritos', parseInt(e.target.value) || Infinity)}
-                    className="bg-white border-gray-200 focus:border-blue-400 focus:ring-blue-400/20 text-gray-900"
+                    className="bg-gray-900 border-gray-600 focus:border-red-500 focus:ring-red-500/20 text-white h-11"
                   />
                 </div>
               </div>
             </div>
 
             {/* Views e Frequência */}
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="minViews" className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                  <div className="bg-purple-100 p-1 rounded">
-                    <Eye className="h-4 w-4 text-purple-600" />
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <Label htmlFor="minViews" className="text-sm font-semibold text-gray-200 flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-lg">
+                    <Eye className="h-4 w-4 text-white" />
                   </div>
                   Visualizações Mínimas
                 </Label>
                 <Input
                   id="minViews"
                   type="number"
-                  placeholder="10000"
+                  placeholder="10,000"
                   value={filters.minViews}
                   onChange={(e) => updateFilter('minViews', parseInt(e.target.value) || 0)}
-                  className="bg-white border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 text-gray-900"
+                  className="bg-gray-900 border-gray-600 focus:border-blue-500 focus:ring-blue-500/20 text-white h-11"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="freqMinima" className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                  <div className="bg-teal-100 p-1 rounded">
-                    <Calendar className="h-4 w-4 text-teal-600" />
+              <div className="space-y-3">
+                <Label htmlFor="freqMinima" className="text-sm font-semibold text-gray-200 flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-lg">
+                    <Calendar className="h-4 w-4 text-white" />
                   </div>
-                  Uploads por Semana (mín.)
+                  Uploads por Semana
                 </Label>
                 <Input
                   id="freqMinima"
@@ -200,7 +206,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                   placeholder="1"
                   value={filters.freqMinima}
                   onChange={(e) => updateFilter('freqMinima', parseInt(e.target.value) || 0)}
-                  className="bg-white border-gray-200 focus:border-teal-400 focus:ring-teal-400/20 text-gray-900"
+                  className="bg-gray-900 border-gray-600 focus:border-green-500 focus:ring-green-500/20 text-white h-11"
                 />
               </div>
             </div>
@@ -209,17 +215,18 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
           <Button 
             type="submit" 
             disabled={isLoading || !filters.apiKey || !filters.nicho}
-            className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white py-4 text-lg font-bold transition-all duration-300 shadow-lg hover:shadow-xl border-0"
+            className="w-full bg-gradient-to-r from-red-600 via-red-500 to-red-600 hover:from-red-700 hover:via-red-600 hover:to-red-700 text-white py-6 text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-red-500/25 border-0 rounded-xl"
           >
             {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
                 Analisando canais premium...
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Iniciar Análise Premium
+              <div className="flex items-center gap-3">
+                <Target className="h-6 w-6" />
+                Iniciar Prospecção Premium
+                <Play className="h-5 w-5 fill-current" />
               </div>
             )}
           </Button>

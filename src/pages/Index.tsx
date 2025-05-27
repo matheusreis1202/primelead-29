@@ -4,7 +4,7 @@ import { SearchForm } from '@/components/SearchForm';
 import { ChannelResults } from '@/components/ChannelResults';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { PremiumHeader } from '@/components/PremiumHeader';
-import { Search, Target } from 'lucide-react';
+import { Search, Target, Play } from 'lucide-react';
 
 export interface SearchFilters {
   apiKey: string;
@@ -33,7 +33,7 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
 
   const calculateChannelScore = (channel: any): number => {
-    // Premium scoring algorithm
+    // Advanced scoring algorithm for YouTube channels
     const subscriberScore = Math.min((channel.subscriberCount / 100000) * 20, 40);
     const viewScore = Math.min((channel.viewCount / 1000000) * 30, 30);
     const engagementScore = Math.min((channel.viewCount / channel.subscriberCount) * 30, 30);
@@ -139,15 +139,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <div className="relative">
-        {/* Subtle Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-white to-gray-50"></div>
+        {/* Dark Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-transparent to-red-900/20"></div>
           <div 
             className="absolute inset-0" 
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23374151' fill-opacity='0.02'%3E%3Cpath d='M40 40l20-20v40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF0000' fill-opacity='0.03'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           ></div>
         </div>
@@ -155,66 +155,66 @@ const Index = () => {
         <div className="relative z-10">
           <PremiumHeader />
           
-          <div className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-[calc(100vh-300px)]">
-              {/* Left Side - Interface Controls */}
-              <div className="lg:col-span-4 space-y-6">
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                    <div className="bg-indigo-600 p-2 rounded-lg">
-                      <Target className="h-6 w-6 text-white" />
+          <div className="container mx-auto px-4 py-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[calc(100vh-400px)]">
+              {/* Left Side - Search Controls */}
+              <div className="lg:col-span-4 space-y-8">
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-2xl p-8 shadow-2xl">
+                  <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-4">
+                    <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl">
+                      <Target className="h-7 w-7 text-white" />
                     </div>
-                    Buscar Canais
+                    Prospecção
                   </h2>
                   <SearchForm onSearch={searchChannels} isLoading={isLoading} />
                 </div>
 
                 {/* Score Legend */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Tabela de Scores</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-lg border border-emerald-200">
-                      <span className="text-white font-medium">85 - 100</span>
-                      <span className="text-white font-bold">Premium</span>
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-2xl p-8 shadow-2xl">
+                  <h3 className="text-2xl font-bold text-white mb-6">Classificação de Scores</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl shadow-lg">
+                      <span className="text-black font-bold">85 - 100</span>
+                      <span className="text-black font-black">PREMIUM</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg border border-blue-200">
-                      <span className="text-white font-medium">70 - 84</span>
-                      <span className="text-white font-bold">Ótimo</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg">
+                      <span className="text-white font-bold">70 - 84</span>
+                      <span className="text-white font-black">EXCELENTE</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg border border-amber-200">
-                      <span className="text-white font-medium">55 - 69</span>
-                      <span className="text-white font-bold">Bom</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                      <span className="text-white font-bold">55 - 69</span>
+                      <span className="text-white font-black">BOM</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg border border-orange-200">
-                      <span className="text-white font-medium">40 - 54</span>
-                      <span className="text-white font-bold">Razoável</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg">
+                      <span className="text-white font-bold">40 - 54</span>
+                      <span className="text-white font-black">MÉDIO</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-lg border border-red-200">
-                      <span className="text-white font-medium">0 - 39</span>
-                      <span className="text-white font-bold">Ruim</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
+                      <span className="text-white font-bold">0 - 39</span>
+                      <span className="text-white font-black">BAIXO</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Right Side - Channel Results */}
+              {/* Right Side - Results */}
               <div className="lg:col-span-8">
                 {/* Loading State */}
                 {isLoading && (
-                  <div className="flex flex-col items-center justify-center py-20">
+                  <div className="flex flex-col items-center justify-center py-24">
                     <LoadingSpinner />
-                    <p className="text-slate-600 mt-4 text-lg">Analisando canais premium...</p>
+                    <p className="text-gray-300 mt-6 text-xl">Analisando canais premium com IA...</p>
                   </div>
                 )}
 
                 {/* Error State */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-red-100 p-2 rounded-full">
-                        <Search className="h-5 w-5 text-red-600" />
+                  <div className="bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/50 rounded-2xl p-8 mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-red-500 p-3 rounded-full">
+                        <Search className="h-6 w-6 text-white" />
                       </div>
-                      <p className="text-red-700 font-medium">{error}</p>
+                      <p className="text-red-300 font-semibold text-lg">{error}</p>
                     </div>
                   </div>
                 )}
@@ -226,14 +226,18 @@ const Index = () => {
 
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="bg-slate-100 p-6 rounded-full mb-6 border border-slate-200">
-                      <Target className="h-12 w-12 text-slate-600" />
+                  <div className="flex flex-col items-center justify-center py-24 text-center">
+                    <div className="bg-gradient-to-br from-red-500 to-red-600 p-8 rounded-full mb-8 shadow-2xl">
+                      <Target className="h-16 w-16 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Pronto para buscar</h3>
-                    <p className="text-slate-600 max-w-md">
-                      Configure os filtros à esquerda e clique em "Buscar Canais" para encontrar os melhores canais premium.
+                    <h3 className="text-3xl font-bold text-white mb-4">Pronto para Prospectar</h3>
+                    <p className="text-gray-300 max-w-lg text-lg leading-relaxed">
+                      Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
                     </p>
+                    <div className="mt-6 flex items-center gap-2 text-red-400">
+                      <Play className="h-5 w-5 fill-current" />
+                      <span className="font-semibold">Powered by YouTube Data API</span>
+                    </div>
                   </div>
                 )}
               </div>
