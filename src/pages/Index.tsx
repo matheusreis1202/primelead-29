@@ -147,7 +147,7 @@ const Index = () => {
           <div 
             className="absolute inset-0" 
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23374151' fill-opacity='0.02'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           ></div>
         </div>
@@ -159,9 +159,9 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[calc(100vh-400px)]">
               {/* Left Side - Search Controls */}
               <div className="lg:col-span-4 space-y-8">
-                <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-lg">
-                  <h2 className="text-3xl font-bold text-black mb-8 flex items-center gap-4">
-                    <div className="bg-black p-3 rounded-xl">
+                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-md">
+                  <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-4">
+                    <div className="bg-blue-800 p-3 rounded-xl">
                       <Target className="h-7 w-7 text-white" />
                     </div>
                     Prospecção
@@ -170,28 +170,28 @@ const Index = () => {
                 </div>
 
                 {/* Score Legend */}
-                <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-lg">
-                  <h3 className="text-2xl font-bold text-black mb-6">Classificação de Scores</h3>
+                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-md">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Classificação de Scores</h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-xl shadow-lg">
-                      <span className="text-black font-bold">85 - 100</span>
-                      <span className="text-black font-black">PREMIUM</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-green-400 to-green-500 rounded-xl shadow-md">
+                      <span className="text-white font-bold">85 - 100</span>
+                      <span className="text-white font-black">PREMIUM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-300 to-emerald-400 rounded-xl shadow-lg">
-                      <span className="text-black font-bold">70 - 84</span>
-                      <span className="text-black font-black">EXCELENTE</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-700 to-blue-800 rounded-xl shadow-md">
+                      <span className="text-white font-bold">70 - 84</span>
+                      <span className="text-white font-black">ÓTIMO</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-400 to-gray-500 rounded-xl shadow-lg">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-400 to-gray-500 rounded-xl shadow-md">
                       <span className="text-white font-bold">55 - 69</span>
                       <span className="text-white font-black">BOM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-400 to-red-500 rounded-xl shadow-lg">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl shadow-md">
                       <span className="text-white font-bold">40 - 54</span>
-                      <span className="text-white font-black">MÉDIO</span>
+                      <span className="text-white font-black">RAZOÁVEL</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-400 to-red-500 rounded-xl shadow-md">
                       <span className="text-white font-bold">0 - 39</span>
-                      <span className="text-white font-black">PÉSSIMO</span>
+                      <span className="text-white font-black">RUIM</span>
                     </div>
                   </div>
                 </div>
@@ -227,14 +227,14 @@ const Index = () => {
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <div className="bg-black p-8 rounded-full mb-8 shadow-xl">
+                    <div className="bg-blue-800 p-8 rounded-full mb-8 shadow-lg">
                       <Target className="h-16 w-16 text-white" />
                     </div>
-                    <h3 className="text-3xl font-bold text-black mb-4">Pronto para Prospectar</h3>
+                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Pronto para Prospectar</h3>
                     <p className="text-gray-600 max-w-lg text-lg leading-relaxed">
                       Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
                     </p>
-                    <div className="mt-6 flex items-center gap-2 text-emerald-500">
+                    <div className="mt-6 flex items-center gap-2 text-green-500">
                       <Play className="h-5 w-5 fill-current" />
                       <span className="font-semibold">Powered by YouTube Data API</span>
                     </div>
