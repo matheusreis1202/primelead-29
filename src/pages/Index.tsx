@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import { SearchForm } from '@/components/SearchForm';
 import { ChannelResults } from '@/components/ChannelResults';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { PremiumHeader } from '@/components/PremiumHeader';
-import { Search, Youtube } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 export interface SearchFilters {
   apiKey: string;
@@ -23,7 +24,7 @@ export interface Channel {
   viewCount: number;
   thumbnail: string;
   description: string;
-  score: number; // Added score property
+  score: number;
 }
 
 const Index = () => {
@@ -138,15 +139,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900">
       <div className="relative">
         {/* Premium Background Pattern */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5"></div>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10"></div>
           <div 
             className="absolute inset-0" 
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           ></div>
         </div>
@@ -155,35 +156,86 @@ const Index = () => {
           <PremiumHeader />
           
           <div className="container mx-auto px-4 py-8">
-            {/* Search Form */}
-            <div className="mb-8">
-              <SearchForm onSearch={searchChannels} isLoading={isLoading} />
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-[calc(100vh-300px)]">
+              {/* Left Side - Interface Controls */}
+              <div className="lg:col-span-4 space-y-6">
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                  <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <Search className="h-6 w-6 text-purple-400" />
+                    Buscar Canais
+                  </h2>
+                  <SearchForm onSearch={searchChannels} isLoading={isLoading} />
+                </div>
 
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex flex-col items-center justify-center py-12">
-                <LoadingSpinner />
-                <p className="text-white/70 mt-4 text-lg">Analisando canais premium...</p>
-              </div>
-            )}
-
-            {/* Error State */}
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 mb-8 backdrop-blur-sm">
-                <div className="flex items-center gap-3">
-                  <div className="bg-red-500/20 p-2 rounded-full">
-                    <Search className="h-5 w-5 text-red-400" />
+                {/* Score Legend */}
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">Tabela de Scores</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg border border-green-500/30">
+                      <span className="text-green-300 font-medium">85 - 100</span>
+                      <span className="text-green-200 font-bold">Premium</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg border border-blue-500/30">
+                      <span className="text-blue-300 font-medium">70 - 84</span>
+                      <span className="text-blue-200 font-bold">Ótimo</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg border border-yellow-500/30">
+                      <span className="text-yellow-300 font-medium">55 - 69</span>
+                      <span className="text-yellow-200 font-bold">Bom</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-lg border border-orange-500/30">
+                      <span className="text-orange-300 font-medium">40 - 54</span>
+                      <span className="text-orange-200 font-bold">Razoável</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-lg border border-red-500/30">
+                      <span className="text-red-300 font-medium">0 - 39</span>
+                      <span className="text-red-200 font-bold">Ruim</span>
+                    </div>
                   </div>
-                  <p className="text-red-300 font-medium">{error}</p>
                 </div>
               </div>
-            )}
 
-            {/* Results */}
-            {channels.length > 0 && (
-              <ChannelResults channels={channels} />
-            )}
+              {/* Right Side - Channel Results */}
+              <div className="lg:col-span-8">
+                {/* Loading State */}
+                {isLoading && (
+                  <div className="flex flex-col items-center justify-center py-20">
+                    <LoadingSpinner />
+                    <p className="text-white/70 mt-4 text-lg">Analisando canais premium...</p>
+                  </div>
+                )}
+
+                {/* Error State */}
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 mb-8 backdrop-blur-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-red-500/20 p-2 rounded-full">
+                        <Search className="h-5 w-5 text-red-400" />
+                      </div>
+                      <p className="text-red-300 font-medium">{error}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Results */}
+                {channels.length > 0 && (
+                  <ChannelResults channels={channels} />
+                )}
+
+                {/* Empty State */}
+                {!isLoading && !error && channels.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="bg-white/5 p-6 rounded-full mb-6">
+                      <Search className="h-12 w-12 text-white/40" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Pronto para buscar</h3>
+                    <p className="text-white/60 max-w-md">
+                      Configure os filtros à esquerda e clique em "Buscar Canais" para encontrar os melhores canais premium.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
