@@ -30,7 +30,8 @@ import {
   HeadphonesIcon,
   Timer,
   TrendingDown,
-  AlertTriangle
+  AlertTriangle,
+  LogIn
 } from 'lucide-react';
 
 const Sales = () => {
@@ -194,8 +195,21 @@ const Sales = () => {
       <div className="relative overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-blue-900">
         <div className="absolute inset-0 opacity-20" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}}></div>
         
+        {/* Login Button - Canto superior direito */}
+        <div className="absolute top-6 right-6 z-50">
+          <Link to="/login">
+            <Button 
+              variant="outline" 
+              className="border-white/30 text-white hover:bg-white/20 hover:text-white hover:border-white/50 px-6 py-2 font-semibold rounded-xl transition-all hover:scale-105"
+            >
+              <LogIn className="h-4 w-4 mr-2" />
+              Entrar
+            </Button>
+          </Link>
+        </div>
+        
         {/* Timer de Tempo Perdido - Flutuante */}
-        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white p-3 rounded-lg shadow-lg animate-pulse">
+        <div className="fixed top-4 right-4 z-40 bg-red-500 text-white p-3 rounded-lg shadow-lg animate-pulse">
           <div className="flex items-center gap-2 text-sm">
             <Timer className="h-4 w-4" />
             <div>
