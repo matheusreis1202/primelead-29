@@ -138,15 +138,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-slate-900">
       <div className="relative">
         {/* Premium Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-black to-red-950/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-800/10"></div>
           <div 
             className="absolute inset-0" 
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef4444' fill-opacity='0.03'%3E%3Cpath d='M40 40l20-20v40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.03'%3E%3Cpath d='M40 40l20-20v40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           ></div>
         </div>
@@ -158,37 +158,37 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-[calc(100vh-300px)]">
               {/* Left Side - Interface Controls */}
               <div className="lg:col-span-4 space-y-6">
-                <div className="bg-black/90 backdrop-blur-sm border border-red-800/30 rounded-xl p-6">
+                <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700/30 rounded-xl p-6">
                   <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                    <Target className="h-6 w-6 text-red-400" />
+                    <Target className="h-6 w-6 text-amber-400" />
                     Buscar Canais
                   </h2>
                   <SearchForm onSearch={searchChannels} isLoading={isLoading} />
                 </div>
 
                 {/* Score Legend */}
-                <div className="bg-black/90 backdrop-blur-sm border border-red-800/30 rounded-xl p-6">
+                <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700/30 rounded-xl p-6">
                   <h3 className="text-xl font-bold text-white mb-4">Tabela de Scores</h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-red-600/20 to-red-700/20 rounded-lg border border-red-500/30">
-                      <span className="text-red-300 font-medium">85 - 100</span>
-                      <span className="text-red-200 font-bold">Premium</span>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-lg border border-amber-400/30">
+                      <span className="text-amber-300 font-medium">85 - 100</span>
+                      <span className="text-amber-200 font-bold">Premium</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-white/10 to-gray-200/10 rounded-lg border border-white/20">
-                      <span className="text-white font-medium">70 - 84</span>
-                      <span className="text-gray-200 font-bold">Ótimo</span>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-lg border border-blue-400/30">
+                      <span className="text-blue-300 font-medium">70 - 84</span>
+                      <span className="text-blue-200 font-bold">Ótimo</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-500/20 to-gray-600/20 rounded-lg border border-gray-500/30">
-                      <span className="text-gray-300 font-medium">55 - 69</span>
-                      <span className="text-gray-200 font-bold">Bom</span>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-600/20 to-slate-700/20 rounded-lg border border-slate-500/30">
+                      <span className="text-slate-300 font-medium">55 - 69</span>
+                      <span className="text-slate-200 font-bold">Bom</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-red-800/20 to-red-900/20 rounded-lg border border-red-800/30">
-                      <span className="text-red-400 font-medium">40 - 54</span>
-                      <span className="text-red-300 font-bold">Razoável</span>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-700/20 to-slate-800/20 rounded-lg border border-slate-600/30">
+                      <span className="text-slate-400 font-medium">40 - 54</span>
+                      <span className="text-slate-300 font-bold">Razoável</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-800/20 to-black/20 rounded-lg border border-gray-700/30">
-                      <span className="text-gray-400 font-medium">0 - 39</span>
-                      <span className="text-gray-300 font-bold">Ruim</span>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-800/20 to-slate-900/20 rounded-lg border border-slate-700/30">
+                      <span className="text-slate-500 font-medium">0 - 39</span>
+                      <span className="text-slate-400 font-bold">Ruim</span>
                     </div>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ const Index = () => {
                 {isLoading && (
                   <div className="flex flex-col items-center justify-center py-20">
                     <LoadingSpinner />
-                    <p className="text-gray-400 mt-4 text-lg">Analisando canais premium...</p>
+                    <p className="text-slate-400 mt-4 text-lg">Analisando canais premium...</p>
                   </div>
                 )}
 
@@ -224,11 +224,11 @@ const Index = () => {
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="bg-red-950/20 p-6 rounded-full mb-6 border border-red-800/30">
-                      <Target className="h-12 w-12 text-red-400" />
+                    <div className="bg-slate-800/20 p-6 rounded-full mb-6 border border-slate-700/30">
+                      <Target className="h-12 w-12 text-amber-400" />
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-2">Pronto para buscar</h3>
-                    <p className="text-gray-400 max-w-md">
+                    <p className="text-slate-400 max-w-md">
                       Configure os filtros à esquerda e clique em "Buscar Canais" para encontrar os melhores canais premium.
                     </p>
                   </div>
