@@ -139,15 +139,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className="min-h-screen bg-white">
       <div className="relative">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-100/30 via-transparent to-slate-100/30"></div>
+        <div className="absolute inset-0 opacity-3">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 via-transparent to-gray-50/30"></div>
           <div 
             className="absolute inset-0" 
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23334155' fill-opacity='0.03'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           ></div>
         </div>
@@ -159,9 +159,9 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[calc(100vh-400px)]">
               {/* Left Side - Search Controls */}
               <div className="lg:col-span-4 space-y-8">
-                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-4">
-                    <div className="bg-gradient-to-br from-slate-600 to-slate-700 p-3 rounded-xl">
+                <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-lg">
+                  <h2 className="text-3xl font-bold text-black mb-8 flex items-center gap-4">
+                    <div className="bg-black p-3 rounded-xl">
                       <Target className="h-7 w-7 text-white" />
                     </div>
                     Prospecção
@@ -170,28 +170,28 @@ const Index = () => {
                 </div>
 
                 {/* Score Legend */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl">
-                  <h3 className="text-2xl font-bold text-slate-800 mb-6">Classificação de Scores</h3>
+                <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-lg">
+                  <h3 className="text-2xl font-bold text-black mb-6">Classificação de Scores</h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl shadow-lg">
-                      <span className="text-white font-bold">85 - 100</span>
-                      <span className="text-white font-black">PREMIUM</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-xl shadow-lg">
+                      <span className="text-black font-bold">85 - 100</span>
+                      <span className="text-black font-black">PREMIUM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg">
-                      <span className="text-white font-bold">70 - 84</span>
-                      <span className="text-white font-black">EXCELENTE</span>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-300 to-emerald-400 rounded-xl shadow-lg">
+                      <span className="text-black font-bold">70 - 84</span>
+                      <span className="text-black font-black">EXCELENTE</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-400 to-gray-500 rounded-xl shadow-lg">
                       <span className="text-white font-bold">55 - 69</span>
                       <span className="text-white font-black">BOM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-400 to-red-500 rounded-xl shadow-lg">
                       <span className="text-white font-bold">40 - 54</span>
                       <span className="text-white font-black">MÉDIO</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-rose-500 to-rose-600 rounded-xl shadow-lg">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
                       <span className="text-white font-bold">0 - 39</span>
-                      <span className="text-white font-black">BAIXO</span>
+                      <span className="text-white font-black">PÉSSIMO</span>
                     </div>
                   </div>
                 </div>
@@ -203,18 +203,18 @@ const Index = () => {
                 {isLoading && (
                   <div className="flex flex-col items-center justify-center py-24">
                     <LoadingSpinner />
-                    <p className="text-slate-600 mt-6 text-xl">Analisando canais premium com IA...</p>
+                    <p className="text-gray-600 mt-6 text-xl">Analisando canais premium com IA...</p>
                   </div>
                 )}
 
                 {/* Error State */}
                 {error && (
-                  <div className="bg-gradient-to-r from-rose-50 to-rose-100 border border-rose-200 rounded-2xl p-8 mb-8">
+                  <div className="bg-red-50 border border-red-200 rounded-2xl p-8 mb-8">
                     <div className="flex items-center gap-4">
-                      <div className="bg-rose-500 p-3 rounded-full">
+                      <div className="bg-red-500 p-3 rounded-full">
                         <Search className="h-6 w-6 text-white" />
                       </div>
-                      <p className="text-rose-700 font-semibold text-lg">{error}</p>
+                      <p className="text-red-700 font-semibold text-lg">{error}</p>
                     </div>
                   </div>
                 )}
@@ -227,14 +227,14 @@ const Index = () => {
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <div className="bg-gradient-to-br from-slate-600 to-slate-700 p-8 rounded-full mb-8 shadow-xl">
+                    <div className="bg-black p-8 rounded-full mb-8 shadow-xl">
                       <Target className="h-16 w-16 text-white" />
                     </div>
-                    <h3 className="text-3xl font-bold text-slate-800 mb-4">Pronto para Prospectar</h3>
-                    <p className="text-slate-600 max-w-lg text-lg leading-relaxed">
+                    <h3 className="text-3xl font-bold text-black mb-4">Pronto para Prospectar</h3>
+                    <p className="text-gray-600 max-w-lg text-lg leading-relaxed">
                       Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
                     </p>
-                    <div className="mt-6 flex items-center gap-2 text-amber-600">
+                    <div className="mt-6 flex items-center gap-2 text-emerald-500">
                       <Play className="h-5 w-5 fill-current" />
                       <span className="font-semibold">Powered by YouTube Data API</span>
                     </div>

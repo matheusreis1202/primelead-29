@@ -36,17 +36,17 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
   };
 
   return (
-    <Card className="shadow-xl border-slate-200 bg-white">
-      <CardHeader className="pb-6 border-b border-slate-100">
-        <CardTitle className="flex items-center gap-4 text-2xl text-slate-800">
-          <div className="bg-gradient-to-br from-slate-600 to-slate-700 p-3 rounded-xl shadow-lg">
+    <Card className="shadow-lg border-gray-100 bg-white">
+      <CardHeader className="pb-6 border-b border-gray-50">
+        <CardTitle className="flex items-center gap-4 text-2xl text-black">
+          <div className="bg-black p-3 rounded-xl shadow-lg">
             <Target className="h-6 w-6 text-white" />
           </div>
           Busca Inteligente
-          <div className="bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-1.5 rounded-full border border-amber-300">
+          <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 px-3 py-1.5 rounded-full border border-emerald-300">
             <div className="flex items-center gap-1">
-              <Play className="h-3 w-3 text-slate-800 fill-current" />
-              <span className="text-slate-800 font-bold text-xs">PRO</span>
+              <Play className="h-3 w-3 text-black fill-current" />
+              <span className="text-black font-bold text-xs">PRO</span>
             </div>
           </div>
         </CardTitle>
@@ -55,9 +55,9 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* API Key */}
           <div className="space-y-3">
-            <Label htmlFor="apiKey" className="text-sm font-semibold text-slate-700 flex items-center gap-3">
+            <Label htmlFor="apiKey" className="text-sm font-semibold text-gray-700 flex items-center gap-3">
               🔑 Chave da API do YouTube *
-              <span className="text-blue-600 text-xs bg-blue-50 px-3 py-1 rounded-full border border-blue-200">YouTube Data API</span>
+              <span className="text-black text-xs bg-gray-50 px-3 py-1 rounded-full border border-gray-200">YouTube Data API</span>
             </Label>
             <Input
               id="apiKey"
@@ -65,26 +65,26 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
               placeholder="Cole sua chave da API aqui..."
               value={filters.apiKey}
               onChange={(e) => updateFilter('apiKey', e.target.value)}
-              className="bg-slate-50 border-slate-200 focus:border-amber-400 focus:ring-amber-200 text-slate-800 placeholder:text-slate-400 h-12"
+              className="bg-gray-50 border-gray-200 focus:border-emerald-400 focus:ring-emerald-200 text-black placeholder:text-gray-400 h-12"
               required
             />
-            <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <p className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-200">
               💡 Obtenha gratuitamente em: console.cloud.google.com → YouTube Data API v3
             </p>
           </div>
 
           {/* Nicho */}
           <div className="space-y-3">
-            <Label htmlFor="nicho" className="text-sm font-semibold text-slate-700 flex items-center gap-3">
+            <Label htmlFor="nicho" className="text-sm font-semibold text-gray-700 flex items-center gap-3">
               🎯 Nicho/Palavra-chave *
-              <span className="text-emerald-600 text-xs bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">IA Enhanced</span>
+              <span className="text-black text-xs bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">IA Enhanced</span>
             </Label>
             <Input
               id="nicho"
               placeholder="Ex: tecnologia, culinária, fitness, empreendedorismo..."
               value={filters.nicho}
               onChange={(e) => updateFilter('nicho', e.target.value)}
-              className="bg-slate-50 border-slate-200 focus:border-emerald-400 focus:ring-emerald-200 text-slate-800 placeholder:text-slate-400 h-12"
+              className="bg-gray-50 border-gray-200 focus:border-emerald-400 focus:ring-emerald-200 text-black placeholder:text-gray-400 h-12"
               required
             />
           </div>
@@ -92,17 +92,17 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* País */}
             <div className="space-y-3">
-              <Label className="text-sm font-semibold text-slate-700 flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-lg">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-3">
+                <div className="bg-black p-2 rounded-lg">
                   <Globe className="h-4 w-4 text-white" />
                 </div>
                 País de Origem
               </Label>
               <Select value={filters.pais} onValueChange={(value) => updateFilter('pais', value)}>
-                <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-800 focus:ring-blue-200 h-12">
+                <SelectTrigger className="bg-gray-50 border-gray-200 text-black focus:ring-emerald-200 h-12">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200 text-slate-800">
+                <SelectContent className="bg-white border-gray-200 text-black">
                   <SelectItem value="BR">🇧🇷 Brasil</SelectItem>
                   <SelectItem value="US">🇺🇸 Estados Unidos</SelectItem>
                   <SelectItem value="PT">🇵🇹 Portugal</SelectItem>
@@ -117,17 +117,17 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
 
             {/* Idioma */}
             <div className="space-y-3">
-              <Label className="text-sm font-semibold text-slate-700 flex items-center gap-3">
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-2 rounded-lg">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-3">
+                <div className="bg-black p-2 rounded-lg">
                   <span className="text-white text-sm">🗣️</span>
                 </div>
                 Idioma Principal
               </Label>
               <Select value={filters.idioma} onValueChange={(value) => updateFilter('idioma', value)}>
-                <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-800 focus:ring-purple-200 h-12">
+                <SelectTrigger className="bg-gray-50 border-gray-200 text-black focus:ring-emerald-200 h-12">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200 text-slate-800">
+                <SelectContent className="bg-white border-gray-200 text-black">
                   <SelectItem value="pt">Português</SelectItem>
                   <SelectItem value="en">Inglês</SelectItem>
                   <SelectItem value="es">Espanhol</SelectItem>
@@ -142,34 +142,34 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Inscritos */}
             <div className="space-y-4">
-              <Label className="text-sm font-semibold text-slate-700 flex items-center gap-3">
-                <div className="bg-gradient-to-br from-slate-500 to-slate-600 p-2 rounded-lg">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-3">
+                <div className="bg-black p-2 rounded-lg">
                   <Users className="h-4 w-4 text-white" />
                 </div>
                 Número de Inscritos
-                <span className="bg-gradient-to-r from-amber-400 to-amber-500 px-2 py-1 rounded text-xs font-bold text-slate-800">PREMIUM</span>
+                <span className="bg-gradient-to-r from-emerald-400 to-emerald-500 px-2 py-1 rounded text-xs font-bold text-black">PREMIUM</span>
               </Label>
               <div className="space-y-3">
                 <div>
-                  <Label htmlFor="minInscritos" className="text-xs text-slate-500 mb-1 block">Mínimo</Label>
+                  <Label htmlFor="minInscritos" className="text-xs text-gray-500 mb-1 block">Mínimo</Label>
                   <Input
                     id="minInscritos"
                     type="number"
                     placeholder="1,000"
                     value={filters.minInscritos}
                     onChange={(e) => updateFilter('minInscritos', parseInt(e.target.value) || 0)}
-                    className="bg-slate-50 border-slate-200 focus:border-slate-400 focus:ring-slate-200 text-slate-800 h-11"
+                    className="bg-gray-50 border-gray-200 focus:border-emerald-400 focus:ring-emerald-200 text-black h-11"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="maxInscritos" className="text-xs text-slate-500 mb-1 block">Máximo</Label>
+                  <Label htmlFor="maxInscritos" className="text-xs text-gray-500 mb-1 block">Máximo</Label>
                   <Input
                     id="maxInscritos"
                     type="number"
                     placeholder="1,000,000"
                     value={filters.maxInscritos}
                     onChange={(e) => updateFilter('maxInscritos', parseInt(e.target.value) || Infinity)}
-                    className="bg-slate-50 border-slate-200 focus:border-slate-400 focus:ring-slate-200 text-slate-800 h-11"
+                    className="bg-gray-50 border-gray-200 focus:border-emerald-400 focus:ring-emerald-200 text-black h-11"
                   />
                 </div>
               </div>
@@ -178,8 +178,8 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
             {/* Views e Frequência */}
             <div className="space-y-4">
               <div className="space-y-3">
-                <Label htmlFor="minViews" className="text-sm font-semibold text-slate-700 flex items-center gap-3">
-                  <div className="bg-gradient-to-br from-teal-500 to-teal-600 p-2 rounded-lg">
+                <Label htmlFor="minViews" className="text-sm font-semibold text-gray-700 flex items-center gap-3">
+                  <div className="bg-black p-2 rounded-lg">
                     <Eye className="h-4 w-4 text-white" />
                   </div>
                   Visualizações Mínimas
@@ -190,12 +190,12 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                   placeholder="10,000"
                   value={filters.minViews}
                   onChange={(e) => updateFilter('minViews', parseInt(e.target.value) || 0)}
-                  className="bg-slate-50 border-slate-200 focus:border-teal-400 focus:ring-teal-200 text-slate-800 h-11"
+                  className="bg-gray-50 border-gray-200 focus:border-emerald-400 focus:ring-emerald-200 text-black h-11"
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="freqMinima" className="text-sm font-semibold text-slate-700 flex items-center gap-3">
-                  <div className="bg-gradient-to-br from-violet-500 to-violet-600 p-2 rounded-lg">
+                <Label htmlFor="freqMinima" className="text-sm font-semibold text-gray-700 flex items-center gap-3">
+                  <div className="bg-black p-2 rounded-lg">
                     <Calendar className="h-4 w-4 text-white" />
                   </div>
                   Uploads por Semana
@@ -206,7 +206,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                   placeholder="1"
                   value={filters.freqMinima}
                   onChange={(e) => updateFilter('freqMinima', parseInt(e.target.value) || 0)}
-                  className="bg-slate-50 border-slate-200 focus:border-violet-400 focus:ring-violet-200 text-slate-800 h-11"
+                  className="bg-gray-50 border-gray-200 focus:border-emerald-400 focus:ring-emerald-200 text-black h-11"
                 />
               </div>
             </div>
@@ -215,7 +215,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
           <Button 
             type="submit" 
             disabled={isLoading || !filters.apiKey || !filters.nicho}
-            className="w-full bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 text-white py-6 text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl border-0 rounded-xl"
+            className="w-full bg-black hover:bg-gray-800 text-white py-6 text-lg font-bold transition-all duration-300 shadow-lg hover:shadow-xl border-0 rounded-xl"
           >
             {isLoading ? (
               <div className="flex items-center gap-3">
