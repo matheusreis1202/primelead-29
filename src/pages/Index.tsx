@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { SearchForm } from '@/components/SearchForm';
 import { ChannelResults } from '@/components/ChannelResults';
@@ -139,15 +138,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#282828]">
       <div className="relative">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-3">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100/30 via-transparent to-gray-100/30"></div>
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-red-500/10"></div>
           <div 
             className="absolute inset-0" 
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23374151' fill-opacity='0.02'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF0000' fill-opacity='0.05'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
             }}
           ></div>
         </div>
@@ -159,9 +158,9 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[calc(100vh-400px)]">
               {/* Left Side - Search Controls */}
               <div className="lg:col-span-4 space-y-8">
-                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-md">
-                  <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-4">
-                    <div className="bg-blue-900 p-3 rounded-xl">
+                <div className="bg-white border border-gray-600 rounded-2xl p-8 shadow-xl">
+                  <h2 className="text-3xl font-bold text-[#282828] mb-8 flex items-center gap-4">
+                    <div className="bg-[#FF0000] p-3 rounded-xl shadow-lg">
                       <Target className="h-7 w-7 text-white" />
                     </div>
                     Prospecção
@@ -170,26 +169,26 @@ const Index = () => {
                 </div>
 
                 {/* Score Legend */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-md">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Classificação de Scores</h3>
+                <div className="bg-white border border-gray-600 rounded-2xl p-8 shadow-xl">
+                  <h3 className="text-2xl font-bold text-[#282828] mb-6">Classificação de Scores</h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-green-400 to-green-500 rounded-xl shadow-md">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-[#FF0000] to-red-600 rounded-xl shadow-md">
                       <span className="text-white font-bold">85 - 100</span>
                       <span className="text-white font-black">PREMIUM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-700 to-blue-800 rounded-xl shadow-md">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-[#282828] to-gray-700 rounded-xl shadow-md">
                       <span className="text-white font-bold">70 - 84</span>
                       <span className="text-white font-black">ÓTIMO</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-400 to-gray-500 rounded-xl shadow-md">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl shadow-md">
                       <span className="text-white font-bold">55 - 69</span>
                       <span className="text-white font-black">BOM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl shadow-md">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl shadow-md">
                       <span className="text-white font-bold">40 - 54</span>
                       <span className="text-white font-black">RAZOÁVEL</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-red-400 to-red-500 rounded-xl shadow-md">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md">
                       <span className="text-white font-bold">0 - 39</span>
                       <span className="text-white font-black">RUIM</span>
                     </div>
@@ -203,18 +202,18 @@ const Index = () => {
                 {isLoading && (
                   <div className="flex flex-col items-center justify-center py-24">
                     <LoadingSpinner />
-                    <p className="text-gray-600 mt-6 text-xl">Analisando canais premium com IA...</p>
+                    <p className="text-white mt-6 text-xl">Analisando canais premium com IA...</p>
                   </div>
                 )}
 
                 {/* Error State */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-2xl p-8 mb-8">
+                  <div className="bg-[#FF0000]/10 border border-[#FF0000]/30 rounded-2xl p-8 mb-8">
                     <div className="flex items-center gap-4">
-                      <div className="bg-red-500 p-3 rounded-full">
+                      <div className="bg-[#FF0000] p-3 rounded-full">
                         <Search className="h-6 w-6 text-white" />
                       </div>
-                      <p className="text-red-700 font-semibold text-lg">{error}</p>
+                      <p className="text-[#FF0000] font-semibold text-lg">{error}</p>
                     </div>
                   </div>
                 )}
@@ -227,14 +226,14 @@ const Index = () => {
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <div className="bg-blue-800 p-8 rounded-full mb-8 shadow-lg">
+                    <div className="bg-[#FF0000] p-8 rounded-full mb-8 shadow-xl">
                       <Target className="h-16 w-16 text-white" />
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Pronto para Prospectar</h3>
-                    <p className="text-gray-600 max-w-lg text-lg leading-relaxed">
+                    <h3 className="text-3xl font-bold text-white mb-4">Pronto para Prospectar</h3>
+                    <p className="text-gray-300 max-w-lg text-lg leading-relaxed">
                       Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
                     </p>
-                    <div className="mt-6 flex items-center gap-2 text-green-500">
+                    <div className="mt-6 flex items-center gap-2 text-[#FF0000]">
                       <Play className="h-5 w-5 fill-current" />
                       <span className="font-semibold">Powered by YouTube Data API</span>
                     </div>
