@@ -34,10 +34,9 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const handleSendToAnalysis = (channel: Channel) => {
-    // Verificar se o canal já está na lista de análise
     if (!channelsForAnalysis.find(c => c.id === channel.id)) {
       setChannelsForAnalysis(prev => [...prev, channel]);
-      setActiveTab('analytics'); // Mudar para a aba de análises
+      setActiveTab('analytics');
     }
   };
 
@@ -46,7 +45,6 @@ const Index = () => {
   };
 
   const calculateChannelScore = (channel: any): number => {
-    // Advanced scoring algorithm for YouTube channels
     const subscriberScore = Math.min((channel.subscriberCount / 100000) * 20, 40);
     const viewScore = Math.min((channel.viewCount / 1000000) * 30, 30);
     const engagementScore = Math.min((channel.viewCount / channel.subscriberCount) * 30, 30);
@@ -135,14 +133,13 @@ const Index = () => {
         nextPageToken = searchData.nextPageToken;
       }
 
-      // Sort by score (highest first)
       foundChannels.sort((a, b) => b.score - a.score);
       setChannels(foundChannels);
       
       if (foundChannels.length === 0) {
         setError('Nenhum canal encontrado com os filtros selecionados.');
       } else {
-        setActiveTab('results'); // Switch to results tab after successful search
+        setActiveTab('results');
       }
 
     } catch (error) {
@@ -173,13 +170,13 @@ const Index = () => {
           <div className="container mx-auto px-4 py-12">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-8">
-                <TabsTrigger value="dashboard" className="font-orbitron font-semibold">
+                <TabsTrigger value="dashboard" className="font-roboto font-semibold">
                   Dashboard
                 </TabsTrigger>
-                <TabsTrigger value="results" className="font-orbitron font-semibold">
+                <TabsTrigger value="results" className="font-roboto font-semibold">
                   Resultados
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="font-orbitron font-semibold">
+                <TabsTrigger value="analytics" className="font-roboto font-semibold">
                   Análises
                   {channelsForAnalysis.length > 0 && (
                     <span className="ml-2 bg-youtube-red text-white text-xs px-2 py-1 rounded-full">
