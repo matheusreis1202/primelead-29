@@ -3,7 +3,7 @@ import { SearchForm } from '@/components/SearchForm';
 import { ChannelResults } from '@/components/ChannelResults';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { PremiumHeader } from '@/components/PremiumHeader';
-import { Search, Target, Play } from 'lucide-react';
+import { Search, Target, Play, Zap, Crown, Award, Star, TrendingUp } from 'lucide-react';
 
 export interface SearchFilters {
   apiKey: string;
@@ -138,82 +138,97 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#282828]">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#282828] to-black">
       <div className="relative">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-red-500/10"></div>
-          <div 
-            className="absolute inset-0" 
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF0000' fill-opacity='0.05'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-            }}
-          ></div>
+        {/* Futuristic Background Pattern */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 via-transparent to-[#FF0000]/5"></div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-1/4 left-1/4 w-px h-64 bg-gradient-to-b from-[#FF0000]/20 to-transparent transform rotate-45"></div>
+            <div className="absolute top-1/3 right-1/4 w-px h-48 bg-gradient-to-b from-[#FF0000]/15 to-transparent transform -rotate-45"></div>
+            <div className="absolute bottom-1/4 left-1/3 w-px h-32 bg-gradient-to-b from-[#FF0000]/10 to-transparent"></div>
+          </div>
         </div>
         
         <div className="relative z-10">
           <PremiumHeader />
           
-          <div className="container mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[calc(100vh-400px)]">
+          <div className="container mx-auto px-6 py-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 min-h-[calc(100vh-400px)]">
               {/* Left Side - Search Controls */}
-              <div className="lg:col-span-4 space-y-8">
-                <div className="bg-white border border-gray-600 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-3xl font-bold text-[#282828] mb-8 flex items-center gap-4">
-                    <div className="bg-[#FF0000] p-3 rounded-xl shadow-lg">
-                      <Target className="h-7 w-7 text-white" />
-                    </div>
-                    Prospecção
-                  </h2>
-                  <SearchForm onSearch={searchChannels} isLoading={isLoading} />
-                </div>
+              <div className="lg:col-span-5 space-y-10">
+                <SearchForm onSearch={searchChannels} isLoading={isLoading} />
 
-                {/* Score Legend */}
-                <div className="bg-white border border-gray-600 rounded-2xl p-8 shadow-xl">
-                  <h3 className="text-2xl font-bold text-[#282828] mb-6">Classificação de Scores</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-[#FF0000] to-red-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">85 - 100</span>
-                      <span className="text-white font-black">PREMIUM</span>
+                {/* Futuristic Score Legend */}
+                <div className="bg-gradient-to-br from-white via-gray-50 to-white border-0 rounded-3xl p-10 shadow-2xl backdrop-blur-sm">
+                  <h3 className="text-3xl font-black text-[#282828] mb-8 flex items-center gap-4">
+                    <div className="bg-gradient-to-br from-[#FF0000] to-red-600 p-3 rounded-2xl shadow-lg">
+                      <Crown className="h-6 w-6 text-white" />
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-[#282828] to-gray-700 rounded-xl shadow-md">
-                      <span className="text-white font-bold">70 - 84</span>
-                      <span className="text-white font-black">ÓTIMO</span>
+                    Classificação AI
+                  </h3>
+                  <div className="space-y-5">
+                    <div className="flex justify-between items-center p-5 bg-gradient-to-r from-[#FF0000] to-red-600 rounded-2xl shadow-xl">
+                      <div className="flex items-center gap-3">
+                        <Crown className="h-5 w-5 text-white" />
+                        <span className="text-white font-bold">85 - 100</span>
+                      </div>
+                      <span className="text-white font-black tracking-wider">PREMIUM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">55 - 69</span>
-                      <span className="text-white font-black">BOM</span>
+                    <div className="flex justify-between items-center p-5 bg-gradient-to-r from-[#282828] to-gray-700 rounded-2xl shadow-xl">
+                      <div className="flex items-center gap-3">
+                        <Award className="h-5 w-5 text-white" />
+                        <span className="text-white font-bold">70 - 84</span>
+                      </div>
+                      <span className="text-white font-black tracking-wider">ÓTIMO</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">40 - 54</span>
-                      <span className="text-white font-black">RAZOÁVEL</span>
+                    <div className="flex justify-between items-center p-5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl shadow-xl">
+                      <div className="flex items-center gap-3">
+                        <Star className="h-5 w-5 text-white" />
+                        <span className="text-white font-bold">55 - 69</span>
+                      </div>
+                      <span className="text-white font-black tracking-wider">BOM</span>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">0 - 39</span>
-                      <span className="text-white font-black">RUIM</span>
+                    <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl shadow-xl">
+                      <div className="flex items-center gap-3">
+                        <TrendingUp className="h-5 w-5 text-white" />
+                        <span className="text-white font-bold">40 - 54</span>
+                      </div>
+                      <span className="text-white font-black tracking-wider">RAZOÁVEL</span>
+                    </div>
+                    <div className="flex justify-between items-center p-5 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl shadow-xl">
+                      <div className="flex items-center gap-3">
+                        <Zap className="h-5 w-5 text-white" />
+                        <span className="text-white font-bold">0 - 39</span>
+                      </div>
+                      <span className="text-white font-black tracking-wider">RUIM</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Right Side - Results */}
-              <div className="lg:col-span-8">
+              <div className="lg:col-span-7">
                 {/* Loading State */}
                 {isLoading && (
-                  <div className="flex flex-col items-center justify-center py-24">
+                  <div className="flex flex-col items-center justify-center py-32">
                     <LoadingSpinner />
-                    <p className="text-white mt-6 text-xl">Analisando canais premium com IA...</p>
+                    <p className="text-white mt-8 text-2xl font-light">Analisando canais com IA...</p>
+                    <p className="text-gray-400 mt-2 text-lg">Algoritmo premium em execução</p>
                   </div>
                 )}
 
                 {/* Error State */}
                 {error && (
-                  <div className="bg-[#FF0000]/10 border border-[#FF0000]/30 rounded-2xl p-8 mb-8">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-[#FF0000] p-3 rounded-full">
-                        <Search className="h-6 w-6 text-white" />
+                  <div className="bg-gradient-to-r from-red-900/20 to-red-800/20 border border-[#FF0000]/30 rounded-3xl p-10 mb-10 backdrop-blur-sm">
+                    <div className="flex items-center gap-6">
+                      <div className="bg-gradient-to-br from-[#FF0000] to-red-600 p-4 rounded-2xl shadow-lg">
+                        <Search className="h-8 w-8 text-white" />
                       </div>
-                      <p className="text-[#FF0000] font-semibold text-lg">{error}</p>
+                      <div>
+                        <h3 className="text-[#FF0000] font-bold text-xl mb-2">Erro na Busca</h3>
+                        <p className="text-red-400 text-lg">{error}</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -225,17 +240,18 @@ const Index = () => {
 
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <div className="bg-[#FF0000] p-8 rounded-full mb-8 shadow-xl">
-                      <Target className="h-16 w-16 text-white" />
+                  <div className="flex flex-col items-center justify-center py-32 text-center">
+                    <div className="bg-gradient-to-br from-[#FF0000] to-red-600 p-12 rounded-3xl mb-10 shadow-2xl relative overflow-hidden">
+                      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+                      <Target className="h-20 w-20 text-white relative z-10" />
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-4">Pronto para Prospectar</h3>
-                    <p className="text-gray-300 max-w-lg text-lg leading-relaxed">
-                      Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
+                    <h3 className="text-4xl font-black text-white mb-6">Pronto para Descobrir</h3>
+                    <p className="text-gray-300 max-w-2xl text-xl leading-relaxed font-light mb-8">
+                      Configure seus filtros de busca e descubra os melhores canais premium do YouTube com nossa IA avançada.
                     </p>
-                    <div className="mt-6 flex items-center gap-2 text-[#FF0000]">
+                    <div className="flex items-center gap-3 text-[#FF0000] bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm">
                       <Play className="h-5 w-5 fill-current" />
-                      <span className="font-semibold">Powered by YouTube Data API</span>
+                      <span className="font-bold">Powered by YouTube Data API</span>
                     </div>
                   </div>
                 )}
