@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { PremiumHeader } from '@/components/PremiumHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardTab } from '@/components/tabs/DashboardTab';
 import { ResultsTab } from '@/components/tabs/ResultsTab';
+import { AnalysisTab } from '@/components/tabs/AnalysisTab';
 
 export interface SearchFilters {
   apiKey: string;
@@ -28,9 +28,21 @@ export interface Channel {
 
 const Index = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [channelsForAnalysis, setChannelsForAnalysis] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  const handleSendToAnalysis = (channel: Channel) => {
+    if (!channelsForAnalysis.find(c => c.id === channel.id)) {
+      setChannelsForAnalysis(prev => [...prev, channel]);
+      setActiveTab('analysis');
+    }
+  };
+
+  const handleRemoveFromAnalysis = (channelId: string) => {
+    setChannelsForAnalysis(prev => prev.filter(c => c.id !== channelId));
+  };
 
   const calculateChannelScore = (channel: any): number => {
     const subscriberScore = Math.min((channel.subscriberCount / 100000) * 20, 40);
@@ -157,12 +169,20 @@ const Index = () => {
           
           <div className="container mx-auto px-4 py-12">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsList className="grid w-full grid-cols-3 mb-8">
                 <TabsTrigger value="dashboard" className="font-roboto font-semibold">
                   Dashboard
                 </TabsTrigger>
                 <TabsTrigger value="results" className="font-roboto font-semibold">
                   Resultados
+                </TabsTrigger>
+                <TabsTrigger value="analysis" className="font-roboto font-semibold">
+                  Análises
+                  {channelsForAnalysis.length > 0 && (
+                    <span className="ml-2 bg-youtube-red text-white text-xs px-2 py-1 rounded-full">
+                      {channelsForAnalysis.length}
+                    </span>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
@@ -175,7 +195,14 @@ const Index = () => {
                   channels={channels} 
                   isLoading={isLoading} 
                   error={error}
-                  onSendToAnalysis={() => {}}
+                  onSendToAnalysis={handleSendToAnalysis}
+                />
+              </TabsContent>
+
+              <TabsContent value="analysis">
+                <AnalysisTab 
+                  channelsForAnalysis={channelsForAnalysis}
+                  onRemoveFromAnalysis={handleRemoveFromAnalysis}
                 />
               </TabsContent>
             </Tabs>
