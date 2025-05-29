@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { AdvancedAnalysisForm } from '@/components/AdvancedAnalysisForm';
+import { SimpleAnalysisForm } from '@/components/SimpleAnalysisForm';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { BarChart3, Lightbulb } from 'lucide-react';
@@ -25,7 +25,7 @@ export const AnalyticsTab = ({ channels, channelsForAnalysis, onRemoveFromAnalys
     setAnalysisResult(null);
 
     try {
-      console.log('Iniciando análise avançada de canais:', channelIds);
+      console.log('Iniciando análise inteligente de canais:', channelIds);
       const result = await channelAnalysisService.analyzeChannels(channelIds, filters);
       setAnalysisResult(result);
     } catch (error) {
@@ -41,10 +41,10 @@ export const AnalyticsTab = ({ channels, channelsForAnalysis, onRemoveFromAnalys
       <div className="flex flex-col items-center justify-center py-24">
         <LoadingSpinner />
         <p className="text-youtube-white mt-6 text-xl font-roboto">
-          Executando análise avançada dos canais...
+          Executando análise inteligente dos canais...
         </p>
         <p className="text-youtube-gray mt-2 text-sm font-roboto">
-          Aplicando filtros estratégicos e coletando métricas
+          Aplicando critérios automáticos e coletando métricas
         </p>
       </div>
     );
@@ -73,10 +73,10 @@ export const AnalyticsTab = ({ channels, channelsForAnalysis, onRemoveFromAnalys
             </div>
             <div>
               <h2 className="text-2xl font-bold text-youtube-white font-roboto">
-                Resultados da Análise
+                Resultados da Análise Inteligente
               </h2>
               <p className="text-youtube-gray font-roboto">
-                Análise completa com filtros estratégicos aplicados
+                Análise completa com critérios automáticos aplicados
               </p>
             </div>
           </div>
@@ -102,30 +102,30 @@ export const AnalyticsTab = ({ channels, channelsForAnalysis, onRemoveFromAnalys
           </div>
         </div>
         <h2 className="text-3xl font-bold text-youtube-white mb-2 font-roboto">
-          Sistema de Análise Avançada
+          Sistema de Análise Inteligente
         </h2>
         <p className="text-youtube-gray max-w-2xl mx-auto text-lg font-roboto">
-          Analise múltiplos canais simultaneamente com filtros estratégicos para encontrar as melhores parcerias comerciais
+          Analise canais automaticamente com critérios otimizados para encontrar as melhores parcerias comerciais
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <AdvancedAnalysisForm onAnalyze={handleAnalyze} isLoading={isAnalyzing} />
+        <SimpleAnalysisForm onAnalyze={handleAnalyze} isLoading={isAnalyzing} />
         
-        {/* Dicas de uso */}
+        {/* Informações sobre o sistema */}
         <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb className="h-5 w-5 text-youtube-red" />
             <h3 className="text-youtube-white font-semibold font-roboto">
-              Como usar o sistema de análise
+              Como funciona a análise inteligente
             </h3>
           </div>
           <ul className="text-youtube-gray space-y-2 text-sm font-roboto">
-            <li>• <strong>IDs dos Canais:</strong> Insira os IDs dos canais separados por vírgula (ex: UCxxxxx, UCyyyyy)</li>
-            <li>• <strong>Filtros Numéricos:</strong> Configure valores mínimos para inscritos, views e engajamento</li>
-            <li>• <strong>Filtros Geográficos:</strong> Selecione país e idioma específicos</li>
-            <li>• <strong>Palavras-chave:</strong> O sistema busca estas palavras no título e descrição do canal</li>
-            <li>• <strong>Frequência:</strong> Analisa quantos vídeos o canal publica por mês</li>
+            <li>• <strong>Análise Automática:</strong> Aplica critérios pré-definidos para parcerias comerciais</li>
+            <li>• <strong>Dados Demográficos:</strong> Estima faixa etária e gênero predominante do público</li>
+            <li>• <strong>Busca de Contato:</strong> Procura automaticamente emails de contato na descrição</li>
+            <li>• <strong>Avaliação de Parceria:</strong> Classifica cada canal como EXCELENTE, BOM, REGULAR ou RUIM</li>
+            <li>• <strong>Métricas Completas:</strong> Analisa engajamento, frequência de uploads e relevância</li>
           </ul>
         </div>
       </div>
