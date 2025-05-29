@@ -11,6 +11,12 @@ export interface AnalysisFilters {
   minUploadsPerMonth: number;
 }
 
+export interface ChannelDemographics {
+  idadePredominante: string;
+  generoPredominante: string;
+  paisesTopAudiencia: string[];
+}
+
 export interface ChannelAnalysisData {
   id: string;
   nome: string;
@@ -25,8 +31,12 @@ export interface ChannelAnalysisData {
   descricao: string;
   palavrasChaveEncontradas: string[];
   uploadsPerMonth: number;
+  demographics: ChannelDemographics;
+  emailContato?: string;
   aprovado: boolean;
   motivosReprovacao: string[];
+  recomendacaoParceria: 'EXCELENTE' | 'BOM' | 'REGULAR' | 'RUIM';
+  pontuacaoGeral: number;
 }
 
 export interface AnalysisResult {
