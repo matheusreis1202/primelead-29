@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Users, Eye, TrendingUp, Award } from 'lucide-react';
+import { Users, Eye, TrendingUp, Award, Crown, Star } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
 interface AnalyticsTabProps {
@@ -23,6 +23,9 @@ export const AnalyticsTab = ({ channels }: AnalyticsTabProps) => {
     );
   }
 
+  // Top 3 channels for detailed analysis
+  const top3Channels = channels.slice(0, 3);
+  
   // Prepare data for charts
   const totalSubscribers = channels.reduce((sum, channel) => sum + channel.subscriberCount, 0);
   const totalViews = channels.reduce((sum, channel) => sum + channel.viewCount, 0);
@@ -42,8 +45,114 @@ export const AnalyticsTab = ({ channels }: AnalyticsTabProps) => {
     { name: 'Grande (> 1M)', value: channels.filter(c => c.subscriberCount >= 1000000).length, color: '#CC0000' },
   ].filter(item => item.value > 0);
 
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`;
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`;
+    }
+    return num.toLocaleString();
+  };
+
+  const getChannelIcon = (index: number) => {
+    if (index === 0) return Crown;
+    if (index === 1) return Award;
+    return Star;
+  };
+
+  const getChannelColor = (index: number) => {
+    if (index === 0) return 'from-yellow-500 to-yellow-600';
+    if (index === 1) return 'from-gray-400 to-gray-500';
+    return 'from-orange-500 to-orange-600';
+  };
+
   return (
     <div className="space-y-8">
+      {/* Top 3 Channels Analysis */}
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold text-youtube-white font-orbitron mb-6">
+          Top 3 Canais - Análise Detalhada
+        </h2>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {top3Channels.map((channel, index) => {
+            const ChannelIcon = getChannelIcon(index);
+            const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
+            
+            return (
+              <Card key={channel.id} className="tech-card">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`bg-gradient-to-r ${getChannelColor(index)} p-3 rounded-lg futuristic-glow`}>
+                      <ChannelIcon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="text-xs font-bold text-youtube-gray font-orbitron">
+                      #{index + 1} CANAL
+                    </div>
+                  </div>
+                  <CardTitle className="text-youtube-white text-lg font-orbitron line-clamp-2">
+                    {channel.title}
+                  </CardTitle>
+                  {channel.thumbnail && (
+                    <img 
+                      src={channel.thumbnail} 
+                      alt={channel.title}
+                      className="w-full h-24 object-cover rounded-lg border border-youtube-red/30"
+                    />
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Score */}
+                  <div className="bg-youtube-dark p-3 rounded-lg border border-youtube-red/30">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-youtube-red font-orbitron">
+                        {channel.score}/100
+                      </div>
+                      <div className="text-xs text-youtube-gray font-inter">
+                        Score de Performance
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subscribers */}
+                  <div className="flex items-center justify-between p-3 bg-youtube-dark rounded-lg border border-youtube-red/30">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-youtube-red" />
+                      <span className="text-sm text-youtube-gray font-inter">Inscritos</span>
+                    </div>
+                    <span className="font-bold text-youtube-white font-orbitron">
+                      {formatNumber(channel.subscriberCount)}
+                    </span>
+                  </div>
+
+                  {/* Views */}
+                  <div className="flex items-center justify-between p-3 bg-youtube-dark rounded-lg border border-youtube-red/30">
+                    <div className="flex items-center gap-2">
+                      <Eye className="h-4 w-4 text-youtube-red" />
+                      <span className="text-sm text-youtube-gray font-inter">Views</span>
+                    </div>
+                    <span className="font-bold text-youtube-white font-orbitron">
+                      {formatNumber(channel.viewCount)}
+                    </span>
+                  </div>
+
+                  {/* Engagement */}
+                  <div className="flex items-center justify-between p-3 bg-youtube-dark rounded-lg border border-green-500/30">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-green-400" />
+                      <span className="text-sm text-green-400 font-inter">Engajamento</span>
+                    </div>
+                    <span className="font-bold text-green-400 font-orbitron">
+                      {engagementRate.toFixed(1)}%
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="tech-card">

@@ -1,5 +1,6 @@
 
 import { SearchForm } from '@/components/SearchForm';
+import { KeywordGenerator } from '@/components/KeywordGenerator';
 import { Target } from 'lucide-react';
 import { SearchFilters } from '@/pages/Index';
 
@@ -10,7 +11,8 @@ interface DashboardTabProps {
 
 export const DashboardTab = ({ onSearch, isLoading }: DashboardTabProps) => {
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      {/* Filtros de Busca */}
       <div className="tech-card">
         <h2 className="text-3xl font-bold text-youtube-white mb-8 flex items-center gap-4 font-orbitron">
           <div className="bg-youtube-red p-3 rounded-lg shadow-lg futuristic-glow">
@@ -22,6 +24,11 @@ export const DashboardTab = ({ onSearch, isLoading }: DashboardTabProps) => {
           Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
         </p>
         <SearchForm onSearch={onSearch} isLoading={isLoading} />
+      </div>
+
+      {/* Gerador de Palavras-chave */}
+      <div className="tech-card">
+        <KeywordGenerator />
       </div>
     </div>
   );
