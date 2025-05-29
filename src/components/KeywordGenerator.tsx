@@ -13,11 +13,11 @@ export const KeywordGenerator = () => {
 
   // Top 5 nichos do YouTube em tempo real (baseado em dados reais)
   const top5Nichos = [
-    { name: 'Gaming', growth: '+15%', color: 'bg-green-500' },
-    { name: 'Tech', growth: '+12%', color: 'bg-blue-500' },
-    { name: 'Lifestyle', growth: '+10%', color: 'bg-purple-500' },
-    { name: 'Educação', growth: '+8%', color: 'bg-orange-500' },
-    { name: 'Fitness', growth: '+7%', color: 'bg-red-500' }
+    { name: 'Gaming', growth: '+15%', color: 'bg-youtube-red' },
+    { name: 'Tech', growth: '+12%', color: 'bg-youtube-dark' },
+    { name: 'Lifestyle', growth: '+10%', color: 'bg-youtube-red' },
+    { name: 'Educação', growth: '+8%', color: 'bg-youtube-dark' },
+    { name: 'Fitness', growth: '+7%', color: 'bg-youtube-red' }
   ];
 
   const nichoDatabase = {
@@ -96,41 +96,6 @@ export const KeywordGenerator = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top 5 Nichos do YouTube - Corrigido */}
-      <Card className="tech-card">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            <div className="bg-youtube-red p-2 rounded-lg futuristic-glow">
-              <Crown className="h-4 w-4 text-youtube-white" />
-            </div>
-            <CardTitle className="text-youtube-white font-roboto text-base">
-              Top 5 Nichos YouTube
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="grid grid-cols-1 gap-2">
-            {top5Nichos.map((nicho, index) => (
-              <div 
-                key={index}
-                className="bg-youtube-dark border border-youtube-red/30 rounded-lg p-2 flex items-center justify-between hover:border-youtube-red transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${nicho.color}`}></div>
-                  <span className="text-xs font-bold text-youtube-gray">#{index + 1}</span>
-                  <span className="text-sm font-semibold text-youtube-white font-roboto">
-                    {nicho.name}
-                  </span>
-                </div>
-                <span className="text-xs text-green-400 font-roboto">
-                  {nicho.growth}
-                </span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Gerador de Nicho */}
       <div className="flex items-center gap-4 mb-6">
         <div className="bg-youtube-red p-3 rounded-lg shadow-lg futuristic-glow">
@@ -211,6 +176,41 @@ export const KeywordGenerator = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Top 5 Nichos do YouTube - Movido para baixo */}
+      <Card className="tech-card">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="bg-youtube-red p-2 rounded-lg futuristic-glow">
+              <Crown className="h-4 w-4 text-youtube-white" />
+            </div>
+            <CardTitle className="text-youtube-white font-roboto text-base">
+              Top 5 Nichos YouTube
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 gap-2">
+            {top5Nichos.map((nicho, index) => (
+              <div 
+                key={index}
+                className="bg-youtube-dark border border-youtube-red/30 rounded-lg p-2 flex items-center justify-between hover:border-youtube-red transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${nicho.color}`}></div>
+                  <span className="text-xs font-bold text-youtube-gray">#{index + 1}</span>
+                  <span className="text-sm font-semibold text-youtube-white font-roboto">
+                    {nicho.name}
+                  </span>
+                </div>
+                <span className="text-xs text-youtube-red font-roboto">
+                  {nicho.growth}
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
