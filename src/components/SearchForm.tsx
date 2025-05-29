@@ -142,8 +142,8 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Inscritos */}
             <div className="space-y-4">
-              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-3">
-                <div className="bg-blue-900 p-2 rounded-lg">
+              <Label className="text-sm font-semibold text-[#282828] flex items-center gap-3">
+                <div className="bg-[#FF0000] p-2 rounded-lg">
                   <Users className="h-4 w-4 text-white" />
                 </div>
                 Número de Inscritos
@@ -157,7 +157,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                     placeholder="1,000"
                     value={filters.minInscritos}
                     onChange={(e) => updateFilter('minInscritos', parseInt(e.target.value) || 0)}
-                    className="bg-gray-50 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200 text-gray-800 h-11 rounded-lg"
+                    className="bg-gray-50 border-gray-300 focus:border-[#FF0000] focus:ring-[#FF0000]/20 text-[#282828] h-11 rounded-lg"
                   />
                 </div>
                 <div>
@@ -168,7 +168,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                     placeholder="1,000,000"
                     value={filters.maxInscritos}
                     onChange={(e) => updateFilter('maxInscritos', parseInt(e.target.value) || Infinity)}
-                    className="bg-gray-50 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200 text-gray-800 h-11 rounded-lg"
+                    className="bg-gray-50 border-gray-300 focus:border-[#FF0000] focus:ring-[#FF0000]/20 text-[#282828] h-11 rounded-lg"
                   />
                 </div>
               </div>
@@ -177,8 +177,8 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
             {/* Views e Frequência */}
             <div className="space-y-4">
               <div className="space-y-3">
-                <Label htmlFor="minViews" className="text-sm font-semibold text-gray-700 flex items-center gap-3">
-                  <div className="bg-blue-900 p-2 rounded-lg">
+                <Label htmlFor="minViews" className="text-sm font-semibold text-[#282828] flex items-center gap-3">
+                  <div className="bg-[#FF0000] p-2 rounded-lg">
                     <Eye className="h-4 w-4 text-white" />
                   </div>
                   Visualizações Mínimas
@@ -189,12 +189,12 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                   placeholder="10,000"
                   value={filters.minViews}
                   onChange={(e) => updateFilter('minViews', parseInt(e.target.value) || 0)}
-                  className="bg-gray-50 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200 text-gray-800 h-11 rounded-lg"
+                  className="bg-gray-50 border-gray-300 focus:border-[#FF0000] focus:ring-[#FF0000]/20 text-[#282828] h-11 rounded-lg"
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="freqMinima" className="text-sm font-semibold text-gray-700 flex items-center gap-3">
-                  <div className="bg-blue-900 p-2 rounded-lg">
+                <Label htmlFor="freqMinima" className="text-sm font-semibold text-[#282828] flex items-center gap-3">
+                  <div className="bg-[#FF0000] p-2 rounded-lg">
                     <Calendar className="h-4 w-4 text-white" />
                   </div>
                   Uploads por Semana
@@ -205,7 +205,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                   placeholder="1"
                   value={filters.freqMinima}
                   onChange={(e) => updateFilter('freqMinima', parseInt(e.target.value) || 0)}
-                  className="bg-gray-50 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200 text-gray-800 h-11 rounded-lg"
+                  className="bg-gray-50 border-gray-300 focus:border-[#FF0000] focus:ring-[#FF0000]/20 text-[#282828] h-11 rounded-lg"
                 />
               </div>
             </div>

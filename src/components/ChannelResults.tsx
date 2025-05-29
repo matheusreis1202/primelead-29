@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -163,23 +164,15 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                     </span>
                   </div>
 
-                  {/* Engagement Rate */}
-                  <div className={`flex items-center justify-between text-sm p-4 rounded-xl border ${
-                    engagementRate < 10 ? 'bg-orange-50 border-orange-200' : 'bg-red-50 border-red-200'
-                  }`}>
+                  {/* Engagement Rate - Verde claro */}
+                  <div className="flex items-center justify-between text-sm p-4 rounded-xl border bg-green-50 border-green-200">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        engagementRate < 10 ? 'bg-orange-500' : 'bg-[#FF0000]'
-                      }`}>
+                      <div className="bg-green-500 p-2 rounded-lg">
                         <TrendingUp className="h-4 w-4 text-white" />
                       </div>
-                      <span className={`font-semibold ${
-                        engagementRate < 10 ? 'text-orange-600' : 'text-[#FF0000]'
-                      }`}>Engajamento</span>
+                      <span className="font-semibold text-green-700">Engajamento</span>
                     </div>
-                    <span className={`font-bold text-lg ${
-                      engagementRate < 10 ? 'text-orange-600' : 'text-[#FF0000]'
-                    }`}>
+                    <span className="font-bold text-green-700 text-lg">
                       {engagementRate.toFixed(1)}%
                     </span>
                   </div>
