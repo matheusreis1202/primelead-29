@@ -20,16 +20,15 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'orbitron': ['Orbitron', 'monospace'],
-				'inter': ['Inter', 'sans-serif'],
+				'roboto': ['Roboto', 'sans-serif'],
 			},
 			colors: {
 				// YouTube color palette
 				'youtube-red': '#FF0000',
 				'youtube-red-hover': '#FF4C4C',
-				'youtube-black': '#0F0F0F',
-				'youtube-dark': '#212121',
-				'youtube-white': '#F9F9F9',
+				'youtube-black': '#000000',
+				'youtube-dark': '#282828',
+				'youtube-white': '#FFFFFF',
 				'youtube-gray': '#AAAAAA',
 				
 				border: 'hsl(var(--border))',

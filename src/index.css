@@ -1,85 +1,85 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 15 15 15; /* #0F0F0F */
-    --foreground: 249 249 249; /* #F9F9F9 */
+    --background: 0 0 0; /* #000000 */
+    --foreground: 255 255 255; /* #FFFFFF */
 
-    --card: 33 33 33; /* #212121 */
-    --card-foreground: 249 249 249; /* #F9F9F9 */
+    --card: 40 40 40; /* #282828 */
+    --card-foreground: 255 255 255; /* #FFFFFF */
 
-    --popover: 33 33 33; /* #212121 */
-    --popover-foreground: 249 249 249; /* #F9F9F9 */
+    --popover: 40 40 40; /* #282828 */
+    --popover-foreground: 255 255 255; /* #FFFFFF */
 
     --primary: 255 0 0; /* #FF0000 */
-    --primary-foreground: 249 249 249; /* #F9F9F9 */
+    --primary-foreground: 255 255 255; /* #FFFFFF */
 
-    --secondary: 33 33 33; /* #212121 */
-    --secondary-foreground: 249 249 249; /* #F9F9F9 */
+    --secondary: 40 40 40; /* #282828 */
+    --secondary-foreground: 255 255 255; /* #FFFFFF */
 
     --muted: 170 170 170; /* #AAAAAA */
-    --muted-foreground: 249 249 249; /* #F9F9F9 */
+    --muted-foreground: 255 255 255; /* #FFFFFF */
 
     --accent: 255 0 0; /* #FF0000 */
-    --accent-foreground: 249 249 249; /* #F9F9F9 */
+    --accent-foreground: 255 255 255; /* #FFFFFF */
 
     --destructive: 255 0 0; /* #FF0000 */
-    --destructive-foreground: 249 249 249; /* #F9F9F9 */
+    --destructive-foreground: 255 255 255; /* #FFFFFF */
 
     --border: 255 0 0; /* #FF0000 */
-    --input: 33 33 33; /* #212121 */
+    --input: 40 40 40; /* #282828 */
     --ring: 255 0 0; /* #FF0000 */
 
     --radius: 0.375rem; /* 6px */
 
-    --sidebar-background: 33 33 33; /* #212121 */
-    --sidebar-foreground: 249 249 249; /* #F9F9F9 */
+    --sidebar-background: 40 40 40; /* #282828 */
+    --sidebar-foreground: 255 255 255; /* #FFFFFF */
     --sidebar-primary: 255 0 0; /* #FF0000 */
-    --sidebar-primary-foreground: 249 249 249; /* #F9F9F9 */
-    --sidebar-accent: 33 33 33; /* #212121 */
-    --sidebar-accent-foreground: 249 249 249; /* #F9F9F9 */
+    --sidebar-primary-foreground: 255 255 255; /* #FFFFFF */
+    --sidebar-accent: 40 40 40; /* #282828 */
+    --sidebar-accent-foreground: 255 255 255; /* #FFFFFF */
     --sidebar-border: 255 0 0; /* #FF0000 */
     --sidebar-ring: 255 0 0; /* #FF0000 */
   }
 
   .dark {
-    --background: 15 15 15; /* #0F0F0F */
-    --foreground: 249 249 249; /* #F9F9F9 */
+    --background: 0 0 0; /* #000000 */
+    --foreground: 255 255 255; /* #FFFFFF */
 
-    --card: 33 33 33; /* #212121 */
-    --card-foreground: 249 249 249; /* #F9F9F9 */
+    --card: 40 40 40; /* #282828 */
+    --card-foreground: 255 255 255; /* #FFFFFF */
 
-    --popover: 33 33 33; /* #212121 */
-    --popover-foreground: 249 249 249; /* #F9F9F9 */
+    --popover: 40 40 40; /* #282828 */
+    --popover-foreground: 255 255 255; /* #FFFFFF */
 
     --primary: 255 0 0; /* #FF0000 */
-    --primary-foreground: 249 249 249; /* #F9F9F9 */
+    --primary-foreground: 255 255 255; /* #FFFFFF */
 
-    --secondary: 33 33 33; /* #212121 */
-    --secondary-foreground: 249 249 249; /* #F9F9F9 */
+    --secondary: 40 40 40; /* #282828 */
+    --secondary-foreground: 255 255 255; /* #FFFFFF */
 
     --muted: 170 170 170; /* #AAAAAA */
-    --muted-foreground: 249 249 249; /* #F9F9F9 */
+    --muted-foreground: 255 255 255; /* #FFFFFF */
 
     --accent: 255 0 0; /* #FF0000 */
-    --accent-foreground: 249 249 249; /* #F9F9F9 */
+    --accent-foreground: 255 255 255; /* #FFFFFF */
 
     --destructive: 255 0 0; /* #FF0000 */
-    --destructive-foreground: 249 249 249; /* #F9F9F9 */
+    --destructive-foreground: 255 255 255; /* #FFFFFF */
 
     --border: 255 0 0; /* #FF0000 */
-    --input: 33 33 33; /* #212121 */
+    --input: 40 40 40; /* #282828 */
     --ring: 255 0 0; /* #FF0000 */
-    --sidebar-background: 33 33 33; /* #212121 */
-    --sidebar-foreground: 249 249 249; /* #F9F9F9 */
+    --sidebar-background: 40 40 40; /* #282828 */
+    --sidebar-foreground: 255 255 255; /* #FFFFFF */
     --sidebar-primary: 255 0 0; /* #FF0000 */
-    --sidebar-primary-foreground: 249 249 249; /* #F9F9F9 */
-    --sidebar-accent: 33 33 33; /* #212121 */
-    --sidebar-accent-foreground: 249 249 249; /* #F9F9F9 */
+    --sidebar-primary-foreground: 255 255 255; /* #FFFFFF */
+    --sidebar-accent: 40 40 40; /* #282828 */
+    --sidebar-accent-foreground: 255 255 255; /* #FFFFFF */
     --sidebar-border: 255 0 0; /* #FF0000 */
     --sidebar-ring: 255 0 0; /* #FF0000 */
   }
@@ -91,14 +91,14 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
-    background-color: #0F0F0F;
-    color: #F9F9F9;
-    font-family: 'Inter', sans-serif;
+    @apply bg-background text-foreground font-roboto;
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'Roboto', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', monospace;
+    font-family: 'Roboto', sans-serif;
     font-weight: 600;
   }
 
@@ -115,15 +115,15 @@
 
   .tech-border {
     border: 1px solid #FF0000;
-    background-color: #212121;
+    background-color: #282828;
     border-radius: 6px;
   }
 
   .futuristic-button {
     background: linear-gradient(135deg, #FF0000, #CC0000);
     border: none;
-    color: #F9F9F9;
-    font-family: 'Orbitron', monospace;
+    color: #FFFFFF;
+    font-family: 'Roboto', sans-serif;
     font-weight: 500;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);
@@ -136,7 +136,7 @@
   }
 
   .tech-card {
-    background-color: #212121;
+    background-color: #282828;
     border: 1px solid #FF0000;
     border-radius: 6px;
     padding: 1.5rem;
@@ -151,9 +151,9 @@
   }
 
   .tech-input {
-    background-color: #212121;
+    background-color: #282828;
     border: 1px solid #FF0000;
-    color: #F9F9F9;
+    color: #FFFFFF;
     border-radius: 6px;
     transition: all 0.3s ease;
   }

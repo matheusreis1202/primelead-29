@@ -16,7 +16,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
     return (
       <div className="flex flex-col items-center justify-center py-24">
         <LoadingSpinner />
-        <p className="text-youtube-white mt-6 text-xl font-inter">Analisando canais premium com IA...</p>
+        <p className="text-youtube-white mt-6 text-xl font-roboto">Analisando canais premium com IA...</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
           <div className="bg-youtube-red p-3 rounded-full futuristic-glow">
             <Search className="h-6 w-6 text-youtube-white" />
           </div>
-          <p className="text-youtube-red font-semibold text-lg font-inter">{error}</p>
+          <p className="text-youtube-red font-semibold text-lg font-roboto">{error}</p>
         </div>
       </div>
     );
@@ -43,13 +43,13 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
       <div className="bg-youtube-red p-8 rounded-full mb-8 shadow-xl futuristic-glow">
         <Target className="h-16 w-16 text-youtube-white" />
       </div>
-      <h3 className="text-3xl font-bold text-youtube-white mb-4 font-orbitron">Nenhum Resultado Ainda</h3>
-      <p className="text-youtube-gray max-w-lg text-lg leading-relaxed font-inter">
+      <h3 className="text-3xl font-bold text-youtube-white mb-4 font-roboto">Nenhum Resultado Ainda</h3>
+      <p className="text-youtube-gray max-w-lg text-lg leading-relaxed font-roboto">
         Use a aba Dashboard para configurar seus filtros de busca e encontrar canais premium do YouTube.
       </p>
       <div className="mt-6 flex items-center gap-2 text-youtube-red">
         <Play className="h-5 w-5 fill-current" />
-        <span className="font-semibold font-orbitron">Powered by YouTube Data API</span>
+        <span className="font-semibold font-roboto">Powered by YouTube Data API</span>
       </div>
     </div>
   );

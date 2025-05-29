@@ -11,16 +11,16 @@ interface DashboardTabProps {
 
 export const DashboardTab = ({ onSearch, isLoading }: DashboardTabProps) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 max-w-7xl mx-auto">
       {/* Filtros de Busca */}
       <div className="tech-card">
-        <h2 className="text-3xl font-bold text-youtube-white mb-8 flex items-center gap-4 font-orbitron">
+        <h2 className="text-2xl font-bold text-youtube-white mb-6 flex items-center gap-4 font-roboto">
           <div className="bg-youtube-red p-3 rounded-lg shadow-lg futuristic-glow">
-            <Target className="h-7 w-7 text-youtube-white" />
+            <Target className="h-6 w-6 text-youtube-white" />
           </div>
           Prospecção de Canais
         </h2>
-        <p className="text-youtube-gray mb-8 text-lg leading-relaxed font-inter">
+        <p className="text-youtube-gray mb-6 text-base leading-relaxed font-roboto">
           Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
         </p>
         <SearchForm onSearch={onSearch} isLoading={isLoading} />
