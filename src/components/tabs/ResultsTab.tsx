@@ -8,9 +8,10 @@ interface ResultsTabProps {
   channels: Channel[];
   isLoading: boolean;
   error: string | null;
+  onSendToAnalysis: (channel: Channel) => void;
 }
 
-export const ResultsTab = ({ channels, isLoading, error }: ResultsTabProps) => {
+export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: ResultsTabProps) => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
@@ -34,7 +35,7 @@ export const ResultsTab = ({ channels, isLoading, error }: ResultsTabProps) => {
   }
 
   if (channels.length > 0) {
-    return <ChannelResults channels={channels} />;
+    return <ChannelResults channels={channels} onSendToAnalysis={onSendToAnalysis} />;
   }
 
   return (

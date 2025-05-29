@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PremiumHeader } from '@/components/PremiumHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,9 +28,22 @@ export interface Channel {
 
 const Index = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [channelsForAnalysis, setChannelsForAnalysis] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  const handleSendToAnalysis = (channel: Channel) => {
+    // Verificar se o canal já está na lista de análise
+    if (!channelsForAnalysis.find(c => c.id === channel.id)) {
+      setChannelsForAnalysis(prev => [...prev, channel]);
+      setActiveTab('analytics'); // Mudar para a aba de análises
+    }
+  };
+
+  const handleRemoveFromAnalysis = (channelId: string) => {
+    setChannelsForAnalysis(prev => prev.filter(c => c.id !== channelId));
+  };
 
   const calculateChannelScore = (channel: any): number => {
     // Advanced scoring algorithm for YouTube channels
@@ -169,6 +181,11 @@ const Index = () => {
                 </TabsTrigger>
                 <TabsTrigger value="analytics" className="font-orbitron font-semibold">
                   Análises
+                  {channelsForAnalysis.length > 0 && (
+                    <span className="ml-2 bg-youtube-red text-white text-xs px-2 py-1 rounded-full">
+                      {channelsForAnalysis.length}
+                    </span>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
@@ -180,12 +197,17 @@ const Index = () => {
                 <ResultsTab 
                   channels={channels} 
                   isLoading={isLoading} 
-                  error={error} 
+                  error={error}
+                  onSendToAnalysis={handleSendToAnalysis}
                 />
               </TabsContent>
 
               <TabsContent value="analytics">
-                <AnalyticsTab channels={channels} />
+                <AnalyticsTab 
+                  channels={channels}
+                  channelsForAnalysis={channelsForAnalysis}
+                  onRemoveFromAnalysis={handleRemoveFromAnalysis}
+                />
               </TabsContent>
             </Tabs>
           </div>
