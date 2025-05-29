@@ -138,11 +138,11 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#282828]">
+    <div className="min-h-screen bg-youtube-black">
       <div className="relative">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-red-500/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-youtube-red/10 via-transparent to-youtube-red/10"></div>
           <div 
             className="absolute inset-0" 
             style={{
@@ -158,41 +158,14 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[calc(100vh-400px)]">
               {/* Left Side - Search Controls */}
               <div className="lg:col-span-4 space-y-8">
-                <div className="bg-white border border-gray-600 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-3xl font-bold text-[#282828] mb-8 flex items-center gap-4">
-                    <div className="bg-[#FF0000] p-3 rounded-xl shadow-lg">
-                      <Target className="h-7 w-7 text-white" />
+                <div className="tech-card">
+                  <h2 className="text-3xl font-bold text-youtube-white mb-8 flex items-center gap-4 font-orbitron">
+                    <div className="bg-youtube-red p-3 rounded-lg shadow-lg futuristic-glow">
+                      <Target className="h-7 w-7 text-youtube-white" />
                     </div>
                     Prospecção
                   </h2>
                   <SearchForm onSearch={searchChannels} isLoading={isLoading} />
-                </div>
-
-                {/* Score Legend */}
-                <div className="bg-white border border-gray-600 rounded-2xl p-8 shadow-xl">
-                  <h3 className="text-2xl font-bold text-[#282828] mb-6">Classificação de Scores</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-[#FF0000] to-red-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">85 - 100</span>
-                      <span className="text-white font-black">PREMIUM</span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-[#282828] to-gray-700 rounded-xl shadow-md">
-                      <span className="text-white font-bold">70 - 84</span>
-                      <span className="text-white font-black">ÓTIMO</span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">55 - 69</span>
-                      <span className="text-white font-black">BOM</span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">40 - 54</span>
-                      <span className="text-white font-black">RAZOÁVEL</span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md">
-                      <span className="text-white font-bold">0 - 39</span>
-                      <span className="text-white font-black">RUIM</span>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -202,18 +175,18 @@ const Index = () => {
                 {isLoading && (
                   <div className="flex flex-col items-center justify-center py-24">
                     <LoadingSpinner />
-                    <p className="text-white mt-6 text-xl">Analisando canais premium com IA...</p>
+                    <p className="text-youtube-white mt-6 text-xl font-inter">Analisando canais premium com IA...</p>
                   </div>
                 )}
 
                 {/* Error State */}
                 {error && (
-                  <div className="bg-[#FF0000]/10 border border-[#FF0000]/30 rounded-2xl p-8 mb-8">
+                  <div className="bg-youtube-red/10 border border-youtube-red/30 rounded-lg p-8 mb-8">
                     <div className="flex items-center gap-4">
-                      <div className="bg-[#FF0000] p-3 rounded-full">
-                        <Search className="h-6 w-6 text-white" />
+                      <div className="bg-youtube-red p-3 rounded-full futuristic-glow">
+                        <Search className="h-6 w-6 text-youtube-white" />
                       </div>
-                      <p className="text-[#FF0000] font-semibold text-lg">{error}</p>
+                      <p className="text-youtube-red font-semibold text-lg font-inter">{error}</p>
                     </div>
                   </div>
                 )}
@@ -226,16 +199,16 @@ const Index = () => {
                 {/* Empty State */}
                 {!isLoading && !error && channels.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <div className="bg-[#FF0000] p-8 rounded-full mb-8 shadow-xl">
-                      <Target className="h-16 w-16 text-white" />
+                    <div className="bg-youtube-red p-8 rounded-full mb-8 shadow-xl futuristic-glow">
+                      <Target className="h-16 w-16 text-youtube-white" />
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-4">Pronto para Prospectar</h3>
-                    <p className="text-gray-300 max-w-lg text-lg leading-relaxed">
+                    <h3 className="text-3xl font-bold text-youtube-white mb-4 font-orbitron">Pronto para Prospectar</h3>
+                    <p className="text-youtube-gray max-w-lg text-lg leading-relaxed font-inter">
                       Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
                     </p>
-                    <div className="mt-6 flex items-center gap-2 text-[#FF0000]">
+                    <div className="mt-6 flex items-center gap-2 text-youtube-red">
                       <Play className="h-5 w-5 fill-current" />
-                      <span className="font-semibold">Powered by YouTube Data API</span>
+                      <span className="font-semibold font-orbitron">Powered by YouTube Data API</span>
                     </div>
                   </div>
                 )}

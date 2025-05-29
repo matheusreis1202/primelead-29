@@ -20,8 +20,8 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'from-[#FF0000] to-red-600';
-    if (score >= 70) return 'from-[#282828] to-gray-700';
+    if (score >= 85) return 'from-youtube-red to-red-600';
+    if (score >= 70) return 'from-youtube-dark to-gray-700';
     if (score >= 55) return 'from-gray-500 to-gray-600';
     if (score >= 40) return 'from-yellow-500 to-yellow-600';
     return 'from-orange-500 to-orange-600';
@@ -43,33 +43,33 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
   };
 
   const getScoreBorderColor = (score: number) => {
-    if (score >= 85) return 'border-red-200';
-    if (score >= 70) return 'border-gray-600';
+    if (score >= 85) return 'border-youtube-red';
+    if (score >= 70) return 'border-youtube-gray';
     if (score >= 55) return 'border-gray-300';
-    if (score >= 40) return 'border-yellow-200';
-    return 'border-orange-200';
+    if (score >= 40) return 'border-yellow-400';
+    return 'border-orange-400';
   };
 
   const getScoreTextColor = (score: number) => {
-    if (score >= 85) return 'text-[#FF0000]';
-    if (score >= 70) return 'text-[#282828]';
-    if (score >= 55) return 'text-gray-600';
-    if (score >= 40) return 'text-yellow-600';
-    return 'text-orange-600';
+    if (score >= 85) return 'text-youtube-red';
+    if (score >= 70) return 'text-youtube-white';
+    if (score >= 55) return 'text-gray-300';
+    if (score >= 40) return 'text-yellow-400';
+    return 'text-orange-400';
   };
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-4xl font-bold text-white mb-3">
-            Canais <span className="text-gradient bg-gradient-to-r from-[#FF0000] to-red-600 bg-clip-text text-transparent">Premium</span> Encontrados
+          <h2 className="text-4xl font-bold text-youtube-white mb-3 font-orbitron">
+            Canais <span className="text-gradient bg-gradient-to-r from-youtube-red to-red-600 bg-clip-text text-transparent">Premium</span> Encontrados
           </h2>
-          <p className="text-gray-300 text-lg">Ranqueados por algoritmo de performance avançado</p>
+          <p className="text-youtube-gray text-lg font-inter">Ranqueados por algoritmo de performance avançado</p>
         </div>
         <Badge 
           variant="secondary" 
-          className="text-lg px-6 py-3 bg-[#FF0000] text-white border-0 shadow-xl rounded-full"
+          className="text-lg px-6 py-3 bg-youtube-red text-youtube-white border-0 shadow-xl rounded-md futuristic-glow font-orbitron"
         >
           {channels.length} canais descobertos
         </Badge>
@@ -82,12 +82,12 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
           return (
             <Card 
               key={channel.id} 
-              className={`bg-white border ${getScoreBorderColor(channel.score)} hover:border-[#FF0000] transition-all duration-300 hover:shadow-xl group relative rounded-xl`}
+              className={`tech-card ${getScoreBorderColor(channel.score)} group relative`}
             >
               <CardContent className="p-8">
                 {/* Premium Ranking Badge */}
                 {index < 3 && (
-                  <div className="absolute -top-3 -right-3 bg-[#FF0000] text-white text-sm font-bold px-4 py-2 rounded-full shadow-xl border-2 border-white">
+                  <div className="absolute -top-3 -right-3 bg-youtube-red text-youtube-white text-sm font-bold px-4 py-2 rounded-md shadow-xl border-2 border-youtube-black futuristic-glow font-orbitron">
                     <div className="flex items-center gap-1">
                       <Crown className="h-4 w-4" />
                       TOP #{index + 1}
@@ -97,14 +97,14 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
 
                 {/* Score Section */}
                 <div className="flex items-center justify-between mb-6">
-                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-4 rounded-2xl text-white shadow-md`}>
+                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-4 rounded-lg text-youtube-white shadow-md futuristic-glow`}>
                     <ScoreIcon className="h-8 w-8" />
                   </div>
                   <div className="text-right">
-                    <div className={`text-3xl font-bold ${getScoreTextColor(channel.score)}`}>
+                    <div className={`text-3xl font-bold ${getScoreTextColor(channel.score)} font-orbitron`}>
                       {channel.score}/100
                     </div>
-                    <div className={`text-sm font-bold ${getScoreTextColor(channel.score)} opacity-80`}>
+                    <div className={`text-sm font-bold ${getScoreTextColor(channel.score)} opacity-80 font-inter`}>
                       {getScoreLabel(channel.score)}
                     </div>
                   </div>
@@ -116,14 +116,14 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                     <img 
                       src={channel.thumbnail} 
                       alt={channel.title}
-                      className="w-20 h-20 rounded-full border-2 border-gray-300 group-hover:border-[#FF0000] transition-colors shadow-sm"
+                      className="w-20 h-20 rounded-lg border-2 border-youtube-gray group-hover:border-youtube-red transition-colors shadow-sm"
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#282828] text-xl leading-tight mb-3 line-clamp-2 group-hover:text-gray-700 transition-colors">
+                    <h3 className="font-bold text-youtube-white text-xl leading-tight mb-3 line-clamp-2 group-hover:text-youtube-gray transition-colors font-orbitron">
                       {channel.title}
                     </h3>
-                    <p className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full inline-block border border-gray-200">
+                    <p className="text-xs text-youtube-gray bg-youtube-dark px-3 py-1 rounded-md inline-block border border-youtube-red font-inter">
                       ID: {channel.id}
                     </p>
                   </div>
@@ -132,7 +132,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                 {/* Description */}
                 {channel.description && (
                   <div className="mb-8">
-                    <p className="text-sm text-gray-600 line-clamp-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <p className="text-sm text-youtube-gray line-clamp-3 bg-youtube-dark p-4 rounded-lg border border-youtube-red font-inter">
                       {channel.description}
                     </p>
                   </div>
@@ -140,39 +140,39 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
 
                 {/* Metrics */}
                 <div className="space-y-4 mb-8">
-                  <div className="flex items-center justify-between text-sm bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <div className="flex items-center gap-3 text-gray-600">
-                      <div className="bg-[#FF0000] p-2 rounded-lg">
-                        <Users className="h-4 w-4 text-white" />
+                  <div className="flex items-center justify-between text-sm bg-youtube-dark p-4 rounded-lg border border-youtube-red">
+                    <div className="flex items-center gap-3 text-youtube-gray">
+                      <div className="bg-youtube-red p-2 rounded-md futuristic-glow">
+                        <Users className="h-4 w-4 text-youtube-white" />
                       </div>
-                      <span className="font-semibold">Inscritos</span>
+                      <span className="font-semibold font-inter">Inscritos</span>
                     </div>
-                    <span className="font-bold text-[#282828] text-lg">
+                    <span className="font-bold text-youtube-white text-lg font-orbitron">
                       {formatNumber(channel.subscriberCount)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-sm bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <div className="flex items-center gap-3 text-gray-600">
-                      <div className="bg-[#FF0000] p-2 rounded-lg">
-                        <Eye className="h-4 w-4 text-white" />
+                  <div className="flex items-center justify-between text-sm bg-youtube-dark p-4 rounded-lg border border-youtube-red">
+                    <div className="flex items-center gap-3 text-youtube-gray">
+                      <div className="bg-youtube-red p-2 rounded-md futuristic-glow">
+                        <Eye className="h-4 w-4 text-youtube-white" />
                       </div>
-                      <span className="font-semibold">Visualizações</span>
+                      <span className="font-semibold font-inter">Visualizações</span>
                     </div>
-                    <span className="font-bold text-[#282828] text-lg">
+                    <span className="font-bold text-youtube-white text-lg font-orbitron">
                       {formatNumber(channel.viewCount)}
                     </span>
                   </div>
 
-                  {/* Engagement Rate - Verde claro */}
-                  <div className="flex items-center justify-between text-sm p-4 rounded-xl border bg-green-50 border-green-200">
+                  {/* Engagement Rate */}
+                  <div className="flex items-center justify-between text-sm p-4 rounded-lg border bg-youtube-dark border-green-500">
                     <div className="flex items-center gap-3">
-                      <div className="bg-green-500 p-2 rounded-lg">
-                        <TrendingUp className="h-4 w-4 text-white" />
+                      <div className="bg-green-500 p-2 rounded-md futuristic-glow">
+                        <TrendingUp className="h-4 w-4 text-youtube-white" />
                       </div>
-                      <span className="font-semibold text-green-700">Engajamento</span>
+                      <span className="font-semibold text-green-400 font-inter">Engajamento</span>
                     </div>
-                    <span className="font-bold text-green-700 text-lg">
+                    <span className="font-bold text-green-400 text-lg font-orbitron">
                       {engagementRate.toFixed(1)}%
                     </span>
                   </div>
@@ -182,7 +182,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                 <div className="flex flex-col gap-4">
                   <Button 
                     asChild 
-                    className="w-full bg-[#FF0000] hover:bg-red-600 text-white border-0 shadow-md py-3 rounded-xl"
+                    className="w-full futuristic-button py-3 rounded-md font-orbitron"
                   >
                     <a 
                       href={`https://www.youtube.com/channel/${channel.id}`} 
@@ -199,7 +199,7 @@ export const ChannelResults = ({ channels }: ChannelResultsProps) => {
                   <Button 
                     asChild 
                     variant="outline" 
-                    className="w-full border-gray-300 bg-white text-[#282828] hover:bg-gray-50 hover:border-[#FF0000] py-3 rounded-xl"
+                    className="w-full border-youtube-red bg-youtube-dark text-youtube-white hover:bg-youtube-red hover:border-youtube-red py-3 rounded-md transition-all duration-300 font-inter"
                   >
                     <a 
                       href={`https://www.youtube.com/channel/${channel.id}/about`} 
