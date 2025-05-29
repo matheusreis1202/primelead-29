@@ -157,12 +157,12 @@ export const AdvancedAnalysisForm = ({ onAnalyze, isLoading }: AdvancedAnalysisF
               <Label className="text-youtube-white font-semibold font-roboto">
                 País de Atuação
               </Label>
-              <Select value={filters.pais || ''} onValueChange={(value) => updateFilter('pais', value)}>
+              <Select value={filters.pais || 'any'} onValueChange={(value) => updateFilter('pais', value === 'any' ? undefined : value)}>
                 <SelectTrigger className="tech-input">
                   <SelectValue placeholder="Selecione um país" />
                 </SelectTrigger>
                 <SelectContent className="bg-youtube-dark border-youtube-red text-youtube-white">
-                  <SelectItem value="">Qualquer país</SelectItem>
+                  <SelectItem value="any">Qualquer país</SelectItem>
                   <SelectItem value="BR">🇧🇷 Brasil</SelectItem>
                   <SelectItem value="US">🇺🇸 Estados Unidos</SelectItem>
                   <SelectItem value="PT">🇵🇹 Portugal</SelectItem>
@@ -175,12 +175,12 @@ export const AdvancedAnalysisForm = ({ onAnalyze, isLoading }: AdvancedAnalysisF
               <Label className="text-youtube-white font-semibold font-roboto">
                 Idioma Predominante
               </Label>
-              <Select value={filters.idioma || ''} onValueChange={(value) => updateFilter('idioma', value)}>
+              <Select value={filters.idioma || 'any'} onValueChange={(value) => updateFilter('idioma', value === 'any' ? undefined : value)}>
                 <SelectTrigger className="tech-input">
                   <SelectValue placeholder="Selecione um idioma" />
                 </SelectTrigger>
                 <SelectContent className="bg-youtube-dark border-youtube-red text-youtube-white">
-                  <SelectItem value="">Qualquer idioma</SelectItem>
+                  <SelectItem value="any">Qualquer idioma</SelectItem>
                   <SelectItem value="pt">Português</SelectItem>
                   <SelectItem value="en">Inglês</SelectItem>
                   <SelectItem value="es">Espanhol</SelectItem>
