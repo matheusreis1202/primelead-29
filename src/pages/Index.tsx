@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
-import { SearchForm } from '@/components/SearchForm';
-import { ChannelResults } from '@/components/ChannelResults';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { PremiumHeader } from '@/components/PremiumHeader';
-import { Search, Target, Play } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DashboardTab } from '@/components/tabs/DashboardTab';
+import { ResultsTab } from '@/components/tabs/ResultsTab';
+import { AnalyticsTab } from '@/components/tabs/AnalyticsTab';
 
 export interface SearchFilters {
   apiKey: string;
@@ -30,6 +31,7 @@ const Index = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   const calculateChannelScore = (channel: any): number => {
     // Advanced scoring algorithm for YouTube channels
@@ -127,6 +129,8 @@ const Index = () => {
       
       if (foundChannels.length === 0) {
         setError('Nenhum canal encontrado com os filtros selecionados.');
+      } else {
+        setActiveTab('results'); // Switch to results tab after successful search
       }
 
     } catch (error) {
@@ -155,65 +159,35 @@ const Index = () => {
           <PremiumHeader />
           
           <div className="container mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[calc(100vh-400px)]">
-              {/* Left Side - Search Controls */}
-              <div className="lg:col-span-4 space-y-8">
-                <div className="tech-card">
-                  <h2 className="text-3xl font-bold text-youtube-white mb-8 flex items-center gap-4 font-orbitron">
-                    <div className="bg-youtube-red p-3 rounded-lg shadow-lg futuristic-glow">
-                      <Target className="h-7 w-7 text-youtube-white" />
-                    </div>
-                    Prospecção
-                  </h2>
-                  <SearchForm onSearch={searchChannels} isLoading={isLoading} />
-                </div>
-              </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-8">
+                <TabsTrigger value="dashboard" className="font-orbitron font-semibold">
+                  Dashboard
+                </TabsTrigger>
+                <TabsTrigger value="results" className="font-orbitron font-semibold">
+                  Resultados
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="font-orbitron font-semibold">
+                  Análises
+                </TabsTrigger>
+              </TabsList>
 
-              {/* Right Side - Results */}
-              <div className="lg:col-span-8">
-                {/* Loading State */}
-                {isLoading && (
-                  <div className="flex flex-col items-center justify-center py-24">
-                    <LoadingSpinner />
-                    <p className="text-youtube-white mt-6 text-xl font-inter">Analisando canais premium com IA...</p>
-                  </div>
-                )}
+              <TabsContent value="dashboard">
+                <DashboardTab onSearch={searchChannels} isLoading={isLoading} />
+              </TabsContent>
 
-                {/* Error State */}
-                {error && (
-                  <div className="bg-youtube-red/10 border border-youtube-red/30 rounded-lg p-8 mb-8">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-youtube-red p-3 rounded-full futuristic-glow">
-                        <Search className="h-6 w-6 text-youtube-white" />
-                      </div>
-                      <p className="text-youtube-red font-semibold text-lg font-inter">{error}</p>
-                    </div>
-                  </div>
-                )}
+              <TabsContent value="results">
+                <ResultsTab 
+                  channels={channels} 
+                  isLoading={isLoading} 
+                  error={error} 
+                />
+              </TabsContent>
 
-                {/* Results */}
-                {channels.length > 0 && (
-                  <ChannelResults channels={channels} />
-                )}
-
-                {/* Empty State */}
-                {!isLoading && !error && channels.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <div className="bg-youtube-red p-8 rounded-full mb-8 shadow-xl futuristic-glow">
-                      <Target className="h-16 w-16 text-youtube-white" />
-                    </div>
-                    <h3 className="text-3xl font-bold text-youtube-white mb-4 font-orbitron">Pronto para Prospectar</h3>
-                    <p className="text-youtube-gray max-w-lg text-lg leading-relaxed font-inter">
-                      Configure seus filtros de busca e descubra os melhores canais premium do YouTube para sua estratégia.
-                    </p>
-                    <div className="mt-6 flex items-center gap-2 text-youtube-red">
-                      <Play className="h-5 w-5 fill-current" />
-                      <span className="font-semibold font-orbitron">Powered by YouTube Data API</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+              <TabsContent value="analytics">
+                <AnalyticsTab channels={channels} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
