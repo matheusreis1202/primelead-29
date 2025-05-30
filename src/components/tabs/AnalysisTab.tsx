@@ -41,20 +41,50 @@ interface ChannelAnalysis {
     faixaEtaria: string;
     localizacao: string;
   };
+  partnershipScore: {
+    overall: number;
+    audienceSize: number;
+    engagement: number;
+    consistency: number;
+    content: number;
+    reachability: number;
+  };
+  socialMedia: {
+    email?: string;
+    instagram?: string;
+    tiktok?: string;
+    website?: string;
+  };
 }
 
 interface AnalysisTabProps {
   channelsForAnalysis: Channel[];
   onRemoveFromAnalysis: (channelId: string) => void;
+  onSaveChannel: (channel: Channel) => void;
+  isChannelSaved: (channelId: string) => boolean;
 }
 
-export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: AnalysisTabProps) => {
+export const AnalysisTab = ({ 
+  channelsForAnalysis, 
+  onRemoveFromAnalysis, 
+  onSaveChannel,
+  isChannelSaved 
+}: AnalysisTabProps) => {
   const [analyzedChannels, setAnalyzedChannels] = useState<ChannelAnalysis[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const analyzeChannel = (channel: Channel): ChannelAnalysis => {
     const engagementRate = (channel.viewCount / channel.subscriberCount) * 100;
     const avgViews = channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 1000));
+
+    // Simular score de parceria mais realista
+    const audienceScore = channel.subscriberCount > 100000 ? 20 : channel.subscriberCount > 10000 ? 15 : 10;
+    const engagementScore = engagementRate > 5 ? 20 : engagementRate > 2 ? 15 : 10;
+    const consistencyScore = 15;
+    const contentScore = 12;
+    const reachabilityScore = Math.floor(Math.random() * 10) + 5;
+    
+    const overallScore = audienceScore + engagementScore + consistencyScore + contentScore + reachabilityScore;
 
     return {
       id: channel.id,
@@ -94,6 +124,20 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
         genero: ['Masculino', 'Feminino', 'Misto'][Math.floor(Math.random() * 3)] as any,
         faixaEtaria: '18-34 anos',
         localizacao: 'Brasil'
+      },
+      partnershipScore: {
+        overall: overallScore,
+        audienceSize: audienceScore,
+        engagement: engagementScore,
+        consistency: consistencyScore,
+        content: contentScore,
+        reachability: reachabilityScore
+      },
+      socialMedia: {
+        email: Math.random() > 0.7 ? 'contato@exemplo.com' : undefined,
+        instagram: Math.random() > 0.6 ? 'https://instagram.com/canal' : undefined,
+        tiktok: Math.random() > 0.8 ? 'https://tiktok.com/@canal' : undefined,
+        website: Math.random() > 0.9 ? 'https://website.com' : undefined
       }
     };
   };
@@ -171,7 +215,7 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
         )}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {channelsForAnalysis.map(channel => {
           const analysis = analyzedChannels.find(a => a.id === channel.id);
           return (
@@ -181,6 +225,9 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
               analysis={analysis}
               onRemove={() => onRemoveFromAnalysis(channel.id)}
               onAnalyze={() => handleAnalyzeIndividual(channel)}
+              onSave={() => onSaveChannel(channel)}
+              showSaveButton={true}
+              isSaved={isChannelSaved(channel.id)}
             />
           );
         })}

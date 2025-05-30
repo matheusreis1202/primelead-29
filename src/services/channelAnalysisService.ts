@@ -1,5 +1,5 @@
-
 import { AnalysisFilters, ChannelAnalysisData, AnalysisResult, ChannelDemographics } from '@/types/analysis';
+import { SocialMediaService } from './socialMediaService';
 
 export class ChannelAnalysisService {
   private async fetchChannelData(channelId: string, apiKey: string): Promise<any> {
@@ -107,35 +107,15 @@ export class ChannelAnalysisService {
   }
 
   private calculatePartnershipScore(channel: ChannelAnalysisData): { recomendacao: 'EXCELENTE' | 'BOM' | 'REGULAR' | 'RUIM', pontuacao: number } {
-    let pontuacao = 0;
-
-    // Critérios de pontuação
-    if (channel.inscritos >= 100000) pontuacao += 25;
-    else if (channel.inscritos >= 50000) pontuacao += 20;
-    else if (channel.inscritos >= 10000) pontuacao += 15;
-    else pontuacao += 5;
-
-    if (channel.taxaEngajamento >= 5.0) pontuacao += 25;
-    else if (channel.taxaEngajamento >= 3.0) pontuacao += 20;
-    else if (channel.taxaEngajamento >= 1.0) pontuacao += 15;
-    else pontuacao += 5;
-
-    if (channel.uploadsPerMonth >= 4) pontuacao += 20;
-    else if (channel.uploadsPerMonth >= 2) pontuacao += 15;
-    else if (channel.uploadsPerMonth >= 1) pontuacao += 10;
-    else pontuacao += 5;
-
-    if (channel.emailContato) pontuacao += 15;
-    
-    if (channel.palavrasChaveEncontradas.length > 0) pontuacao += 15;
+    const score = channel.partnershipScore.overall;
 
     let recomendacao: 'EXCELENTE' | 'BOM' | 'REGULAR' | 'RUIM';
-    if (pontuacao >= 80) recomendacao = 'EXCELENTE';
-    else if (pontuacao >= 60) recomendacao = 'BOM';
-    else if (pontuacao >= 40) recomendacao = 'REGULAR';
+    if (score >= 80) recomendacao = 'EXCELENTE';
+    else if (score >= 60) recomendacao = 'BOM';
+    else if (score >= 40) recomendacao = 'REGULAR';
     else recomendacao = 'RUIM';
 
-    return { recomendacao, pontuacao };
+    return { recomendacao, pontuacao: score };
   }
 
   private findKeywords(text: string, keywords: string[]): string[] {
@@ -226,6 +206,12 @@ export class ChannelAnalysisService {
         // Extrair email de contato
         const emailContato = await this.extractContactEmail(canal);
 
+        // Buscar informações de redes sociais
+        const socialMedia = await SocialMediaService.extractSocialMediaInfo(canal);
+        
+        // Calcular score de parceria
+        const partnershipScoreData = SocialMediaService.calculatePartnershipScore(canal, socialMedia, stats);
+
         // Estimar demografia
         const demographics = this.estimateDemographics(canal);
 
@@ -244,11 +230,13 @@ export class ChannelAnalysisService {
           palavrasChaveEncontradas,
           uploadsPerMonth,
           demographics,
-          emailContato,
+          emailContato: socialMedia.email || emailContato,
           aprovado: false,
           motivosReprovacao: [],
           recomendacaoParceria: 'RUIM',
-          pontuacaoGeral: 0
+          pontuacaoGeral: 0,
+          socialMedia,
+          partnershipScore: partnershipScoreData.breakdown
         };
 
         // Aplicar filtros

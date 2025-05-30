@@ -11,9 +11,12 @@ import {
   Award, 
   X,
   BarChart3,
-  Clock,
   Star,
-  Zap
+  Zap,
+  Heart,
+  Mail,
+  Globe,
+  Instagram
 } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
@@ -52,6 +55,20 @@ interface ChannelAnalysis {
     faixaEtaria: string;
     localizacao: string;
   };
+  partnershipScore: {
+    overall: number;
+    audienceSize: number;
+    engagement: number;
+    consistency: number;
+    content: number;
+    reachability: number;
+  };
+  socialMedia: {
+    email?: string;
+    instagram?: string;
+    tiktok?: string;
+    website?: string;
+  };
 }
 
 interface ChannelAnalysisCardProps {
@@ -59,9 +76,20 @@ interface ChannelAnalysisCardProps {
   analysis?: ChannelAnalysis;
   onRemove: () => void;
   onAnalyze?: () => void;
+  onSave?: () => void;
+  showSaveButton?: boolean;
+  isSaved?: boolean;
 }
 
-export const ChannelAnalysisCard = ({ channel, analysis, onRemove, onAnalyze }: ChannelAnalysisCardProps) => {
+export const ChannelAnalysisCard = ({ 
+  channel, 
+  analysis, 
+  onRemove, 
+  onAnalyze, 
+  onSave,
+  showSaveButton = true,
+  isSaved = false
+}: ChannelAnalysisCardProps) => {
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M`;
@@ -69,6 +97,13 @@ export const ChannelAnalysisCard = ({ channel, analysis, onRemove, onAnalyze }: 
       return `${(num / 1000).toFixed(1)}K`;
     }
     return num.toLocaleString();
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-400';
+    if (score >= 60) return 'text-blue-400';
+    if (score >= 40) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
   const getClassificationColor = (classification: string) => {
@@ -93,22 +128,32 @@ export const ChannelAnalysisCard = ({ channel, analysis, onRemove, onAnalyze }: 
 
   return (
     <Card className="tech-card border-youtube-red/30">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="bg-youtube-red p-3 rounded-lg futuristic-glow">
-              <BarChart3 className="h-6 w-6 text-youtube-white" />
-            </div>
+          <div className="flex items-center gap-3">
+            <img 
+              src={channel.thumbnail} 
+              alt={channel.title}
+              className="w-12 h-12 rounded-full object-cover"
+            />
             <div>
-              <CardTitle className="text-youtube-white font-roboto">
-                Canal Analisado
+              <CardTitle className="text-youtube-white font-roboto text-lg">
+                {channel.title}
               </CardTitle>
               <p className="text-youtube-gray font-roboto text-sm">
-                {channel.title}
+                {formatNumber(channel.subscriberCount)} inscritos
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {analysis && (
+              <div className="text-center">
+                <div className={`text-2xl font-bold ${getScoreColor(analysis.partnershipScore.overall)}`}>
+                  {analysis.partnershipScore.overall}
+                </div>
+                <div className="text-xs text-youtube-gray">Score</div>
+              </div>
+            )}
             {!analysis && onAnalyze && (
               <Button
                 onClick={onAnalyze}
@@ -117,6 +162,16 @@ export const ChannelAnalysisCard = ({ channel, analysis, onRemove, onAnalyze }: 
               >
                 <Zap className="h-4 w-4 mr-1" />
                 Analisar
+              </Button>
+            )}
+            {showSaveButton && onSave && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onSave}
+                className={`${isSaved ? 'text-red-500' : 'text-youtube-gray'} hover:text-red-400`}
+              >
+                <Heart className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
               </Button>
             )}
             <Button
@@ -131,137 +186,108 @@ export const ChannelAnalysisCard = ({ channel, analysis, onRemove, onAnalyze }: 
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="pt-0">
         {!analysis ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="text-center">
-              <p className="text-youtube-gray font-roboto">Clique em "Analisar" para ver os resultados</p>
-            </div>
+          <div className="flex items-center justify-center py-6">
+            <p className="text-youtube-gray font-roboto">Clique em "Analisar" para ver os resultados</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Tamanho da Audiência */}
-            <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="h-4 w-4 text-youtube-red" />
-                <h3 className="font-semibold text-youtube-white font-roboto">Audiência</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Inscritos:</span>
-                  <span className="text-youtube-white font-bold">{formatNumber(analysis.audienciaSize.inscritos)}</span>
+          <div className="space-y-4">
+            {/* Informações de Contato */}
+            {(analysis.socialMedia.email || analysis.socialMedia.instagram || analysis.socialMedia.tiktok || analysis.socialMedia.website) && (
+              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
+                <h4 className="text-youtube-white font-semibold text-sm mb-2 flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-youtube-red" />
+                  Informações de Contato
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {analysis.socialMedia.email && (
+                    <div className="flex items-center gap-1">
+                      <Mail className="h-3 w-3 text-youtube-gray" />
+                      <span className="text-youtube-white truncate">{analysis.socialMedia.email}</span>
+                    </div>
+                  )}
+                  {analysis.socialMedia.instagram && (
+                    <div className="flex items-center gap-1">
+                      <Instagram className="h-3 w-3 text-youtube-gray" />
+                      <span className="text-youtube-white truncate">Instagram</span>
+                    </div>
+                  )}
+                  {analysis.socialMedia.tiktok && (
+                    <div className="flex items-center gap-1">
+                      <div className="h-3 w-3 bg-youtube-gray rounded-sm" />
+                      <span className="text-youtube-white truncate">TikTok</span>
+                    </div>
+                  )}
+                  {analysis.socialMedia.website && (
+                    <div className="flex items-center gap-1">
+                      <Globe className="h-3 w-3 text-youtube-gray" />
+                      <span className="text-youtube-white truncate">Website</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Views:</span>
-                  <span className="text-youtube-white font-bold">{formatNumber(analysis.audienciaSize.views)}</span>
-                </div>
-                <Badge className={`${getClassificationColor(analysis.audienciaSize.classificacao)} text-white`}>
-                  {analysis.audienciaSize.classificacao}
-                </Badge>
               </div>
-            </div>
+            )}
 
-            {/* Engajamento */}
-            <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-4 w-4 text-youtube-red" />
-                <h3 className="font-semibold text-youtube-white font-roboto">Engajamento</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Taxa:</span>
-                  <span className="text-youtube-white font-bold">{analysis.engajamento.taxaEngajamento.toFixed(1)}%</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Média Views:</span>
-                  <span className="text-youtube-white font-bold">{formatNumber(analysis.engajamento.mediaViews)}</span>
-                </div>
-                <Badge className={`${getClassificationColor(analysis.engajamento.classificacao)} text-white`}>
-                  {analysis.engajamento.classificacao}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Nicho e Público-Alvo */}
-            <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="h-4 w-4 text-youtube-red" />
-                <h3 className="font-semibold text-youtube-white font-roboto">Nicho</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Categoria:</span>
-                  <span className="text-youtube-white">{analysis.nicho.categoria}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Público:</span>
-                  <span className="text-youtube-white">{analysis.nicho.publicoAlvo}</span>
-                </div>
-                <Badge className={`${getClassificationColor(analysis.nicho.relevancia)} text-white`}>
-                  Relevância {analysis.nicho.relevancia}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Qualidade do Conteúdo */}
-            <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Award className="h-4 w-4 text-youtube-red" />
-                <h3 className="font-semibold text-youtube-white font-roboto">Qualidade</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Estilo:</span>
-                  <span className="text-youtube-white">{analysis.qualidadeConteudo.estilo}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Nota:</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-youtube-white font-bold">{analysis.qualidadeConteudo.nota}/10</span>
-                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
+            {/* Score Breakdown */}
+            <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
+              <h4 className="text-youtube-white font-semibold text-sm mb-2 flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-youtube-red" />
+                Análise de Parceria
+              </h4>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="text-center">
+                  <div className={`font-bold ${getScoreColor(analysis.partnershipScore.audienceSize * 4)}`}>
+                    {analysis.partnershipScore.audienceSize}
                   </div>
+                  <div className="text-youtube-gray">Audiência</div>
                 </div>
-                <Badge className={`${getClassificationColor(analysis.qualidadeConteudo.consistencia)} text-white`}>
-                  {analysis.qualidadeConteudo.consistencia}
-                </Badge>
+                <div className="text-center">
+                  <div className={`font-bold ${getScoreColor(analysis.partnershipScore.engagement * 4)}`}>
+                    {analysis.partnershipScore.engagement}
+                  </div>
+                  <div className="text-youtube-gray">Engajamento</div>
+                </div>
+                <div className="text-center">
+                  <div className={`font-bold ${getScoreColor(analysis.partnershipScore.reachability * 6.67)}`}>
+                    {analysis.partnershipScore.reachability}
+                  </div>
+                  <div className="text-youtube-gray">Contato</div>
+                </div>
               </div>
             </div>
 
-            {/* Frequência */}
-            <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Calendar className="h-4 w-4 text-youtube-red" />
-                <h3 className="font-semibold text-youtube-white font-roboto">Frequência</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Uploads/mês:</span>
-                  <span className="text-youtube-white font-bold">{analysis.frequencia.uploadsPerMes}</span>
+            {/* Métricas Principais */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-4 w-4 text-youtube-red" />
+                  <span className="text-youtube-white font-semibold text-sm">Audiência</span>
                 </div>
-                <Badge className={`${getClassificationColor(analysis.frequencia.consistencia)} text-white`}>
-                  {analysis.frequencia.consistencia}
-                </Badge>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-youtube-gray">Inscritos:</span>
+                    <span className="text-youtube-white font-bold">{formatNumber(analysis.audienciaSize.inscritos)}</span>
+                  </div>
+                  <Badge className={`${getClassificationColor(analysis.audienciaSize.classificacao)} text-white text-xs`}>
+                    {analysis.audienciaSize.classificacao}
+                  </Badge>
+                </div>
               </div>
-            </div>
 
-            {/* Tipo de Público */}
-            <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Eye className="h-4 w-4 text-youtube-red" />
-                <h3 className="font-semibold text-youtube-white font-roboto">Público</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Gênero:</span>
-                  <span className="text-youtube-white">{analysis.tipoPublico.genero}</span>
+              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="h-4 w-4 text-youtube-red" />
+                  <span className="text-youtube-white font-semibold text-sm">Engajamento</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Idade:</span>
-                  <span className="text-youtube-white">{analysis.tipoPublico.faixaEtaria}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-youtube-gray">Local:</span>
-                  <span className="text-youtube-white">{analysis.tipoPublico.localizacao}</span>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-youtube-gray">Taxa:</span>
+                    <span className="text-youtube-white font-bold">{analysis.engajamento.taxaEngajamento.toFixed(1)}%</span>
+                  </div>
+                  <Badge className={`${getClassificationColor(analysis.engajamento.classificacao)} text-white text-xs`}>
+                    {analysis.engajamento.classificacao}
+                  </Badge>
                 </div>
               </div>
             </div>

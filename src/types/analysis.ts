@@ -17,6 +17,22 @@ export interface ChannelDemographics {
   paisesTopAudiencia: string[];
 }
 
+export interface SocialMediaInfo {
+  instagram?: string;
+  tiktok?: string;
+  email?: string;
+  website?: string;
+}
+
+export interface PartnershipScore {
+  overall: number;
+  audienceSize: number;
+  engagement: number;
+  consistency: number;
+  content: number;
+  reachability: number;
+}
+
 export interface ChannelAnalysisData {
   id: string;
   nome: string;
@@ -37,6 +53,8 @@ export interface ChannelAnalysisData {
   motivosReprovacao: string[];
   recomendacaoParceria: 'EXCELENTE' | 'BOM' | 'REGULAR' | 'RUIM';
   pontuacaoGeral: number;
+  socialMedia: SocialMediaInfo;
+  partnershipScore: PartnershipScore;
 }
 
 export interface AnalysisResult {
