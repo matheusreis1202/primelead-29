@@ -35,13 +35,13 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
   };
 
   return (
-    <div className="tech-card p-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="bg-gradient-to-br from-youtube-dark via-gray-900 to-youtube-dark border border-youtube-red/20 rounded-xl p-6 shadow-2xl backdrop-blur-sm">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* API Key */}
         <div className="space-y-2">
-          <Label htmlFor="apiKey" className="text-sm font-semibold text-youtube-white flex items-center gap-2">
+          <Label htmlFor="apiKey" className="text-sm font-medium text-youtube-white flex items-center gap-2">
             🔑 Chave da API do YouTube *
-            <span className="text-youtube-gray text-xs bg-youtube-dark px-2 py-1 rounded border border-youtube-red/30">YouTube Data API</span>
+            <span className="text-youtube-gray text-xs bg-youtube-red/10 px-2 py-1 rounded-full border border-youtube-red/30">YouTube Data API</span>
           </Label>
           <Input
             id="apiKey"
@@ -49,26 +49,26 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
             placeholder="Cole sua chave da API aqui..."
             value={filters.apiKey}
             onChange={(e) => updateFilter('apiKey', e.target.value)}
-            className="tech-input h-10"
+            className="modern-input h-10"
             required
           />
-          <p className="text-xs text-youtube-gray bg-youtube-dark p-2 rounded border border-youtube-red/30">
+          <p className="text-xs text-youtube-gray bg-gradient-to-r from-youtube-red/5 to-transparent p-3 rounded-lg border border-youtube-red/20">
             💡 Obtenha gratuitamente em: console.cloud.google.com → YouTube Data API v3
           </p>
         </div>
 
         {/* Nicho */}
         <div className="space-y-2">
-          <Label htmlFor="nicho" className="text-sm font-semibold text-youtube-white flex items-center gap-2">
+          <Label htmlFor="nicho" className="text-sm font-medium text-youtube-white flex items-center gap-2">
             🎯 Nicho/Palavra-chave *
-            <span className="text-youtube-white text-xs bg-youtube-red px-2 py-1 rounded">IA Enhanced</span>
+            <span className="text-youtube-white text-xs bg-gradient-to-r from-youtube-red to-red-600 px-2 py-1 rounded-full shadow-lg">IA Enhanced</span>
           </Label>
           <Input
             id="nicho"
             placeholder="Ex: tecnologia, culinária, fitness, empreendedorismo..."
             value={filters.nicho}
             onChange={(e) => updateFilter('nicho', e.target.value)}
-            className="tech-input h-10"
+            className="modern-input h-10"
             required
           />
         </div>
@@ -76,17 +76,17 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* País */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-youtube-white flex items-center gap-2">
-              <div className="bg-youtube-red p-1 rounded">
+            <Label className="text-sm font-medium text-youtube-white flex items-center gap-2">
+              <div className="bg-gradient-to-r from-youtube-red to-red-600 p-1.5 rounded-lg shadow-lg">
                 <Globe className="h-3 w-3 text-youtube-white" />
               </div>
               País de Origem
             </Label>
             <Select value={filters.pais} onValueChange={(value) => updateFilter('pais', value)}>
-              <SelectTrigger className="tech-input h-10">
+              <SelectTrigger className="modern-input h-10">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-youtube-dark border-youtube-red text-youtube-white">
+              <SelectContent className="bg-gradient-to-br from-youtube-dark to-gray-900 border-youtube-red/30 text-youtube-white">
                 <SelectItem value="BR">🇧🇷 Brasil</SelectItem>
                 <SelectItem value="US">🇺🇸 Estados Unidos</SelectItem>
                 <SelectItem value="PT">🇵🇹 Portugal</SelectItem>
@@ -101,17 +101,17 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
 
           {/* Idioma */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-youtube-white flex items-center gap-2">
-              <div className="bg-youtube-red p-1 rounded">
+            <Label className="text-sm font-medium text-youtube-white flex items-center gap-2">
+              <div className="bg-gradient-to-r from-youtube-red to-red-600 p-1.5 rounded-lg shadow-lg">
                 <span className="text-youtube-white text-xs">🗣️</span>
               </div>
               Idioma Principal
             </Label>
             <Select value={filters.idioma} onValueChange={(value) => updateFilter('idioma', value)}>
-              <SelectTrigger className="tech-input h-10">
+              <SelectTrigger className="modern-input h-10">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-youtube-dark border-youtube-red text-youtube-white">
+              <SelectContent className="bg-gradient-to-br from-youtube-dark to-gray-900 border-youtube-red/30 text-youtube-white">
                 <SelectItem value="pt">Português</SelectItem>
                 <SelectItem value="en">Inglês</SelectItem>
                 <SelectItem value="es">Espanhol</SelectItem>
@@ -126,8 +126,8 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Inscritos */}
           <div className="space-y-3">
-            <Label className="text-sm font-semibold text-youtube-white flex items-center gap-2">
-              <div className="bg-youtube-red p-1 rounded">
+            <Label className="text-sm font-medium text-youtube-white flex items-center gap-2">
+              <div className="bg-gradient-to-r from-youtube-red to-red-600 p-1.5 rounded-lg shadow-lg">
                 <Users className="h-3 w-3 text-youtube-white" />
               </div>
               Número de Inscritos
@@ -141,7 +141,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                   placeholder="1,000"
                   value={filters.minInscritos}
                   onChange={(e) => updateFilter('minInscritos', parseInt(e.target.value) || 0)}
-                  className="tech-input h-9"
+                  className="modern-input h-9"
                 />
               </div>
               <div>
@@ -152,7 +152,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                   placeholder="1,000,000"
                   value={filters.maxInscritos}
                   onChange={(e) => updateFilter('maxInscritos', parseInt(e.target.value) || Infinity)}
-                  className="tech-input h-9"
+                  className="modern-input h-9"
                 />
               </div>
             </div>
@@ -161,8 +161,8 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
           {/* Views e Frequência */}
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label htmlFor="minViews" className="text-sm font-semibold text-youtube-white flex items-center gap-2">
-                <div className="bg-youtube-red p-1 rounded">
+              <Label htmlFor="minViews" className="text-sm font-medium text-youtube-white flex items-center gap-2">
+                <div className="bg-gradient-to-r from-youtube-red to-red-600 p-1.5 rounded-lg shadow-lg">
                   <Eye className="h-3 w-3 text-youtube-white" />
                 </div>
                 Visualizações Mínimas
@@ -173,12 +173,12 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                 placeholder="10,000"
                 value={filters.minViews}
                 onChange={(e) => updateFilter('minViews', parseInt(e.target.value) || 0)}
-                className="tech-input h-9"
+                className="modern-input h-9"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="freqMinima" className="text-sm font-semibold text-youtube-white flex items-center gap-2">
-                <div className="bg-youtube-red p-1 rounded">
+              <Label htmlFor="freqMinima" className="text-sm font-medium text-youtube-white flex items-center gap-2">
+                <div className="bg-gradient-to-r from-youtube-red to-red-600 p-1.5 rounded-lg shadow-lg">
                   <Calendar className="h-3 w-3 text-youtube-white" />
                 </div>
                 Uploads por Semana
@@ -189,7 +189,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
                 placeholder="1"
                 value={filters.freqMinima}
                 onChange={(e) => updateFilter('freqMinima', parseInt(e.target.value) || 0)}
-                className="tech-input h-9"
+                className="modern-input h-9"
               />
             </div>
           </div>
@@ -198,7 +198,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
         <Button 
           type="submit" 
           disabled={isLoading || !filters.apiKey || !filters.nicho}
-          className="w-full futuristic-button py-3 text-base font-bold"
+          className="w-full premium-button py-3 text-base font-semibold"
         >
           {isLoading ? (
             <div className="flex items-center gap-2">
