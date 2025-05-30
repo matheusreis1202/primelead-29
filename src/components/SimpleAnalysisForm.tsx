@@ -46,7 +46,7 @@ export const SimpleAnalysisForm = ({ onAnalyze, isLoading }: SimpleAnalysisFormP
             <CardTitle className="text-youtube-white font-roboto text-xl">
               Análise Inteligente de Canais
             </CardTitle>
-            <p className="text-youtube-gray text-sm font-roboto">
+            <p className="text-neutral-400 text-sm font-roboto">
               Sistema automático com critérios otimizados para parcerias
             </p>
           </div>
@@ -84,18 +84,18 @@ export const SimpleAnalysisForm = ({ onAnalyze, isLoading }: SimpleAnalysisFormP
               className="tech-input min-h-[100px]"
               required
             />
-            <p className="text-youtube-gray text-xs font-roboto">
+            <p className="text-neutral-400 text-xs font-roboto">
               💡 Insira múltiplos IDs de canais separados por vírgula
             </p>
           </div>
 
           {/* Critérios automáticos */}
-          <div className="bg-youtube-dark/50 border border-youtube-red/30 rounded-lg p-4">
+          <div className="bg-neutral-800/50 border border-youtube-red/30 rounded-lg p-4">
             <h3 className="text-youtube-white font-semibold font-roboto mb-3 flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-youtube-red" />
               Critérios de Análise Automática
             </h3>
-            <div className="text-youtube-gray text-sm space-y-1 font-roboto">
+            <div className="text-neutral-400 text-sm space-y-1 font-roboto">
               <p>✅ Mínimo de 1.000 inscritos</p>
               <p>✅ Mínimo de 10.000 visualizações totais</p>
               <p>✅ Taxa mínima de engajamento: 1%</p>

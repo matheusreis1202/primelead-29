@@ -96,7 +96,7 @@ export const KeywordGenerator = () => {
           <h2 className="text-2xl font-bold text-youtube-white font-roboto">
             Gerador de Palavras-chave
           </h2>
-          <p className="text-youtube-gray font-roboto">
+          <p className="text-neutral-400 font-roboto">
             Gere ideias de palavras-chave para sua prospecção
           </p>
         </div>
@@ -148,7 +148,7 @@ export const KeywordGenerator = () => {
               {keywords.map((keyword, index) => (
                 <div 
                   key={index}
-                  className="flex items-center justify-between p-3 bg-youtube-dark border border-youtube-red/30 rounded-lg hover:border-youtube-red transition-colors group"
+                  className="flex items-center justify-between p-3 bg-neutral-800 border border-youtube-red/30 rounded-lg hover:border-youtube-red transition-colors group"
                 >
                   <span className="text-youtube-white font-roboto text-sm">
                     {keyword}
@@ -157,7 +157,7 @@ export const KeywordGenerator = () => {
                     size="sm"
                     variant="ghost"
                     onClick={() => copyKeyword(keyword)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-youtube-gray hover:text-youtube-white"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-neutral-400 hover:text-youtube-white"
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
