@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardTab } from '@/components/tabs/DashboardTab';
 import { ResultsTab } from '@/components/tabs/ResultsTab';
 import { AnalysisTab } from '@/components/tabs/AnalysisTab';
+import { SavedTab } from '@/components/tabs/SavedTab';
+import { useSavedChannels } from '@/hooks/useSavedChannels';
 
 export interface SearchFilters {
   apiKey: string;
@@ -32,6 +34,8 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+  
+  const { savedChannels, saveChannel, removeChannel, isChannelSaved } = useSavedChannels();
 
   const handleSendToAnalysis = (channel: Channel) => {
     if (!channelsForAnalysis.find(c => c.id === channel.id)) {
@@ -169,7 +173,7 @@ const Index = () => {
           
           <div className="container mx-auto px-4 py-12">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsList className="grid w-full grid-cols-4 mb-8">
                 <TabsTrigger value="dashboard" className="font-roboto font-semibold">
                   Dashboard
                 </TabsTrigger>
@@ -181,6 +185,14 @@ const Index = () => {
                   {channelsForAnalysis.length > 0 && (
                     <span className="ml-2 bg-youtube-red text-white text-xs px-2 py-1 rounded-full">
                       {channelsForAnalysis.length}
+                    </span>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="saved" className="font-roboto font-semibold">
+                  Salvos
+                  {savedChannels.length > 0 && (
+                    <span className="ml-2 bg-youtube-red text-white text-xs px-2 py-1 rounded-full">
+                      {savedChannels.length}
                     </span>
                   )}
                 </TabsTrigger>
@@ -203,6 +215,15 @@ const Index = () => {
                 <AnalysisTab 
                   channelsForAnalysis={channelsForAnalysis}
                   onRemoveFromAnalysis={handleRemoveFromAnalysis}
+                  onSaveChannel={saveChannel}
+                  isChannelSaved={isChannelSaved}
+                />
+              </TabsContent>
+
+              <TabsContent value="saved">
+                <SavedTab 
+                  savedChannels={savedChannels}
+                  onRemoveFromSaved={removeChannel}
                 />
               </TabsContent>
             </Tabs>
