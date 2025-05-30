@@ -155,15 +155,16 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-youtube-black">
+    <div className="min-h-screen bg-background">
       <div className="relative">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-gradient-to-br from-youtube-red/10 via-transparent to-youtube-red/10"></div>
+        {/* Background Pattern modernizado */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-brand-600/5"></div>
           <div 
-            className="absolute inset-0" 
+            className="absolute inset-0 opacity-30" 
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF0000' fill-opacity='0.05'%3E%3Cpath d='M50 50l25-15v30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef4444' fill-opacity='0.03'%3E%3Cpath d='M60 60l30-18v36z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '120px 120px'
             }}
           ></div>
         </div>
@@ -171,38 +172,56 @@ const Index = () => {
         <div className="relative z-10">
           <PremiumHeader />
           
-          <div className="container mx-auto px-4 py-12">
+          <div className="container mx-auto px-4 py-8 max-w-7xl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-8">
-                <TabsTrigger value="dashboard" className="font-roboto font-semibold">
-                  Dashboard
-                </TabsTrigger>
-                <TabsTrigger value="results" className="font-roboto font-semibold">
-                  Resultados
-                </TabsTrigger>
-                <TabsTrigger value="analysis" className="font-roboto font-semibold">
-                  Análises
-                  {channelsForAnalysis.length > 0 && (
-                    <span className="ml-2 bg-youtube-red text-white text-xs px-2 py-1 rounded-full">
-                      {channelsForAnalysis.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="saved" className="font-roboto font-semibold">
-                  Salvos
-                  {savedChannels.length > 0 && (
-                    <span className="ml-2 bg-youtube-red text-white text-xs px-2 py-1 rounded-full">
-                      {savedChannels.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-              </TabsList>
+              <div className="flex justify-center mb-10">
+                <TabsList className="grid grid-cols-4 bg-neutral-900/80 backdrop-blur-lg border border-neutral-700/50 p-1.5 rounded-2xl shadow-glass">
+                  <TabsTrigger 
+                    value="dashboard" 
+                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                  >
+                    Dashboard
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="results" 
+                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                  >
+                    Resultados
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="analysis" 
+                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-2">
+                      Análises
+                      {channelsForAnalysis.length > 0 && (
+                        <span className="bg-brand-600 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                          {channelsForAnalysis.length}
+                        </span>
+                      )}
+                    </div>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="saved" 
+                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-2">
+                      Salvos
+                      {savedChannels.length > 0 && (
+                        <span className="bg-brand-600 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                          {savedChannels.length}
+                        </span>
+                      )}
+                    </div>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-              <TabsContent value="dashboard">
+              <TabsContent value="dashboard" className="mt-0">
                 <DashboardTab onSearch={searchChannels} isLoading={isLoading} />
               </TabsContent>
 
-              <TabsContent value="results">
+              <TabsContent value="results" className="mt-0">
                 <ResultsTab 
                   channels={channels} 
                   isLoading={isLoading} 
@@ -211,7 +230,7 @@ const Index = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="analysis">
+              <TabsContent value="analysis" className="mt-0">
                 <AnalysisTab 
                   channelsForAnalysis={channelsForAnalysis}
                   onRemoveFromAnalysis={handleRemoveFromAnalysis}
@@ -220,7 +239,7 @@ const Index = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="saved">
+              <TabsContent value="saved" className="mt-0">
                 <SavedTab 
                   savedChannels={savedChannels}
                   onRemoveFromSaved={removeChannel}
