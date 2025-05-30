@@ -174,28 +174,28 @@ const Index = () => {
           
           <div className="container mx-auto px-4 py-8 max-w-7xl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="flex justify-center mb-10">
-                <TabsList className="grid grid-cols-4 bg-neutral-900/80 backdrop-blur-lg border border-neutral-700/50 p-1.5 rounded-2xl shadow-glass">
+              <div className="flex justify-center mb-12">
+                <TabsList className="grid grid-cols-4 bg-neutral-900/90 backdrop-blur-md border border-neutral-700/40 p-2 rounded-full shadow-2xl">
                   <TabsTrigger 
                     value="dashboard" 
-                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                    className="font-inter text-sm px-6 py-3 rounded-full transition-all duration-300 data-[state=active]:shadow-[0_4px_16px_rgba(204,41,54,0.4)]"
                   >
                     Dashboard
                   </TabsTrigger>
                   <TabsTrigger 
                     value="results" 
-                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                    className="font-inter text-sm px-6 py-3 rounded-full transition-all duration-300 data-[state=active]:shadow-[0_4px_16px_rgba(204,41,54,0.4)]"
                   >
                     Resultados
                   </TabsTrigger>
                   <TabsTrigger 
                     value="analysis" 
-                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                    className="font-inter text-sm px-6 py-3 rounded-full transition-all duration-300 data-[state=active]:shadow-[0_4px_16px_rgba(204,41,54,0.4)]"
                   >
                     <div className="flex items-center gap-2">
                       Análises
                       {channelsForAnalysis.length > 0 && (
-                        <span className="bg-brand-600 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                        <span className="bg-youtube-red text-youtube-white text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
                           {channelsForAnalysis.length}
                         </span>
                       )}
@@ -203,12 +203,12 @@ const Index = () => {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="saved" 
-                    className="data-[state=active]:bg-brand-500 data-[state=active]:text-white data-[state=active]:shadow-brand font-inter font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-300"
+                    className="font-inter text-sm px-6 py-3 rounded-full transition-all duration-300 data-[state=active]:shadow-[0_4px_16px_rgba(204,41,54,0.4)]"
                   >
                     <div className="flex items-center gap-2">
                       Salvos
                       {savedChannels.length > 0 && (
-                        <span className="bg-brand-600 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                        <span className="bg-youtube-red text-youtube-white text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
                           {savedChannels.length}
                         </span>
                       )}
