@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,12 +5,8 @@ import {
   Users, 
   Eye, 
   TrendingUp, 
-  Target, 
-  Calendar, 
-  Award, 
   X,
   BarChart3,
-  Star,
   Zap,
   Heart,
   Mail,
@@ -128,27 +123,27 @@ export const ChannelAnalysisCard = ({
 
   return (
     <Card className="tech-card border-youtube-red/30">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <img 
               src={channel.thumbnail} 
               alt={channel.title}
-              className="w-12 h-12 rounded-full object-cover"
+              className="w-8 h-8 rounded-full object-cover"
             />
             <div>
-              <CardTitle className="text-youtube-white font-roboto text-lg">
+              <CardTitle className="text-youtube-white font-roboto text-sm">
                 {channel.title}
               </CardTitle>
-              <p className="text-youtube-gray font-roboto text-sm">
+              <p className="text-youtube-gray font-roboto text-xs">
                 {formatNumber(channel.subscriberCount)} inscritos
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {analysis && (
               <div className="text-center">
-                <div className={`text-2xl font-bold ${getScoreColor(analysis.partnershipScore.overall)}`}>
+                <div className={`text-lg font-bold ${getScoreColor(analysis.partnershipScore.overall)}`}>
                   {analysis.partnershipScore.overall}
                 </div>
                 <div className="text-xs text-youtube-gray">Score</div>
@@ -158,9 +153,9 @@ export const ChannelAnalysisCard = ({
               <Button
                 onClick={onAnalyze}
                 size="sm"
-                className="bg-youtube-red hover:bg-youtube-red/80 text-white"
+                className="bg-youtube-red hover:bg-youtube-red/80 text-white text-xs py-1 px-2"
               >
-                <Zap className="h-4 w-4 mr-1" />
+                <Zap className="h-3 w-3 mr-1" />
                 Analisar
               </Button>
             )}
@@ -169,18 +164,18 @@ export const ChannelAnalysisCard = ({
                 variant="ghost"
                 size="sm"
                 onClick={onSave}
-                className={`${isSaved ? 'text-red-500' : 'text-youtube-gray'} hover:text-red-400`}
+                className={`${isSaved ? 'text-red-500' : 'text-youtube-gray'} hover:text-red-400 p-1`}
               >
-                <Heart className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+                <Heart className={`h-3 w-3 ${isSaved ? 'fill-current' : ''}`} />
               </Button>
             )}
             <Button
               variant="ghost"
               size="sm"
               onClick={onRemove}
-              className="text-youtube-gray hover:text-youtube-red"
+              className="text-youtube-gray hover:text-youtube-red p-1"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3" />
             </Button>
           </div>
         </div>
@@ -188,41 +183,41 @@ export const ChannelAnalysisCard = ({
 
       <CardContent className="pt-0">
         {!analysis ? (
-          <div className="flex items-center justify-center py-6">
-            <p className="text-youtube-gray font-roboto">Clique em "Analisar" para ver os resultados</p>
+          <div className="flex items-center justify-center py-3">
+            <p className="text-youtube-gray font-roboto text-xs">Clique em "Analisar" para ver os resultados</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Informações de Contato */}
             {(analysis.socialMedia.email || analysis.socialMedia.instagram || analysis.socialMedia.tiktok || analysis.socialMedia.website) && (
-              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
-                <h4 className="text-youtube-white font-semibold text-sm mb-2 flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-youtube-red" />
-                  Informações de Contato
+              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-2">
+                <h4 className="text-youtube-white font-semibold text-xs mb-1 flex items-center gap-1">
+                  <Mail className="h-3 w-3 text-youtube-red" />
+                  Contatos
                 </h4>
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-2 gap-1 text-xs">
                   {analysis.socialMedia.email && (
                     <div className="flex items-center gap-1">
-                      <Mail className="h-3 w-3 text-youtube-gray" />
-                      <span className="text-youtube-white truncate">{analysis.socialMedia.email}</span>
+                      <Mail className="h-2 w-2 text-youtube-gray" />
+                      <span className="text-youtube-white truncate text-xs">Email</span>
                     </div>
                   )}
                   {analysis.socialMedia.instagram && (
                     <div className="flex items-center gap-1">
-                      <Instagram className="h-3 w-3 text-youtube-gray" />
-                      <span className="text-youtube-white truncate">Instagram</span>
+                      <Instagram className="h-2 w-2 text-youtube-gray" />
+                      <span className="text-youtube-white truncate text-xs">Instagram</span>
                     </div>
                   )}
                   {analysis.socialMedia.tiktok && (
                     <div className="flex items-center gap-1">
-                      <div className="h-3 w-3 bg-youtube-gray rounded-sm" />
-                      <span className="text-youtube-white truncate">TikTok</span>
+                      <div className="h-2 w-2 bg-youtube-gray rounded-sm" />
+                      <span className="text-youtube-white truncate text-xs">TikTok</span>
                     </div>
                   )}
                   {analysis.socialMedia.website && (
                     <div className="flex items-center gap-1">
-                      <Globe className="h-3 w-3 text-youtube-gray" />
-                      <span className="text-youtube-white truncate">Website</span>
+                      <Globe className="h-2 w-2 text-youtube-gray" />
+                      <span className="text-youtube-white truncate text-xs">Website</span>
                     </div>
                   )}
                 </div>
@@ -230,39 +225,39 @@ export const ChannelAnalysisCard = ({
             )}
 
             {/* Score Breakdown */}
-            <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
-              <h4 className="text-youtube-white font-semibold text-sm mb-2 flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-youtube-red" />
-                Análise de Parceria
+            <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-2">
+              <h4 className="text-youtube-white font-semibold text-xs mb-1 flex items-center gap-1">
+                <BarChart3 className="h-3 w-3 text-youtube-red" />
+                Score de Parceria
               </h4>
-              <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="grid grid-cols-3 gap-1 text-xs">
                 <div className="text-center">
                   <div className={`font-bold ${getScoreColor(analysis.partnershipScore.audienceSize * 4)}`}>
                     {analysis.partnershipScore.audienceSize}
                   </div>
-                  <div className="text-youtube-gray">Audiência</div>
+                  <div className="text-youtube-gray text-xs">Audiência</div>
                 </div>
                 <div className="text-center">
                   <div className={`font-bold ${getScoreColor(analysis.partnershipScore.engagement * 4)}`}>
                     {analysis.partnershipScore.engagement}
                   </div>
-                  <div className="text-youtube-gray">Engajamento</div>
+                  <div className="text-youtube-gray text-xs">Engajamento</div>
                 </div>
                 <div className="text-center">
                   <div className={`font-bold ${getScoreColor(analysis.partnershipScore.reachability * 6.67)}`}>
                     {analysis.partnershipScore.reachability}
                   </div>
-                  <div className="text-youtube-gray">Contato</div>
+                  <div className="text-youtube-gray text-xs">Contato</div>
                 </div>
               </div>
             </div>
 
             {/* Métricas Principais */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="h-4 w-4 text-youtube-red" />
-                  <span className="text-youtube-white font-semibold text-sm">Audiência</span>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-2">
+                <div className="flex items-center gap-1 mb-1">
+                  <Users className="h-3 w-3 text-youtube-red" />
+                  <span className="text-youtube-white font-semibold text-xs">Audiência</span>
                 </div>
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
@@ -275,10 +270,10 @@ export const ChannelAnalysisCard = ({
                 </div>
               </div>
 
-              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-youtube-red" />
-                  <span className="text-youtube-white font-semibold text-sm">Engajamento</span>
+              <div className="bg-youtube-dark/30 border border-youtube-red/20 rounded-lg p-2">
+                <div className="flex items-center gap-1 mb-1">
+                  <TrendingUp className="h-3 w-3 text-youtube-red" />
+                  <span className="text-youtube-white font-semibold text-xs">Engajamento</span>
                 </div>
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">

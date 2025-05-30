@@ -21,7 +21,7 @@
     --secondary: 40 40 40; /* #282828 */
     --secondary-foreground: 255 255 255; /* #FFFFFF */
 
-    --muted: 170 170 170; /* #AAAAAA */
+    --muted: 40 40 40; /* #282828 - Changed from pink to dark gray */
     --muted-foreground: 255 255 255; /* #FFFFFF */
 
     --accent: 255 0 0; /* #FF0000 */
@@ -62,7 +62,7 @@
     --secondary: 40 40 40; /* #282828 */
     --secondary-foreground: 255 255 255; /* #FFFFFF */
 
-    --muted: 170 170 170; /* #AAAAAA */
+    --muted: 40 40 40; /* #282828 - Changed from pink to dark gray */
     --muted-foreground: 255 255 255; /* #FFFFFF */
 
     --accent: 255 0 0; /* #FF0000 */

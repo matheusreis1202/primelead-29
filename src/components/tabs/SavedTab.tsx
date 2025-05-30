@@ -73,14 +73,14 @@ export const SavedTab = ({ savedChannels, onRemoveFromSaved }: SavedTabProps) =>
 
   if (savedChannels.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="bg-youtube-red p-8 rounded-full mb-8 shadow-xl futuristic-glow">
-          <Heart className="h-16 w-16 text-youtube-white" />
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="bg-youtube-red p-6 rounded-full mb-6 shadow-xl futuristic-glow">
+          <Heart className="h-12 w-12 text-youtube-white" />
         </div>
-        <h3 className="text-3xl font-bold text-youtube-white mb-4 font-roboto">
+        <h3 className="text-2xl font-bold text-youtube-white mb-3 font-roboto">
           Nenhum Canal Salvo
         </h3>
-        <p className="text-youtube-gray max-w-lg text-lg leading-relaxed font-roboto">
+        <p className="text-youtube-gray max-w-lg text-base leading-relaxed font-roboto">
           Vá para a aba Análises e clique no ícone de coração para salvar canais interessantes.
         </p>
       </div>
@@ -88,22 +88,22 @@ export const SavedTab = ({ savedChannels, onRemoveFromSaved }: SavedTabProps) =>
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="bg-youtube-red p-3 rounded-lg futuristic-glow">
-          <Bookmark className="h-6 w-6 text-youtube-white" />
+        <div className="bg-youtube-red p-2 rounded-lg futuristic-glow">
+          <Bookmark className="h-5 w-5 text-youtube-white" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-youtube-white font-roboto">
+          <h2 className="text-2xl font-bold text-youtube-white font-roboto">
             Canais Salvos
           </h2>
-          <p className="text-youtube-gray font-roboto">
+          <p className="text-youtube-gray font-roboto text-sm">
             {savedChannels.length} canal(is) salvos para análise futura
           </p>
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {savedChannels.map(channel => {
           const analysis = analyzedChannels.find(a => a.id === channel.id);
           return (
