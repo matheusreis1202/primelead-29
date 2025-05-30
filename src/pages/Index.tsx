@@ -1,9 +1,7 @@
-
 import { useState } from 'react';
-import { PremiumHeader } from '@/components/PremiumHeader';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/AppSidebar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ProfessionalHeader } from '@/components/ProfessionalHeader';
+import { ProfessionalNavigation } from '@/components/ProfessionalNavigation';
+import { MinimalSidebar } from '@/components/MinimalSidebar';
 import { ResultsTab } from '@/components/tabs/ResultsTab';
 import { AnalysisTab } from '@/components/tabs/AnalysisTab';
 import { SavedTab } from '@/components/tabs/SavedTab';
@@ -154,83 +152,58 @@ const Index = () => {
     }
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'results':
+        return (
+          <ResultsTab 
+            channels={channels} 
+            isLoading={isLoading} 
+            error={error}
+            onSendToAnalysis={handleSendToAnalysis}
+          />
+        );
+      case 'analysis':
+        return (
+          <AnalysisTab 
+            channelsForAnalysis={channelsForAnalysis}
+            onRemoveFromAnalysis={handleRemoveFromAnalysis}
+            onSaveChannel={saveChannel}
+            isChannelSaved={isChannelSaved}
+          />
+        );
+      case 'saved':
+        return (
+          <SavedTab 
+            savedChannels={savedChannels}
+            onRemoveFromSaved={removeChannel}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <PremiumHeader />
+    <div className="min-h-screen bg-[#0D0D0D]">
+      <ProfessionalHeader />
       
-      <SidebarProvider>
-        <div className="flex w-full min-h-screen">
-          <AppSidebar onSearch={searchChannels} isLoading={isLoading} />
-          
-          <main className="flex-1">
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <div className="flex justify-center mb-8">
-                  <TabsList className="grid grid-cols-3 bg-neutral-900/90 backdrop-blur-md border border-neutral-700/40 p-2 rounded-full shadow-2xl">
-                    <TabsTrigger 
-                      value="results" 
-                      className="font-inter text-sm px-6 py-3 rounded-full transition-all duration-300 data-[state=active]:shadow-[0_4px_16px_rgba(204,41,54,0.4)]"
-                    >
-                      Resultados
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="analysis" 
-                      className="font-inter text-sm px-6 py-3 rounded-full transition-all duration-300 data-[state=active]:shadow-[0_4px_16px_rgba(204,41,54,0.4)]"
-                    >
-                      <div className="flex items-center gap-2">
-                        Análises
-                        {channelsForAnalysis.length > 0 && (
-                          <span className="bg-youtube-red text-youtube-white text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
-                            {channelsForAnalysis.length}
-                          </span>
-                        )}
-                      </div>
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="saved" 
-                      className="font-inter text-sm px-6 py-3 rounded-full transition-all duration-300 data-[state=active]:shadow-[0_4px_16px_rgba(204,41,54,0.4)]"
-                    >
-                      <div className="flex items-center gap-2">
-                        Salvos
-                        {savedChannels.length > 0 && (
-                          <span className="bg-youtube-red text-youtube-white text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
-                            {savedChannels.length}
-                          </span>
-                        )}
-                      </div>
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
-
-                <TabsContent value="results" className="mt-0">
-                  <ResultsTab 
-                    channels={channels} 
-                    isLoading={isLoading} 
-                    error={error}
-                    onSendToAnalysis={handleSendToAnalysis}
-                  />
-                </TabsContent>
-
-                <TabsContent value="analysis" className="mt-0">
-                  <AnalysisTab 
-                    channelsForAnalysis={channelsForAnalysis}
-                    onRemoveFromAnalysis={handleRemoveFromAnalysis}
-                    onSaveChannel={saveChannel}
-                    isChannelSaved={isChannelSaved}
-                  />
-                </TabsContent>
-
-                <TabsContent value="saved" className="mt-0">
-                  <SavedTab 
-                    savedChannels={savedChannels}
-                    onRemoveFromSaved={removeChannel}
-                  />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </main>
-        </div>
-      </SidebarProvider>
+      <ProfessionalNavigation 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        analysisCount={channelsForAnalysis.length}
+        savedCount={savedChannels.length}
+      />
+      
+      <div className="flex w-full">
+        <MinimalSidebar onSearch={searchChannels} isLoading={isLoading} />
+        
+        <main className="flex-1 min-h-[calc(100vh-200px)]">
+          <div className="container mx-auto px-6 py-8 max-w-6xl">
+            {renderTabContent()}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
