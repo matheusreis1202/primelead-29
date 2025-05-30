@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Users, Eye, TrendingUp, Target, Play, Award, BarChart3, Crown, User } from 'lucide-react';
+import { ExternalLink, Users, Eye, TrendingUp, Target, Play, Award, BarChart3, Crown, User, Contact } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
 interface ChannelResultsProps {
@@ -59,7 +59,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
         {channels.map((channel, index) => {
           const ScoreIcon = getScoreIcon(channel.score);
           const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
@@ -67,7 +67,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
           return (
             <Card 
               key={channel.id} 
-              className="bg-[#1E1E1E] border border-[#525252] hover:border-[#FF0000] transition-all duration-300 h-[450px] w-[300px] group relative overflow-hidden"
+              className="bg-[#1E1E1E] border border-[#525252] hover:border-[#FF0000] transition-all duration-300 group relative overflow-hidden"
             >
               <CardContent className="p-6 h-full flex flex-col">
                 {/* Ranking Badge */}
@@ -145,10 +145,10 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-2 mt-auto">
+                <div className="space-y-3 mt-auto">
                   <Button 
                     onClick={() => onSendToAnalysis(channel)}
-                    className="w-full bg-[#FF0000] hover:bg-[#CC0000] text-white transition-all text-sm py-3 border-0 mb-2"
+                    className="w-full bg-[#FF0000] hover:bg-[#CC0000] text-white transition-all text-sm py-3 border-0"
                   >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Enviar para Análise
@@ -161,13 +161,14 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                       className="border-[#525252] bg-transparent text-[#AAAAAA] hover:bg-[#525252] hover:text-white transition-all text-sm py-2"
                     >
                       <a 
-                        href={`https://www.youtube.com/channel/${channel.id}/about`} 
+                        href={`https://www.youtube.com/channel/${channel.id}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="flex items-center gap-2"
                       >
-                        <Target className="h-4 w-4" />
-                        Contato
+                        <Play className="h-4 w-4" />
+                        Ver Canal
+                        <ExternalLink className="h-3 w-3" />
                       </a>
                     </Button>
 
@@ -177,14 +178,13 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                       className="border-[#525252] bg-transparent text-[#AAAAAA] hover:bg-[#525252] hover:text-white transition-all text-sm py-2"
                     >
                       <a 
-                        href={`https://www.youtube.com/channel/${channel.id}`} 
+                        href={`https://www.youtube.com/channel/${channel.id}/about`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="flex items-center gap-2"
                       >
-                        <Play className="h-4 w-4" />
-                        Canal
-                        <ExternalLink className="h-3 w-3" />
+                        <Contact className="h-4 w-4" />
+                        Contatos
                       </a>
                     </Button>
                   </div>
