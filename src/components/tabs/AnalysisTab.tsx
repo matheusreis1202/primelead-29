@@ -52,10 +52,7 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
   const [analyzedChannels, setAnalyzedChannels] = useState<ChannelAnalysis[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const analyzeChannel = async (channel: Channel): Promise<ChannelAnalysis> => {
-    // Simular análise (em um app real, isso seria uma chamada para API)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
+  const analyzeChannel = (channel: Channel): ChannelAnalysis => {
     const engagementRate = (channel.viewCount / channel.subscriberCount) * 100;
     const avgViews = channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 1000));
 
@@ -76,17 +73,17 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
                       engagementRate > 2 ? 'Médio' : 'Baixo'
       },
       nicho: {
-        categoria: 'Entretenimento', // Seria determinado pela análise real
+        categoria: 'Entretenimento',
         publicoAlvo: 'Jovens adultos',
         relevancia: 'Alta'
       },
       qualidadeConteudo: {
         estilo: 'Profissional',
         consistencia: 'Alta',
-        nota: Math.floor(Math.random() * 3) + 8 // 8-10
+        nota: Math.floor(Math.random() * 3) + 8
       },
       frequencia: {
-        uploadsPerMes: Math.floor(Math.random() * 8) + 2, // 2-10
+        uploadsPerMes: Math.floor(Math.random() * 8) + 2,
         consistencia: 'Regular'
       },
       crescimento: {
@@ -103,17 +100,21 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
 
   const handleAnalyzeAll = async () => {
     setIsAnalyzing(true);
-    const analyses = [];
     
-    for (const channel of channelsForAnalysis) {
-      if (!analyzedChannels.find(a => a.id === channel.id)) {
-        const analysis = await analyzeChannel(channel);
-        analyses.push(analysis);
-      }
-    }
+    // Análise instantânea de todos os canais
+    const analyses = channelsForAnalysis
+      .filter(channel => !analyzedChannels.find(a => a.id === channel.id))
+      .map(channel => analyzeChannel(channel));
     
     setAnalyzedChannels(prev => [...prev, ...analyses]);
     setIsAnalyzing(false);
+  };
+
+  const handleAnalyzeIndividual = (channel: Channel) => {
+    if (!analyzedChannels.find(a => a.id === channel.id)) {
+      const analysis = analyzeChannel(channel);
+      setAnalyzedChannels(prev => [...prev, analysis]);
+    }
   };
 
   if (channelsForAnalysis.length === 0) {
@@ -170,15 +171,6 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
         )}
       </div>
 
-      {isAnalyzing && (
-        <div className="flex flex-col items-center justify-center py-12">
-          <LoadingSpinner />
-          <p className="text-youtube-white mt-4 text-lg font-roboto">
-            Analisando dados dos canais...
-          </p>
-        </div>
-      )}
-
       <div className="space-y-6">
         {channelsForAnalysis.map(channel => {
           const analysis = analyzedChannels.find(a => a.id === channel.id);
@@ -188,6 +180,7 @@ export const AnalysisTab = ({ channelsForAnalysis, onRemoveFromAnalysis }: Analy
               channel={channel}
               analysis={analysis}
               onRemove={() => onRemoveFromAnalysis(channel.id)}
+              onAnalyze={() => handleAnalyzeIndividual(channel)}
             />
           );
         })}

@@ -12,7 +12,8 @@ import {
   X,
   BarChart3,
   Clock,
-  Star
+  Star,
+  Zap
 } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
@@ -57,9 +58,10 @@ interface ChannelAnalysisCardProps {
   channel: Channel;
   analysis?: ChannelAnalysis;
   onRemove: () => void;
+  onAnalyze?: () => void;
 }
 
-export const ChannelAnalysisCard = ({ channel, analysis, onRemove }: ChannelAnalysisCardProps) => {
+export const ChannelAnalysisCard = ({ channel, analysis, onRemove, onAnalyze }: ChannelAnalysisCardProps) => {
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M`;
@@ -106,14 +108,26 @@ export const ChannelAnalysisCard = ({ channel, analysis, onRemove }: ChannelAnal
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onRemove}
-            className="text-youtube-gray hover:text-youtube-red"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {!analysis && onAnalyze && (
+              <Button
+                onClick={onAnalyze}
+                size="sm"
+                className="bg-youtube-red hover:bg-youtube-red/80 text-white"
+              >
+                <Zap className="h-4 w-4 mr-1" />
+                Analisar
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRemove}
+              className="text-youtube-gray hover:text-youtube-red"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
@@ -121,8 +135,7 @@ export const ChannelAnalysisCard = ({ channel, analysis, onRemove }: ChannelAnal
         {!analysis ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
-              <div className="w-8 h-8 border-2 border-youtube-red/30 border-t-youtube-red rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-youtube-gray font-roboto">Aguardando análise...</p>
+              <p className="text-youtube-gray font-roboto">Clique em "Analisar" para ver os resultados</p>
             </div>
           </div>
         ) : (
