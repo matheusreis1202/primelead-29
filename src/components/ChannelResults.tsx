@@ -59,23 +59,23 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-youtube-white mb-2 font-roboto">
+          <h2 className="text-xl font-bold text-youtube-white mb-1 font-roboto">
             Canais <span className="text-youtube-red">Premium</span> Encontrados
           </h2>
-          <p className="text-youtube-gray text-sm font-roboto">Ranqueados por algoritmo de performance avançado</p>
+          <p className="text-youtube-gray text-xs font-roboto">Ranqueados por algoritmo de performance avançado</p>
         </div>
         <Badge 
           variant="secondary" 
-          className="text-sm px-4 py-2 bg-youtube-red text-youtube-white border-0 shadow-lg rounded-md futuristic-glow font-roboto"
+          className="text-xs px-3 py-1 bg-youtube-red text-youtube-white border-0 shadow-lg rounded futuristic-glow font-roboto"
         >
           {channels.length} canais descobertos
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
         {channels.map((channel, index) => {
           const ScoreIcon = getScoreIcon(channel.score);
           const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
@@ -84,10 +84,10 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
               key={channel.id} 
               className={`tech-card ${getScoreBorderColor(channel.score)} group relative`}
             >
-              <CardContent className="p-2">
+              <CardContent className="p-3">
                 {/* Premium Ranking Badge */}
                 {index < 3 && (
-                  <div className="absolute -top-1 -right-1 bg-youtube-red text-youtube-white text-xs font-bold px-1 py-0.5 rounded-md shadow-lg border border-youtube-black futuristic-glow font-roboto">
+                  <div className="absolute -top-1 -right-1 bg-youtube-red text-youtube-white text-xs font-bold px-1 py-0.5 rounded shadow-lg border border-youtube-black futuristic-glow font-roboto">
                     <div className="flex items-center gap-0.5">
                       <Crown className="h-2 w-2" />
                       #{index + 1}
@@ -97,8 +97,8 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
 
                 {/* Score Section */}
                 <div className="flex items-center justify-between mb-2">
-                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-1 rounded-lg text-youtube-white shadow-md futuristic-glow`}>
-                    <ScoreIcon className="h-3 w-3" />
+                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-1 rounded shadow futuristic-glow`}>
+                    <ScoreIcon className="h-3 w-3 text-white" />
                   </div>
                   <div className="text-right">
                     <div className={`text-xs font-bold ${getScoreTextColor(channel.score)} font-roboto`}>
@@ -116,7 +116,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                     <img 
                       src={channel.thumbnail} 
                       alt={channel.title}
-                      className="w-6 h-6 rounded-lg border border-youtube-gray group-hover:border-youtube-red transition-colors shadow-sm"
+                      className="w-6 h-6 rounded border border-youtube-gray group-hover:border-youtube-red transition-colors"
                     />
                   )}
                   <div className="flex-1 min-w-0">
@@ -127,10 +127,10 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                 </div>
 
                 {/* Metrics */}
-                <div className="space-y-1 mb-2">
-                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1 rounded-lg border border-youtube-red">
+                <div className="space-y-1 mb-3">
+                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1.5 rounded border border-youtube-red/30">
                     <div className="flex items-center gap-1 text-youtube-gray">
-                      <div className="bg-youtube-red p-0.5 rounded-md futuristic-glow">
+                      <div className="bg-youtube-red p-0.5 rounded futuristic-glow">
                         <Users className="h-2 w-2 text-youtube-white" />
                       </div>
                       <span className="font-semibold font-roboto text-xs">Inscritos</span>
@@ -140,9 +140,9 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1 rounded-lg border border-youtube-red">
+                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1.5 rounded border border-youtube-red/30">
                     <div className="flex items-center gap-1 text-youtube-gray">
-                      <div className="bg-youtube-red p-0.5 rounded-md futuristic-glow">
+                      <div className="bg-youtube-red p-0.5 rounded futuristic-glow">
                         <Eye className="h-2 w-2 text-youtube-white" />
                       </div>
                       <span className="font-semibold font-roboto text-xs">Views</span>
@@ -153,9 +153,9 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                   </div>
 
                   {/* Engagement Rate */}
-                  <div className="flex items-center justify-between text-xs p-1 rounded-lg border bg-youtube-dark border-green-500">
+                  <div className="flex items-center justify-between text-xs p-1.5 rounded border bg-youtube-dark border-green-500/30">
                     <div className="flex items-center gap-1">
-                      <div className="bg-green-500 p-0.5 rounded-md futuristic-glow">
+                      <div className="bg-green-500 p-0.5 rounded futuristic-glow">
                         <TrendingUp className="h-2 w-2 text-youtube-white" />
                       </div>
                       <span className="font-semibold text-green-400 font-roboto text-xs">Engaj.</span>
@@ -167,11 +167,11 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col gap-1">
+                <div className="space-y-1">
                   <div className="grid grid-cols-2 gap-1">
                     <Button 
                       asChild 
-                      className="w-full futuristic-button py-1 rounded-md font-roboto text-xs"
+                      className="w-full futuristic-button py-1 rounded text-xs"
                     >
                       <a 
                         href={`https://www.youtube.com/channel/${channel.id}`} 
@@ -188,7 +188,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                     <Button 
                       asChild 
                       variant="outline" 
-                      className="w-full border-youtube-red bg-youtube-dark text-youtube-white hover:bg-youtube-red hover:border-youtube-red py-1 rounded-md transition-all duration-300 font-roboto text-xs"
+                      className="w-full border-youtube-red bg-youtube-dark text-youtube-white hover:bg-youtube-red hover:border-youtube-red py-1 rounded transition-all duration-300 text-xs"
                     >
                       <a 
                         href={`https://www.youtube.com/channel/${channel.id}/about`} 
@@ -205,7 +205,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                   {/* Enviar para Análise Button */}
                   <Button 
                     onClick={() => onSendToAnalysis(channel)}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white py-1 rounded-md transition-all duration-300 font-roboto text-xs border-0"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-1 rounded transition-all duration-300 text-xs border-0"
                   >
                     <div className="flex items-center gap-1">
                       <BarChart3 className="h-2 w-2" />
