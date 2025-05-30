@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Users, Eye, TrendingUp, Target, Play, Award, BarChart3, Crown } from 'lucide-react';
+import { ExternalLink, Users, Eye, TrendingUp, Target, Play, Award, BarChart3, Crown, User } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
 interface ChannelResultsProps {
@@ -21,11 +21,11 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'from-youtube-red to-red-600';
-    if (score >= 70) return 'from-youtube-dark to-gray-700';
-    if (score >= 55) return 'from-gray-500 to-gray-600';
-    if (score >= 40) return 'from-youtube-blue to-blue-700';
-    return 'from-orange-500 to-orange-600';
+    if (score >= 85) return 'text-[#FF0000]';
+    if (score >= 70) return 'text-white';
+    if (score >= 55) return 'text-[#AAAAAA]';
+    if (score >= 40) return 'text-blue-400';
+    return 'text-orange-400';
   };
 
   const getScoreLabel = (score: number) => {
@@ -42,175 +42,151 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
     return TrendingUp;
   };
 
-  const getScoreBorderColor = (score: number) => {
-    if (score >= 85) return 'border-youtube-red';
-    if (score >= 70) return 'border-youtube-gray';
-    if (score >= 55) return 'border-gray-300';
-    if (score >= 40) return 'border-youtube-blue';
-    return 'border-orange-400';
-  };
-
-  const getScoreTextColor = (score: number) => {
-    if (score >= 85) return 'text-youtube-red';
-    if (score >= 70) return 'text-youtube-white';
-    if (score >= 55) return 'text-gray-300';
-    if (score >= 40) return 'text-blue-400';
-    return 'text-orange-400';
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-youtube-white mb-1 font-roboto">
-            Canais <span className="text-youtube-red">Premium</span> Encontrados
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Canais <span className="text-[#FF0000]">Premium</span> Encontrados
           </h2>
-          <p className="text-youtube-gray text-xs font-roboto">Ranqueados por algoritmo de performance avançado</p>
+          <p className="text-[#AAAAAA] text-sm">Ranqueados por algoritmo de performance avançado</p>
         </div>
         <Badge 
           variant="secondary" 
-          className="text-xs px-3 py-1 bg-youtube-red text-youtube-white border-0 shadow-lg rounded futuristic-glow font-roboto"
+          className="text-sm px-4 py-2 bg-[#FF0000] text-white border-0 rounded-lg"
         >
           {channels.length} canais descobertos
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {channels.map((channel, index) => {
           const ScoreIcon = getScoreIcon(channel.score);
           const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
+          
           return (
             <Card 
               key={channel.id} 
-              className={`tech-card ${getScoreBorderColor(channel.score)} group relative`}
+              className="bg-[#1E1E1E] border border-[#525252] hover:border-[#FF0000] transition-all duration-300 h-[450px] w-[300px] group relative overflow-hidden"
             >
-              <CardContent className="p-3">
-                {/* Premium Ranking Badge */}
+              <CardContent className="p-6 h-full flex flex-col">
+                {/* Ranking Badge */}
                 {index < 3 && (
-                  <div className="absolute -top-1 -right-1 bg-youtube-red text-youtube-white text-xs font-bold px-1 py-0.5 rounded shadow-lg border border-youtube-black futuristic-glow font-roboto">
-                    <div className="flex items-center gap-0.5">
-                      <Crown className="h-2 w-2" />
-                      #{index + 1}
-                    </div>
+                  <div className="absolute top-3 right-3 bg-[#FF0000] text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    <Crown className="h-3 w-3" />
+                    #{index + 1}
                   </div>
                 )}
 
-                {/* Score Section */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-1 rounded shadow futuristic-glow`}>
-                    <ScoreIcon className="h-3 w-3 text-white" />
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-xs font-bold ${getScoreTextColor(channel.score)} font-roboto`}>
-                      {channel.score}/100
-                    </div>
-                    <div className={`text-xs font-bold ${getScoreTextColor(channel.score)} opacity-80 font-roboto`}>
-                      {getScoreLabel(channel.score)}
-                    </div>
+                {/* Channel Photo */}
+                <div className="flex justify-center mb-4">
+                  <div className="relative">
+                    {channel.thumbnail ? (
+                      <img 
+                        src={channel.thumbnail} 
+                        alt={channel.title}
+                        className="w-20 h-20 rounded-full border-2 border-[#525252] group-hover:border-[#FF0000] transition-colors object-cover"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full border-2 border-[#525252] group-hover:border-[#FF0000] transition-colors bg-[#0D0D0D] flex items-center justify-center">
+                        <User className="h-10 w-10 text-[#AAAAAA]" />
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Channel Profile */}
-                <div className="flex items-start gap-2 mb-2">
-                  {channel.thumbnail && (
-                    <img 
-                      src={channel.thumbnail} 
-                      alt={channel.title}
-                      className="w-6 h-6 rounded border border-youtube-gray group-hover:border-youtube-red transition-colors"
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-youtube-white text-xs leading-tight mb-1 line-clamp-2 group-hover:text-youtube-gray transition-colors font-roboto">
-                      {channel.title}
-                    </h3>
+                {/* Channel Name and Premium Badge */}
+                <div className="text-center mb-4">
+                  <h3 className="font-bold text-white text-lg leading-tight mb-2 line-clamp-2">
+                    {channel.title}
+                  </h3>
+                  
+                  <div className="flex items-center justify-center gap-2">
+                    <div className={`flex items-center gap-1 ${getScoreColor(channel.score)}`}>
+                      <ScoreIcon className="h-4 w-4" />
+                      <span className="text-sm font-bold">
+                        {channel.score}/100 {getScoreLabel(channel.score)}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Metrics */}
-                <div className="space-y-1 mb-3">
-                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1.5 rounded border border-youtube-red/30">
-                    <div className="flex items-center gap-1 text-youtube-gray">
-                      <div className="bg-youtube-red p-0.5 rounded futuristic-glow">
-                        <Users className="h-2 w-2 text-youtube-white" />
-                      </div>
-                      <span className="font-semibold font-roboto text-xs">Inscritos</span>
+                <div className="space-y-3 mb-6 flex-1">
+                  <div className="flex items-center gap-3 p-3 bg-[#0D0D0D] rounded-lg">
+                    <Users className="h-5 w-5 text-[#FF0000]" />
+                    <div className="flex-1">
+                      <span className="text-[#AAAAAA] text-sm">Inscritos</span>
+                      <p className="font-bold text-white text-lg">
+                        {formatNumber(channel.subscriberCount)}
+                      </p>
                     </div>
-                    <span className="font-bold text-youtube-white text-xs font-roboto">
-                      {formatNumber(channel.subscriberCount)}
-                    </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1.5 rounded border border-youtube-red/30">
-                    <div className="flex items-center gap-1 text-youtube-gray">
-                      <div className="bg-youtube-red p-0.5 rounded futuristic-glow">
-                        <Eye className="h-2 w-2 text-youtube-white" />
-                      </div>
-                      <span className="font-semibold font-roboto text-xs">Views</span>
+                  <div className="flex items-center gap-3 p-3 bg-[#0D0D0D] rounded-lg">
+                    <Eye className="h-5 w-5 text-[#FF0000]" />
+                    <div className="flex-1">
+                      <span className="text-[#AAAAAA] text-sm">Views</span>
+                      <p className="font-bold text-white text-lg">
+                        {formatNumber(channel.viewCount)}
+                      </p>
                     </div>
-                    <span className="font-bold text-youtube-white text-xs font-roboto">
-                      {formatNumber(channel.viewCount)}
-                    </span>
                   </div>
 
-                  {/* Engagement Rate */}
-                  <div className="flex items-center justify-between text-xs p-1.5 rounded border bg-youtube-dark border-green-500/30">
-                    <div className="flex items-center gap-1">
-                      <div className="bg-green-500 p-0.5 rounded futuristic-glow">
-                        <TrendingUp className="h-2 w-2 text-youtube-white" />
-                      </div>
-                      <span className="font-semibold text-green-400 font-roboto text-xs">Engaj.</span>
+                  <div className="flex items-center gap-3 p-3 bg-[#0D0D0D] rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-[#4CAF50]" />
+                    <div className="flex-1">
+                      <span className="text-[#AAAAAA] text-sm">Engajamento</span>
+                      <p className="font-bold text-[#4CAF50] text-lg">
+                        {engagementRate.toFixed(1)}%
+                      </p>
                     </div>
-                    <span className="font-bold text-green-400 text-xs font-roboto">
-                      {engagementRate.toFixed(1)}%
-                    </span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-1">
-                  <div className="grid grid-cols-2 gap-1">
+                <div className="space-y-2 mt-auto">
+                  <div className="grid grid-cols-2 gap-2">
                     <Button 
                       asChild 
-                      className="w-full futuristic-button py-1 rounded text-xs"
+                      variant="outline"
+                      className="border-[#525252] bg-transparent text-[#AAAAAA] hover:bg-[#525252] hover:text-white transition-all text-sm py-2"
                     >
                       <a 
                         href={`https://www.youtube.com/channel/${channel.id}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1"
+                        className="flex items-center gap-2"
                       >
-                        <Play className="h-2 w-2 fill-current" />
+                        <Play className="h-4 w-4" />
                         Canal
-                        <ExternalLink className="h-2 w-2" />
+                        <ExternalLink className="h-3 w-3" />
                       </a>
                     </Button>
 
                     <Button 
                       asChild 
-                      variant="outline" 
-                      className="w-full border-youtube-red bg-youtube-dark text-youtube-white hover:bg-youtube-red hover:border-youtube-red py-1 rounded transition-all duration-300 text-xs"
+                      variant="outline"
+                      className="border-[#525252] bg-transparent text-[#AAAAAA] hover:bg-[#525252] hover:text-white transition-all text-sm py-2"
                     >
                       <a 
                         href={`https://www.youtube.com/channel/${channel.id}/about`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1"
+                        className="flex items-center gap-2"
                       >
-                        <Target className="h-2 w-2" />
+                        <Target className="h-4 w-4" />
                         Contato
                       </a>
                     </Button>
                   </div>
 
-                  {/* Enviar para Análise Button */}
                   <Button 
                     onClick={() => onSendToAnalysis(channel)}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white py-1 rounded transition-all duration-300 text-xs border-0"
+                    className="w-full bg-[#FF0000] hover:bg-[#CC0000] text-white transition-all text-sm py-3 border-0"
                   >
-                    <div className="flex items-center gap-1">
-                      <BarChart3 className="h-2 w-2" />
-                      Enviar para Análise
-                    </div>
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Enviar para Análise
                   </Button>
                 </div>
               </CardContent>
