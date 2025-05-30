@@ -24,7 +24,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
     if (score >= 85) return 'from-youtube-red to-red-600';
     if (score >= 70) return 'from-youtube-dark to-gray-700';
     if (score >= 55) return 'from-gray-500 to-gray-600';
-    if (score >= 40) return 'from-yellow-500 to-yellow-600';
+    if (score >= 40) return 'from-youtube-blue to-blue-700';
     return 'from-orange-500 to-orange-600';
   };
 
@@ -46,7 +46,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
     if (score >= 85) return 'border-youtube-red';
     if (score >= 70) return 'border-youtube-gray';
     if (score >= 55) return 'border-gray-300';
-    if (score >= 40) return 'border-yellow-400';
+    if (score >= 40) return 'border-youtube-blue';
     return 'border-orange-400';
   };
 
@@ -54,7 +54,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
     if (score >= 85) return 'text-youtube-red';
     if (score >= 70) return 'text-youtube-white';
     if (score >= 55) return 'text-gray-300';
-    if (score >= 40) return 'text-yellow-400';
+    if (score >= 40) return 'text-blue-400';
     return 'text-orange-400';
   };
 
@@ -75,7 +75,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
         {channels.map((channel, index) => {
           const ScoreIcon = getScoreIcon(channel.score);
           const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
@@ -84,7 +84,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
               key={channel.id} 
               className={`tech-card ${getScoreBorderColor(channel.score)} group relative`}
             >
-              <CardContent className="p-3">
+              <CardContent className="p-2">
                 {/* Premium Ranking Badge */}
                 {index < 3 && (
                   <div className="absolute -top-1 -right-1 bg-youtube-red text-youtube-white text-xs font-bold px-1 py-0.5 rounded-md shadow-lg border border-youtube-black futuristic-glow font-roboto">
@@ -97,11 +97,11 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
 
                 {/* Score Section */}
                 <div className="flex items-center justify-between mb-2">
-                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-1.5 rounded-lg text-youtube-white shadow-md futuristic-glow`}>
+                  <div className={`bg-gradient-to-r ${getScoreColor(channel.score)} p-1 rounded-lg text-youtube-white shadow-md futuristic-glow`}>
                     <ScoreIcon className="h-3 w-3" />
                   </div>
                   <div className="text-right">
-                    <div className={`text-sm font-bold ${getScoreTextColor(channel.score)} font-roboto`}>
+                    <div className={`text-xs font-bold ${getScoreTextColor(channel.score)} font-roboto`}>
                       {channel.score}/100
                     </div>
                     <div className={`text-xs font-bold ${getScoreTextColor(channel.score)} opacity-80 font-roboto`}>
@@ -116,7 +116,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                     <img 
                       src={channel.thumbnail} 
                       alt={channel.title}
-                      className="w-8 h-8 rounded-lg border border-youtube-gray group-hover:border-youtube-red transition-colors shadow-sm"
+                      className="w-6 h-6 rounded-lg border border-youtube-gray group-hover:border-youtube-red transition-colors shadow-sm"
                     />
                   )}
                   <div className="flex-1 min-w-0">
@@ -127,25 +127,25 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                 </div>
 
                 {/* Metrics */}
-                <div className="space-y-1.5 mb-3">
-                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1.5 rounded-lg border border-youtube-red">
+                <div className="space-y-1 mb-2">
+                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1 rounded-lg border border-youtube-red">
                     <div className="flex items-center gap-1 text-youtube-gray">
                       <div className="bg-youtube-red p-0.5 rounded-md futuristic-glow">
                         <Users className="h-2 w-2 text-youtube-white" />
                       </div>
-                      <span className="font-semibold font-roboto">Inscritos</span>
+                      <span className="font-semibold font-roboto text-xs">Inscritos</span>
                     </div>
                     <span className="font-bold text-youtube-white text-xs font-roboto">
                       {formatNumber(channel.subscriberCount)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1.5 rounded-lg border border-youtube-red">
+                  <div className="flex items-center justify-between text-xs bg-youtube-dark p-1 rounded-lg border border-youtube-red">
                     <div className="flex items-center gap-1 text-youtube-gray">
                       <div className="bg-youtube-red p-0.5 rounded-md futuristic-glow">
                         <Eye className="h-2 w-2 text-youtube-white" />
                       </div>
-                      <span className="font-semibold font-roboto">Views</span>
+                      <span className="font-semibold font-roboto text-xs">Views</span>
                     </div>
                     <span className="font-bold text-youtube-white text-xs font-roboto">
                       {formatNumber(channel.viewCount)}
@@ -153,12 +153,12 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                   </div>
 
                   {/* Engagement Rate */}
-                  <div className="flex items-center justify-between text-xs p-1.5 rounded-lg border bg-youtube-dark border-green-500">
+                  <div className="flex items-center justify-between text-xs p-1 rounded-lg border bg-youtube-dark border-green-500">
                     <div className="flex items-center gap-1">
                       <div className="bg-green-500 p-0.5 rounded-md futuristic-glow">
                         <TrendingUp className="h-2 w-2 text-youtube-white" />
                       </div>
-                      <span className="font-semibold text-green-400 font-roboto">Engaj.</span>
+                      <span className="font-semibold text-green-400 font-roboto text-xs">Engaj.</span>
                     </div>
                     <span className="font-bold text-green-400 text-xs font-roboto">
                       {engagementRate.toFixed(1)}%
@@ -167,8 +167,8 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="grid grid-cols-2 gap-1.5">
+                <div className="flex flex-col gap-1">
+                  <div className="grid grid-cols-2 gap-1">
                     <Button 
                       asChild 
                       className="w-full futuristic-button py-1 rounded-md font-roboto text-xs"
@@ -205,10 +205,10 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                   {/* Enviar para Análise Button */}
                   <Button 
                     onClick={() => onSendToAnalysis(channel)}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white py-1.5 rounded-md transition-all duration-300 font-roboto text-xs border-0"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-1 rounded-md transition-all duration-300 font-roboto text-xs border-0"
                   >
                     <div className="flex items-center gap-1">
-                      <BarChart3 className="h-3 w-3" />
+                      <BarChart3 className="h-2 w-2" />
                       Enviar para Análise
                     </div>
                   </Button>

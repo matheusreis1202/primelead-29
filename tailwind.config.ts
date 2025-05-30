@@ -30,6 +30,7 @@ export default {
 				'youtube-dark': '#282828',
 				'youtube-white': '#FFFFFF',
 				'youtube-gray': '#AAAAAA',
+				'youtube-blue': '#1E3A8A', // Azul escuro no lugar do amarelo
 				
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
