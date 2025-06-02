@@ -21,6 +21,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif'],
+				'optima': ['Optima', 'Segoe UI', 'Lucida Grande', 'sans-serif'],
 			},
 			colors: {
 				// Nova paleta profissional

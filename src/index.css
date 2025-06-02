@@ -67,6 +67,10 @@
     letter-spacing: -0.025em;
   }
 
+  .optima-font {
+    font-family: 'Optima', 'Segoe UI', 'Lucida Grande', sans-serif;
+  }
+
   /* Scrollbar minimalista */
   ::-webkit-scrollbar {
     width: 4px;
