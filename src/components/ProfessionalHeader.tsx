@@ -24,7 +24,7 @@ export const ProfessionalHeader = () => {
 
           {/* Slogan Central */}
           <div className="hidden md:block">
-            <h2 className="text-white text-xl font-medium font-optima">
+            <h2 className="text-white text-3xl font-great-vibes text-center">
               Sua ponte para parcerias exclusivas
             </h2>
           </div>

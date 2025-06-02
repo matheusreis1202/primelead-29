@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -22,6 +21,7 @@ export default {
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif'],
 				'optima': ['Optima', 'Segoe UI', 'Lucida Grande', 'sans-serif'],
+				'great-vibes': ['Great Vibes', 'cursive'],
 			},
 			colors: {
 				// Nova paleta profissional
