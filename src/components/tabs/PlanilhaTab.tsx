@@ -35,8 +35,8 @@ export const PlanilhaTab = ({}: PlanilhaTabProps) => {
     {
       key: 'photo',
       name: 'Foto',
-      renderCell: ({ row }: any) => (
-        <img src={row.photo} alt={row.name} width={40} height={40} className="rounded-full" />
+      formatter: (props: any) => (
+        <img src={props.row.photo} alt={props.row.name} width={40} height={40} className="rounded-full" />
       )
     },
     { key: 'name', name: 'Nome', editable: true },
@@ -44,9 +44,9 @@ export const PlanilhaTab = ({}: PlanilhaTabProps) => {
       key: 'link', 
       name: 'Link', 
       editable: true, 
-      renderCell: ({ row }: any) => (
-        <a href={row.link} target="_blank" className="text-blue-500 underline">
-          {row.link}
+      formatter: (props: any) => (
+        <a href={props.row.link} target="_blank" className="text-blue-500 underline">
+          {props.row.link}
         </a>
       )
     },
