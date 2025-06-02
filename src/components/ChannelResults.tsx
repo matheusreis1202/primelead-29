@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -59,7 +58,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {channels.map((channel, index) => {
           const ScoreIcon = getScoreIcon(channel.score);
           const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
@@ -100,6 +99,13 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                   <h3 className="font-bold text-white text-lg leading-tight mb-2 line-clamp-2">
                     {channel.title}
                   </h3>
+                  
+                  {/* Bio do canal - ligeiramente maior */}
+                  {channel.description && (
+                    <p className="text-[#AAAAAA] text-xs leading-relaxed mb-3 line-clamp-3">
+                      {channel.description.slice(0, 120)}...
+                    </p>
+                  )}
                   
                   <div className="flex items-center justify-center gap-2">
                     <div className={`flex items-center gap-1 ${getScoreColor(channel.score)}`}>
@@ -154,40 +160,22 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                     Enviar para Análise
                   </Button>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button 
-                      asChild 
-                      variant="outline"
-                      className="border-[#525252] bg-transparent text-[#AAAAAA] hover:bg-[#525252] hover:text-white transition-all text-sm py-2"
+                  <Button 
+                    asChild 
+                    variant="outline"
+                    className="w-full border-[#525252] bg-transparent text-[#AAAAAA] hover:bg-[#525252] hover:text-white transition-all text-sm py-2"
+                  >
+                    <a 
+                      href={`https://www.youtube.com/channel/${channel.id}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2"
                     >
-                      <a 
-                        href={`https://www.youtube.com/channel/${channel.id}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2"
-                      >
-                        <Play className="h-4 w-4" />
-                        Ver Canal
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </Button>
-
-                    <Button 
-                      asChild 
-                      variant="outline"
-                      className="border-[#525252] bg-transparent text-[#AAAAAA] hover:bg-[#525252] hover:text-white transition-all text-sm py-2"
-                    >
-                      <a 
-                        href={`https://www.youtube.com/channel/${channel.id}/about`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2"
-                      >
-                        <Contact className="h-4 w-4" />
-                        Contatos
-                      </a>
-                    </Button>
-                  </div>
+                      <Play className="h-4 w-4" />
+                      Ver Canal
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </Button>
                 </div>
               </CardContent>
             </Card>

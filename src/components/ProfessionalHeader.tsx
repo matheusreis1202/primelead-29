@@ -1,4 +1,3 @@
-
 import { Target, Users, TrendingUp, Zap, User, Play } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,13 +28,6 @@ export const ProfessionalHeader = () => {
                 <p className="text-sm text-[#AAAAAA] font-medium">YouTube Pro</p>
               </div>
             </div>
-          </div>
-
-          {/* Slogan Central */}
-          <div className="hidden md:block">
-            <h2 className="text-white text-2xl font-inter font-light tracking-wide text-center">
-              Sua ponte para parcerias exclusivas
-            </h2>
           </div>
         </div>
       </div>
