@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -99,10 +99,6 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel }: NewPlanilhaT
     onAddChannel?.(newChannel)
   }
 
-  const addChannelFromAnalysis = (channel: ChannelData) => {
-    setData(prev => [...prev, channel])
-  }
-
   const exportToExcel = () => {
     if (data.length === 0) {
       alert("Não há canais para exportar!")
@@ -127,11 +123,6 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel }: NewPlanilhaT
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais')
     XLSX.writeFile(workbook, 'planilha_canais.xlsx')
   }
-
-  // Expor função para adicionar canais externamente
-  React.useImperativeHandle(React.forwardRef(() => null), () => ({
-    addChannelFromAnalysis
-  }))
 
   return (
     <div className="space-y-6">
