@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
 import * as XLSX from "xlsx"
-import DataGrid from 'react-data-grid'
+import { DataGrid } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 
 interface ChannelData {
