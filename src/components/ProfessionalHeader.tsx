@@ -1,5 +1,5 @@
 
-import { Target, Users, TrendingUp, Zap, User } from 'lucide-react';
+import { Target, Users, TrendingUp, Zap, User, Play } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -11,9 +11,18 @@ export const ProfessionalHeader = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="bg-[#FF0000] p-2 rounded-lg">
-              <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-                <div className="w-0 h-0 border-l-[4px] border-l-[#FF0000] border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent ml-0.5"></div>
+            <div className="flex flex-col items-center gap-1">
+              {/* Logo Principal */}
+              <div className="w-12 h-12 rounded-lg overflow-hidden">
+                <img 
+                  src="/lovable-uploads/c4340d13-b884-474c-ab17-5ee12d7278e8.png" 
+                  alt="Prime Lead Logo" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Logo YouTube menor */}
+              <div className="bg-[#FF0000] p-1 rounded">
+                <Play className="w-3 h-3 text-white fill-white" />
               </div>
             </div>
             <div>
