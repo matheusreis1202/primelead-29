@@ -1,18 +1,20 @@
 
-import { Target, BarChart3, Save } from 'lucide-react';
+import { Target, BarChart3, Save, FileSpreadsheet } from 'lucide-react';
 
 interface ProfessionalNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   analysisCount: number;
   savedCount: number;
+  planilhaCount?: number;
 }
 
 export const ProfessionalNavigation = ({ 
   activeTab, 
   onTabChange, 
   analysisCount, 
-  savedCount 
+  savedCount,
+  planilhaCount = 0
 }: ProfessionalNavigationProps) => {
   const tabs = [
     { id: 'results', label: 'Resultados', icon: Target },
@@ -27,6 +29,12 @@ export const ProfessionalNavigation = ({
       label: 'Salvos', 
       icon: Save, 
       count: savedCount 
+    },
+    { 
+      id: 'planilha', 
+      label: 'Planilha', 
+      icon: FileSpreadsheet, 
+      count: planilhaCount 
     }
   ];
 

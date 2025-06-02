@@ -6,6 +6,7 @@ import { ResultsTab } from '@/components/tabs/ResultsTab';
 import { AnalysisTab } from '@/components/tabs/AnalysisTab';
 import { SavedTab } from '@/components/tabs/SavedTab';
 import { useSavedChannels } from '@/hooks/useSavedChannels';
+import { PlanilhaTab } from '@/components/tabs/PlanilhaTab';
 
 export interface SearchFilters {
   apiKey: string;
@@ -178,6 +179,10 @@ const Index = () => {
             savedChannels={savedChannels}
             onRemoveFromSaved={removeChannel}
           />
+        );
+      case 'planilha':
+        return (
+          <PlanilhaTab />
         );
       default:
         return null;
