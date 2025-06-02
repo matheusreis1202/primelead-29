@@ -1,14 +1,17 @@
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
 import * as XLSX from "xlsx"
-import { FileSpreadsheet, Plus } from "lucide-react"
+import DataGrid from 'react-data-grid'
+import 'react-data-grid/lib/styles.css'
 
 interface ChannelData {
   photoUrl: string
   name: string
+  channelId: string
+  phone: string
   subscribers: number
   avgViews: number
   monthlyVideos: number
@@ -17,8 +20,6 @@ interface ChannelData {
   subGrowth: number
   score: number
   classification: string
-  email: string
-  phone: string
 }
 
 interface PlanilhaTabProps {
@@ -26,154 +27,153 @@ interface PlanilhaTabProps {
 }
 
 export const PlanilhaTab = ({}: PlanilhaTabProps) => {
-  const [channels, setChannels] = useState<ChannelData[]>([])
+  const [rows, setRows] = useState<any[]>([])
+  const [search, setSearch] = useState('')
+  const [filterClass, setFilterClass] = useState('')
 
-  const handleAddToPlanilha = (channelData: ChannelData) => {
-    setChannels([...channels, channelData])
+  const columns = [
+    {
+      key: 'photo',
+      name: 'Foto',
+      formatter: ({ row }: any) => (
+        <img src={row.photo} alt={row.name} width={40} height={40} className="rounded-full" />
+      )
+    },
+    { key: 'name', name: 'Nome', editable: true },
+    { 
+      key: 'link', 
+      name: 'Link', 
+      editable: true, 
+      formatter: ({ row }: any) => (
+        <a href={row.link} target="_blank" className="text-blue-500 underline">
+          {row.link}
+        </a>
+      )
+    },
+    { key: 'phone', name: 'Telefone', editable: true },
+    { key: 'subscribers', name: 'Inscritos', editable: true },
+    { key: 'avgViews', name: 'Média Views', editable: true },
+    { key: 'monthlyVideos', name: 'Freq (mês)', editable: true },
+    { key: 'engagement', name: 'Engajamento (%)', editable: true },
+    { key: 'subGrowth', name: 'Crescimento (%)', editable: true },
+    { key: 'score', name: 'Score', editable: false },
+    { key: 'classification', name: 'Classificação', editable: false },
+  ]
+
+  const handleRowsChange = (updatedRows: any[]) => {
+    setRows(updatedRows)
+  }
+
+  const addChannelToPlanilha = (channelData: ChannelData) => {
+    const newRow = {
+      photo: channelData.photoUrl,
+      name: channelData.name,
+      link: `https://youtube.com/channel/${channelData.channelId}`,
+      phone: channelData.phone,
+      subscribers: channelData.subscribers,
+      avgViews: channelData.avgViews,
+      monthlyVideos: channelData.monthlyVideos,
+      engagement: (((channelData.avgLikes + channelData.avgComments) / channelData.avgViews) * 100).toFixed(2),
+      subGrowth: channelData.subGrowth,
+      score: channelData.score,
+      classification: channelData.classification
+    }
+    setRows([...rows, newRow])
   }
 
   const exportToExcel = () => {
-    if (channels.length === 0) {
+    if (rows.length === 0) {
       alert("Não há canais para exportar!")
       return
     }
 
-    const worksheetData = channels.map(channel => ({
-      "Nome": channel.name,
-      "Email": channel.email,
-      "Telefone": channel.phone,
-      "Inscritos": channel.subscribers,
-      "Média de Visualizações": channel.avgViews,
-      "Frequência (vídeos/mês)": channel.monthlyVideos,
-      "Engajamento (%)": (((channel.avgLikes + channel.avgComments) / channel.avgViews) * 100).toFixed(2),
-      "Crescimento (%)": channel.subGrowth,
-      "Score": channel.score,
-      "Classificação": channel.classification
+    const worksheetData = rows.map(row => ({
+      Nome: row.name,
+      Link: row.link,
+      Telefone: row.phone,
+      Inscritos: row.subscribers,
+      'Média Views': row.avgViews,
+      'Frequência': row.monthlyVideos,
+      'Engajamento (%)': row.engagement,
+      'Crescimento (%)': row.subGrowth,
+      Score: row.score,
+      Classificação: row.classification
     }))
-
     const worksheet = XLSX.utils.json_to_sheet(worksheetData)
     const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Canais Analisados")
-
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Canais")
     XLSX.writeFile(workbook, "planilha_canais.xlsx")
   }
 
-  if (channels.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="bg-youtube-red p-8 rounded-full mb-8 shadow-xl futuristic-glow">
-          <FileSpreadsheet className="h-16 w-16 text-youtube-white" />
-        </div>
-        <h3 className="text-3xl font-bold text-youtube-white mb-4 font-roboto">
-          Planilha Vazia
-        </h3>
-        <p className="text-youtube-gray max-w-lg text-lg leading-relaxed font-roboto mb-8">
-          Você ainda não adicionou nenhum canal à planilha. Os canais analisados aparecerão aqui quando você enviá-los para a planilha.
-        </p>
+  const filteredRows = rows.filter(row => {
+    const matchesSearch = row.name.toLowerCase().includes(search.toLowerCase())
+    const matchesClass = filterClass ? row.classification === filterClass : true
+    return matchesSearch && matchesClass
+  })
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold text-white">Planilha Sofisticada</h1>
+
+      <div className="flex space-x-4 flex-wrap gap-4">
+        <Input 
+          placeholder="Buscar..." 
+          value={search} 
+          onChange={e => setSearch(e.target.value)}
+          className="bg-[#1E1E1E] border-[#525252] text-white"
+        />
         
+        <Select onValueChange={setFilterClass}>
+          <SelectTrigger className="bg-[#1E1E1E] border-[#525252] text-white">
+            <SelectValue placeholder="Filtrar por classificação" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#1E1E1E] border-[#525252]">
+            <SelectItem value="">Todas</SelectItem>
+            <SelectItem value="Altíssimo Potencial">Altíssimo Potencial</SelectItem>
+            <SelectItem value="Grande Potencial">Grande Potencial</SelectItem>
+            <SelectItem value="Médio Potencial">Médio Potencial</SelectItem>
+            <SelectItem value="Baixo Potencial">Baixo Potencial</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Button onClick={exportToExcel} className="futuristic-button">
+          Exportar para Excel
+        </Button>
+
         <Button
           variant="outline"
-          onClick={() => handleAddToPlanilha({
-            photoUrl: "https://via.placeholder.com/64", 
-            name: "Exemplo Canal",
-            subscribers: 123456,
+          onClick={() => addChannelToPlanilha({
+            photoUrl: "https://via.placeholder.com/64",
+            name: "Canal Exemplo",
+            channelId: "UC123456",
+            phone: "+55 11 91234-5678",
+            subscribers: 150000,
             avgViews: 50000,
             monthlyVideos: 12,
             avgLikes: 3000,
             avgComments: 500,
             subGrowth: 20,
             score: 42,
-            classification: "Grande Potencial",
-            email: "exemplo@canal.com",
-            phone: "+55 11 91234-5678"
+            classification: "Grande Potencial"
           })}
           className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]"
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Adicionar Canal de Exemplo
+          Enviar informações
         </Button>
       </div>
-    );
-  }
 
-  return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="bg-youtube-red p-3 rounded-lg futuristic-glow">
-            <FileSpreadsheet className="h-6 w-6 text-youtube-white" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-youtube-white font-roboto">
-              Planilha de Canais Analisados
-            </h2>
-            <p className="text-youtube-gray font-roboto">
-              {channels.length} canal(is) na planilha
-            </p>
-          </div>
-        </div>
-
-        <div className="flex space-x-4">
-          <Button 
-            onClick={exportToExcel} 
-            className="futuristic-button"
-          >
-            <FileSpreadsheet className="h-4 w-4 mr-2" />
-            Exportar para Excel
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleAddToPlanilha({
-              photoUrl: "https://via.placeholder.com/64", 
-              name: "Exemplo Canal",
-              subscribers: 123456,
-              avgViews: 50000,
-              monthlyVideos: 12,
-              avgLikes: 3000,
-              avgComments: 500,
-              subGrowth: 20,
-              score: 42,
-              classification: "Grande Potencial",
-              email: "exemplo@canal.com",
-              phone: "+55 11 91234-5678"
-            })}
-            className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Adicionar Canal de Exemplo
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {channels.map((channel, idx) => (
-          <Card key={idx} className="bg-[#1E1E1E] border border-[#525252] p-4 space-y-4 shadow-md hover:shadow-lg transition rounded-2xl">
-            <div className="flex items-center space-x-4">
-              <img 
-                src={channel.photoUrl} 
-                alt={channel.name} 
-                width={64} 
-                height={64} 
-                className="rounded-full border border-[#525252]"
-              />
-              <div>
-                <h2 className="text-xl font-semibold text-white">{channel.name}</h2>
-                <Badge variant="outline" className="text-white">{channel.classification}</Badge>
-              </div>
-            </div>
-
-            <CardContent className="space-y-1 p-0">
-              <p className="text-white"><strong>Inscritos:</strong> {channel.subscribers.toLocaleString()}</p>
-              <p className="text-white"><strong>Média de Views:</strong> {channel.avgViews.toLocaleString()}</p>
-              <p className="text-white"><strong>Frequência:</strong> {channel.monthlyVideos} vídeos/mês</p>
-              <p className="text-white"><strong>Engajamento:</strong> {((channel.avgLikes + channel.avgComments) / channel.avgViews * 100).toFixed(2)}%</p>
-              <p className="text-white"><strong>Crescimento:</strong> {channel.subGrowth}%</p>
-              <p className="text-white"><strong>Score:</strong> {channel.score}/50</p>
-              <p className="text-white"><strong>Email:</strong> {channel.email}</p>
-              <p className="text-white"><strong>Telefone:</strong> {channel.phone}</p>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="bg-[#1E1E1E] rounded-lg p-4">
+        <DataGrid
+          columns={columns}
+          rows={filteredRows}
+          onRowsChange={handleRowsChange}
+          className="rdg-light border rounded-lg"
+          style={{ 
+            height: '500px',
+            backgroundColor: '#1E1E1E',
+            color: 'white'
+          }}
+        />
       </div>
     </div>
   )
