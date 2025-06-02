@@ -1,4 +1,3 @@
-
 import { Target, Users, TrendingUp, Zap, User, Play } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,24 +10,23 @@ export const ProfessionalHeader = () => {
         <div className="flex items-center justify-between">
           {/* Logo e Branding */}
           <div className="flex items-center gap-4">
-            <div className="flex flex-col gap-2">
-              {/* Logo Principal - Dobrado de tamanho */}
-              <div className="w-24 h-24 rounded-lg overflow-hidden">
-                <img 
-                  src="/lovable-uploads/c4340d13-b884-474c-ab17-5ee12d7278e8.png" 
-                  alt="Prime Lead Logo" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              {/* Logo YouTube menor como complemento */}
-              <div className="bg-[#FF0000] p-1 rounded self-start mt-2">
-                <Play className="w-5 h-5 text-white fill-white" />
-              </div>
+            {/* Logo Principal - Tamanho reduzido em 50% */}
+            <div className="w-12 h-12 rounded-lg overflow-hidden">
+              <img 
+                src="/lovable-uploads/c4340d13-b884-474c-ab17-5ee12d7278e8.png" 
+                alt="Prime Lead Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
-            {/* Texto alinhado horizontalmente com a logo */}
+            {/* Texto com ícone do YouTube integrado */}
             <div className="flex flex-col justify-center">
               <h1 className="text-2xl font-bold text-white font-inter">Prime Lead</h1>
-              <p className="text-sm text-[#AAAAAA] font-medium">YouTube Pro</p>
+              <div className="flex items-center gap-1">
+                <div className="bg-[#FF0000] p-0.5 rounded">
+                  <Play className="w-3 h-3 text-white fill-white" />
+                </div>
+                <p className="text-sm text-[#AAAAAA] font-medium">YouTube Pro</p>
+              </div>
             </div>
           </div>
 
@@ -38,15 +36,6 @@ export const ProfessionalHeader = () => {
               Sua ponte para parcerias exclusivas
             </h2>
           </div>
-
-          {/* Botão Login */}
-          <Button 
-            variant="outline" 
-            className="bg-transparent border-[#FF0000] text-white hover:bg-[#FF0000] hover:text-white transition-colors"
-          >
-            <User className="h-4 w-4 mr-2" />
-            Login
-          </Button>
         </div>
       </div>
 
