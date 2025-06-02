@@ -2,10 +2,9 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useState } from "react"
 import * as XLSX from "xlsx"
-import { DataGrid } from 'react-data-grid'
-import 'react-data-grid/lib/styles.css'
 
 interface ChannelData {
   photoUrl: string
@@ -30,38 +29,13 @@ export const PlanilhaTab = ({}: PlanilhaTabProps) => {
   const [rows, setRows] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [filterClass, setFilterClass] = useState('')
+  const [editingCell, setEditingCell] = useState<{rowIndex: number, field: string} | null>(null)
 
-  const columns = [
-    {
-      key: 'photo',
-      name: 'Foto',
-      formatter: (props: any) => (
-        <img src={props.row.photo} alt={props.row.name} width={40} height={40} className="rounded-full" />
-      )
-    },
-    { key: 'name', name: 'Nome', editable: true },
-    { 
-      key: 'link', 
-      name: 'Link', 
-      editable: true, 
-      formatter: (props: any) => (
-        <a href={props.row.link} target="_blank" className="text-blue-500 underline">
-          {props.row.link}
-        </a>
-      )
-    },
-    { key: 'phone', name: 'Telefone', editable: true },
-    { key: 'subscribers', name: 'Inscritos', editable: true },
-    { key: 'avgViews', name: 'Média Views', editable: true },
-    { key: 'monthlyVideos', name: 'Freq (mês)', editable: true },
-    { key: 'engagement', name: 'Engajamento (%)', editable: true },
-    { key: 'subGrowth', name: 'Crescimento (%)', editable: true },
-    { key: 'score', name: 'Score', editable: false },
-    { key: 'classification', name: 'Classificação', editable: false },
-  ]
-
-  const handleRowsChange = (updatedRows: any[]) => {
+  const handleCellEdit = (rowIndex: number, field: string, value: string) => {
+    const updatedRows = [...rows]
+    updatedRows[rowIndex] = { ...updatedRows[rowIndex], [field]: value }
     setRows(updatedRows)
+    setEditingCell(null)
   }
 
   const addChannelToPlanilha = (channelData: ChannelData) => {
@@ -110,6 +84,35 @@ export const PlanilhaTab = ({}: PlanilhaTabProps) => {
     const matchesClass = filterClass ? row.classification === filterClass : true
     return matchesSearch && matchesClass
   })
+
+  const renderEditableCell = (value: any, rowIndex: number, field: string) => {
+    const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.field === field
+    
+    if (isEditing) {
+      return (
+        <Input
+          defaultValue={value}
+          onBlur={(e) => handleCellEdit(rowIndex, field, e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleCellEdit(rowIndex, field, e.currentTarget.value)
+            }
+          }}
+          className="bg-[#2A2A2A] border-[#525252] text-white h-8"
+          autoFocus
+        />
+      )
+    }
+    
+    return (
+      <div 
+        onClick={() => setEditingCell({rowIndex, field})}
+        className="cursor-pointer hover:bg-[#2A2A2A] p-1 rounded min-h-[2rem] flex items-center"
+      >
+        {value}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -162,18 +165,72 @@ export const PlanilhaTab = ({}: PlanilhaTabProps) => {
         </Button>
       </div>
 
-      <div className="bg-[#1E1E1E] rounded-lg p-4">
-        <DataGrid
-          columns={columns}
-          rows={filteredRows}
-          onRowsChange={handleRowsChange}
-          className="rdg-light border rounded-lg"
-          style={{ 
-            height: '500px',
-            backgroundColor: '#1E1E1E',
-            color: 'white'
-          }}
-        />
+      <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
+        <div className="max-h-[600px] overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-[#525252] hover:bg-[#2A2A2A]">
+                <TableHead className="text-[#AAAAAA]">Foto</TableHead>
+                <TableHead className="text-[#AAAAAA]">Nome</TableHead>
+                <TableHead className="text-[#AAAAAA]">Link</TableHead>
+                <TableHead className="text-[#AAAAAA]">Telefone</TableHead>
+                <TableHead className="text-[#AAAAAA]">Inscritos</TableHead>
+                <TableHead className="text-[#AAAAAA]">Média Views</TableHead>
+                <TableHead className="text-[#AAAAAA]">Freq (mês)</TableHead>
+                <TableHead className="text-[#AAAAAA]">Engajamento (%)</TableHead>
+                <TableHead className="text-[#AAAAAA]">Crescimento (%)</TableHead>
+                <TableHead className="text-[#AAAAAA]">Score</TableHead>
+                <TableHead className="text-[#AAAAAA]">Classificação</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRows.map((row, index) => (
+                <TableRow key={index} className="border-[#525252] hover:bg-[#2A2A2A]">
+                  <TableCell>
+                    <img src={row.photo} alt={row.name} width={40} height={40} className="rounded-full" />
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {renderEditableCell(row.name, index, 'name')}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    <a href={row.link} target="_blank" className="text-blue-400 underline hover:text-blue-300">
+                      {row.link}
+                    </a>
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {renderEditableCell(row.phone, index, 'phone')}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {renderEditableCell(row.subscribers, index, 'subscribers')}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {renderEditableCell(row.avgViews, index, 'avgViews')}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {renderEditableCell(row.monthlyVideos, index, 'monthlyVideos')}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {row.engagement}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {renderEditableCell(row.subGrowth, index, 'subGrowth')}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {row.score}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {row.classification}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {filteredRows.length === 0 && (
+            <div className="text-center py-8 text-[#AAAAAA]">
+              Nenhum canal encontrado
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
