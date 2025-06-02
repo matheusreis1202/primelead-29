@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Handshake } from 'lucide-react'
 import * as XLSX from 'xlsx'
 
 interface ChannelData {
@@ -22,9 +23,10 @@ interface ChannelData {
 interface NewPlanilhaTabProps {
   channelsData?: ChannelData[]
   onAddChannel?: (channel: ChannelData) => void
+  onSendToPartners?: (channel: ChannelData) => void
 }
 
-export const NewPlanilhaTab = ({ channelsData = [], onAddChannel }: NewPlanilhaTabProps) => {
+export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartners }: NewPlanilhaTabProps) => {
   const [data, setData] = useState<ChannelData[]>(channelsData)
   const [globalFilter, setGlobalFilter] = useState('')
 
@@ -67,7 +69,21 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel }: NewPlanilhaT
     { accessorKey: 'engagement', header: 'Engajamento (%)' },
     { accessorKey: 'subGrowth', header: 'Crescimento (%)' },
     { accessorKey: 'score', header: 'Score' },
-    { accessorKey: 'classification', header: 'Classificação' }
+    { accessorKey: 'classification', header: 'Classificação' },
+    {
+      id: 'actions',
+      header: 'Ações',
+      cell: (info: any) => (
+        <Button
+          onClick={() => handleSendToPartners(info.row.original)}
+          size="sm"
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          <Handshake className="h-4 w-4 mr-1" />
+          Parceria Fechada
+        </Button>
+      )
+    }
   ], [])
 
   const table = useReactTable({
@@ -97,6 +113,10 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel }: NewPlanilhaT
     }
     setData(prev => [...prev, newChannel])
     onAddChannel?.(newChannel)
+  }
+
+  const handleSendToPartners = (channel: ChannelData) => {
+    onSendToPartners?.(channel)
   }
 
   const exportToExcel = () => {

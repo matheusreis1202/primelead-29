@@ -5,9 +5,8 @@ import { ProfessionalNavigation } from '@/components/ProfessionalNavigation';
 import { MinimalSidebar } from '@/components/MinimalSidebar';
 import { ResultsTab } from '@/components/tabs/ResultsTab';
 import { AnalysisTab } from '@/components/tabs/AnalysisTab';
-import { SavedTab } from '@/components/tabs/SavedTab';
-import { useSavedChannels } from '@/hooks/useSavedChannels';
 import { NewPlanilhaTab, usePlanilhaData } from '@/components/tabs/NewPlanilhaTab';
+import { PartnersTab, usePartnersData } from '@/components/tabs/PartnersTab';
 
 export interface SearchFilters {
   apiKey: string;
@@ -37,8 +36,8 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('results');
   
-  const { savedChannels, saveChannel, removeChannel, isChannelSaved } = useSavedChannels();
   const { planilhaChannels, addToPlanilha } = usePlanilhaData();
+  const { partnerships, addPartnership } = usePartnersData();
 
   const handleSendToAnalysis = (channel: Channel) => {
     if (!channelsForAnalysis.find(c => c.id === channel.id)) {
@@ -54,6 +53,11 @@ const Index = () => {
   const handleSendToPlanilha = (channel: Channel) => {
     addToPlanilha(channel);
     setActiveTab('planilha');
+  };
+
+  const handleSendToPartners = (channel: Channel | any) => {
+    addPartnership(channel);
+    setActiveTab('partners');
   };
 
   const calculateChannelScore = (channel: any): number => {
@@ -176,21 +180,22 @@ const Index = () => {
           <AnalysisTab 
             channelsForAnalysis={channelsForAnalysis}
             onRemoveFromAnalysis={handleRemoveFromAnalysis}
-            onSaveChannel={saveChannel}
-            isChannelSaved={isChannelSaved}
             onSendToPlanilha={handleSendToPlanilha}
-          />
-        );
-      case 'saved':
-        return (
-          <SavedTab 
-            savedChannels={savedChannels}
-            onRemoveFromSaved={removeChannel}
+            onSendToPartners={handleSendToPartners}
           />
         );
       case 'planilha':
         return (
-          <NewPlanilhaTab channelsData={planilhaChannels} />
+          <NewPlanilhaTab 
+            channelsData={planilhaChannels} 
+            onSendToPartners={handleSendToPartners}
+          />
+        );
+      case 'partners':
+        return (
+          <PartnersTab 
+            partnershipsData={partnerships}
+          />
         );
       default:
         return null;
@@ -205,8 +210,8 @@ const Index = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         analysisCount={channelsForAnalysis.length}
-        savedCount={savedChannels.length}
         planilhaCount={planilhaChannels.length}
+        partnersCount={partnerships.length}
       />
       
       <div className="flex w-full">

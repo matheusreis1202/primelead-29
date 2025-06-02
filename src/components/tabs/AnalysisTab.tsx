@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { BarChart3, Target, Brain, FileSpreadsheet } from 'lucide-react';
+import { BarChart3, Target, Brain, FileSpreadsheet, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Channel } from '@/pages/Index';
 import YouTubeChannelAnalysis from '@/components/YouTubeChannelAnalysis';
@@ -19,17 +19,15 @@ interface ChannelData {
 interface AnalysisTabProps {
   channelsForAnalysis: Channel[];
   onRemoveFromAnalysis: (channelId: string) => void;
-  onSaveChannel: (channel: Channel) => void;
-  isChannelSaved: (channelId: string) => boolean;
   onSendToPlanilha?: (channel: Channel) => void;
+  onSendToPartners?: (channel: Channel) => void;
 }
 
 export const AnalysisTab = ({ 
   channelsForAnalysis, 
   onRemoveFromAnalysis, 
-  onSaveChannel,
-  isChannelSaved,
-  onSendToPlanilha
+  onSendToPlanilha,
+  onSendToPartners
 }: AnalysisTabProps) => {
   const [analyzedChannels, setAnalyzedChannels] = useState<Map<string, ChannelData>>(new Map());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -73,6 +71,10 @@ export const AnalysisTab = ({
 
   const handleSendToPlanilha = (channel: Channel) => {
     onSendToPlanilha?.(channel);
+  };
+
+  const handleSendToPartners = (channel: Channel) => {
+    onSendToPartners?.(channel);
   };
 
   if (channelsForAnalysis.length === 0) {
@@ -173,19 +175,19 @@ export const AnalysisTab = ({
                   <YouTubeChannelAnalysis channelData={analysisData} />
                   <div className="p-4 border-t border-[#525252] flex gap-2">
                     <Button 
-                      onClick={() => onSaveChannel(channel)}
-                      disabled={isChannelSaved(channel.id)}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      {isChannelSaved(channel.id) ? 'Salvo' : 'Salvar Canal'}
-                    </Button>
-                    
-                    <Button 
                       onClick={() => handleSendToPlanilha(channel)}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       <FileSpreadsheet className="h-4 w-4 mr-2" />
                       Enviar para Planilha
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => handleSendToPartners(channel)}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Handshake className="h-4 w-4 mr-2" />
+                      Parceria Fechada
                     </Button>
                     
                     <Button 
