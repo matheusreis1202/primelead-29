@@ -1,3 +1,4 @@
+
 import { Target, Users, TrendingUp, Zap, User, Play } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ export const ProfessionalHeader = () => {
               <h1 className="text-2xl font-bold text-white font-inter">Prime Lead</h1>
               <div className="flex items-center gap-1">
                 <div className="bg-[#FF0000] p-0.5 rounded">
-                  <Play className="w-3 h-3 text-white fill-white" />
+                  <Play className="w-2 h-2 text-white fill-white" />
                 </div>
                 <p className="text-sm text-[#AAAAAA] font-medium">YouTube Pro</p>
               </div>
@@ -32,7 +33,7 @@ export const ProfessionalHeader = () => {
 
           {/* Slogan Central */}
           <div className="hidden md:block">
-            <h2 className="text-white text-3xl font-great-vibes text-center">
+            <h2 className="text-white text-2xl font-inter font-light tracking-wide text-center">
               Sua ponte para parcerias exclusivas
             </h2>
           </div>
