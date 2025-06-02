@@ -1,60 +1,21 @@
 
 import { useState } from 'react';
-import { ChannelAnalysisCard } from '@/components/ChannelAnalysisCard';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { BarChart3, Target, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Channel } from '@/pages/Index';
+import YouTubeChannelAnalysis from '@/components/YouTubeChannelAnalysis';
 
-interface ChannelAnalysis {
-  id: string;
-  audienciaSize: {
-    inscritos: number;
-    views: number;
-    classificacao: 'Pequena' | 'Média' | 'Grande' | 'Mega';
-  };
-  engajamento: {
-    mediaViews: number;
-    taxaEngajamento: number;
-    classificacao: 'Baixo' | 'Médio' | 'Alto' | 'Excelente';
-  };
-  nicho: {
-    categoria: string;
-    publicoAlvo: string;
-    relevancia: 'Baixa' | 'Média' | 'Alta';
-  };
-  qualidadeConteudo: {
-    estilo: string;
-    consistencia: 'Baixa' | 'Média' | 'Alta';
-    nota: number;
-  };
-  frequencia: {
-    uploadsPerMes: number;
-    consistencia: 'Irregular' | 'Regular' | 'Muito Regular';
-  };
-  crescimento: {
-    tendencia: 'Decrescente' | 'Estável' | 'Crescente' | 'Em Alta';
-    velocidade: 'Lenta' | 'Moderada' | 'Rápida';
-  };
-  tipoPublico: {
-    genero: 'Masculino' | 'Feminino' | 'Misto';
-    faixaEtaria: string;
-    localizacao: string;
-  };
-  partnershipScore: {
-    overall: number;
-    audienceSize: number;
-    engagement: number;
-    consistency: number;
-    content: number;
-    reachability: number;
-  };
-  socialMedia: {
-    email?: string;
-    instagram?: string;
-    tiktok?: string;
-    website?: string;
-  };
+interface ChannelData {
+  name: string
+  email: string
+  phone: string
+  subscribers: number
+  avgViews: number
+  monthlyVideos: number
+  avgLikes: number
+  avgComments: number
+  subGrowth: number
 }
 
 interface AnalysisTabProps {
@@ -70,94 +31,45 @@ export const AnalysisTab = ({
   onSaveChannel,
   isChannelSaved 
 }: AnalysisTabProps) => {
-  const [analyzedChannels, setAnalyzedChannels] = useState<ChannelAnalysis[]>([]);
+  const [analyzedChannels, setAnalyzedChannels] = useState<Map<string, ChannelData>>(new Map());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const analyzeChannel = (channel: Channel): ChannelAnalysis => {
-    const engagementRate = (channel.viewCount / channel.subscriberCount) * 100;
-    const avgViews = channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 1000));
-
-    // Simular score de parceria mais realista
-    const audienceScore = channel.subscriberCount > 100000 ? 20 : channel.subscriberCount > 10000 ? 15 : 10;
-    const engagementScore = engagementRate > 5 ? 20 : engagementRate > 2 ? 15 : 10;
-    const consistencyScore = 15;
-    const contentScore = 12;
-    const reachabilityScore = Math.floor(Math.random() * 10) + 5;
-    
-    const overallScore = audienceScore + engagementScore + consistencyScore + contentScore + reachabilityScore;
-
+  const convertChannelToAnalysisData = (channel: Channel): ChannelData => {
+    // Simulando dados para demonstração - em um cenário real, estes dados viriam da API
     return {
-      id: channel.id,
-      audienciaSize: {
-        inscritos: channel.subscriberCount,
-        views: channel.viewCount,
-        classificacao: channel.subscriberCount > 1000000 ? 'Mega' : 
-                      channel.subscriberCount > 100000 ? 'Grande' :
-                      channel.subscriberCount > 10000 ? 'Média' : 'Pequena'
-      },
-      engajamento: {
-        mediaViews: avgViews,
-        taxaEngajamento: engagementRate,
-        classificacao: engagementRate > 10 ? 'Excelente' :
-                      engagementRate > 5 ? 'Alto' :
-                      engagementRate > 2 ? 'Médio' : 'Baixo'
-      },
-      nicho: {
-        categoria: 'Entretenimento',
-        publicoAlvo: 'Jovens adultos',
-        relevancia: 'Alta'
-      },
-      qualidadeConteudo: {
-        estilo: 'Profissional',
-        consistencia: 'Alta',
-        nota: Math.floor(Math.random() * 3) + 8
-      },
-      frequencia: {
-        uploadsPerMes: Math.floor(Math.random() * 8) + 2,
-        consistencia: 'Regular'
-      },
-      crescimento: {
-        tendencia: 'Crescente',
-        velocidade: 'Moderada'
-      },
-      tipoPublico: {
-        genero: ['Masculino', 'Feminino', 'Misto'][Math.floor(Math.random() * 3)] as any,
-        faixaEtaria: '18-34 anos',
-        localizacao: 'Brasil'
-      },
-      partnershipScore: {
-        overall: overallScore,
-        audienceSize: audienceScore,
-        engagement: engagementScore,
-        consistency: consistencyScore,
-        content: contentScore,
-        reachability: reachabilityScore
-      },
-      socialMedia: {
-        email: Math.random() > 0.7 ? 'contato@exemplo.com' : undefined,
-        instagram: Math.random() > 0.6 ? 'https://instagram.com/canal' : undefined,
-        tiktok: Math.random() > 0.8 ? 'https://tiktok.com/@canal' : undefined,
-        website: Math.random() > 0.9 ? 'https://website.com' : undefined
-      }
+      name: channel.title,
+      email: `contato@${channel.title.toLowerCase().replace(/\s+/g, '')}.com`,
+      phone: `(11) ${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
+      subscribers: channel.subscriberCount,
+      avgViews: Math.floor(channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 100))),
+      monthlyVideos: Math.floor(Math.random() * 30) + 1,
+      avgLikes: Math.floor(Math.random() * 5000) + 100,
+      avgComments: Math.floor(Math.random() * 500) + 10,
+      subGrowth: Math.floor(Math.random() * 100) + 1
     };
   };
 
   const handleAnalyzeAll = async () => {
     setIsAnalyzing(true);
     
-    // Análise instantânea de todos os canais
-    const analyses = channelsForAnalysis
-      .filter(channel => !analyzedChannels.find(a => a.id === channel.id))
-      .map(channel => analyzeChannel(channel));
+    // Simula análise de todos os canais
+    const newAnalyzedChannels = new Map(analyzedChannels);
     
-    setAnalyzedChannels(prev => [...prev, ...analyses]);
+    for (const channel of channelsForAnalysis) {
+      if (!newAnalyzedChannels.has(channel.id)) {
+        const analysisData = convertChannelToAnalysisData(channel);
+        newAnalyzedChannels.set(channel.id, analysisData);
+      }
+    }
+    
+    setAnalyzedChannels(newAnalyzedChannels);
     setIsAnalyzing(false);
   };
 
   const handleAnalyzeIndividual = (channel: Channel) => {
-    if (!analyzedChannels.find(a => a.id === channel.id)) {
-      const analysis = analyzeChannel(channel);
-      setAnalyzedChannels(prev => [...prev, analysis]);
+    if (!analyzedChannels.has(channel.id)) {
+      const analysisData = convertChannelToAnalysisData(channel);
+      setAnalyzedChannels(prev => new Map(prev).set(channel.id, analysisData));
     }
   };
 
@@ -194,7 +106,7 @@ export const AnalysisTab = ({
           </div>
         </div>
 
-        {channelsForAnalysis.length > analyzedChannels.length && (
+        {channelsForAnalysis.length > analyzedChannels.size && (
           <Button 
             onClick={handleAnalyzeAll}
             disabled={isAnalyzing}
@@ -215,20 +127,67 @@ export const AnalysisTab = ({
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {channelsForAnalysis.map(channel => {
-          const analysis = analyzedChannels.find(a => a.id === channel.id);
+          const analysisData = analyzedChannels.get(channel.id);
+          
           return (
-            <ChannelAnalysisCard
-              key={channel.id}
-              channel={channel}
-              analysis={analysis}
-              onRemove={() => onRemoveFromAnalysis(channel.id)}
-              onAnalyze={() => handleAnalyzeIndividual(channel)}
-              onSave={() => onSaveChannel(channel)}
-              showSaveButton={true}
-              isSaved={isChannelSaved(channel.id)}
-            />
+            <div key={channel.id} className="space-y-4">
+              {!analysisData ? (
+                <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    {channel.thumbnail && (
+                      <img 
+                        src={channel.thumbnail} 
+                        alt={channel.title}
+                        className="w-16 h-16 rounded-lg border border-[#525252]"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-white font-bold text-lg">{channel.title}</h3>
+                      <p className="text-[#AAAAAA] text-sm">{channel.subscriberCount.toLocaleString()} inscritos</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => handleAnalyzeIndividual(channel)}
+                      className="flex-1 bg-[#FF0000] hover:bg-[#CC0000] text-white"
+                    >
+                      <Brain className="h-4 w-4 mr-2" />
+                      Analisar Canal
+                    </Button>
+                    <Button 
+                      onClick={() => onRemoveFromAnalysis(channel.id)}
+                      variant="outline"
+                      className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]"
+                    >
+                      Remover
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg overflow-hidden">
+                  <YouTubeChannelAnalysis channelData={analysisData} />
+                  <div className="p-4 border-t border-[#525252] flex gap-2">
+                    <Button 
+                      onClick={() => onSaveChannel(channel)}
+                      disabled={isChannelSaved(channel.id)}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {isChannelSaved(channel.id) ? 'Salvo' : 'Salvar Canal'}
+                    </Button>
+                    <Button 
+                      onClick={() => onRemoveFromAnalysis(channel.id)}
+                      variant="outline"
+                      className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]"
+                    >
+                      Remover
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
