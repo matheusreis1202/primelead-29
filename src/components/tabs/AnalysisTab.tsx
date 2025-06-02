@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { BarChart3, Target, Brain } from 'lucide-react';
@@ -8,8 +7,6 @@ import YouTubeChannelAnalysis from '@/components/YouTubeChannelAnalysis';
 
 interface ChannelData {
   name: string
-  email: string
-  phone: string
   subscribers: number
   avgViews: number
   monthlyVideos: number
@@ -38,8 +35,6 @@ export const AnalysisTab = ({
     // Simulando dados para demonstração - em um cenário real, estes dados viriam da API
     return {
       name: channel.title,
-      email: `contato@${channel.title.toLowerCase().replace(/\s+/g, '')}.com`,
-      phone: `(11) ${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
       subscribers: channel.subscriberCount,
       avgViews: Math.floor(channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 100))),
       monthlyVideos: Math.floor(Math.random() * 30) + 1,

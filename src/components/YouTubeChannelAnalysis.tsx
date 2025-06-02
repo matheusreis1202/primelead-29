@@ -8,8 +8,6 @@ import { Channel } from "@/pages/Index"
 
 interface ChannelData {
   name: string
-  email: string
-  phone: string
   subscribers: number
   avgViews: number
   monthlyVideos: number
@@ -87,8 +85,6 @@ export default function YouTubeChannelAnalysis({ channelData }: YouTubeChannelAn
       <h2 className="text-2xl font-bold text-white">Análise do Canal</h2>
       <div className="space-y-2 text-white">
         <p><strong>Nome:</strong> {channelData.name}</p>
-        <p><strong>Email:</strong> {channelData.email}</p>
-        <p><strong>Telefone:</strong> {channelData.phone}</p>
         <p><strong>Inscritos:</strong> {channelData.subscribers.toLocaleString()}</p>
         <p><strong>Média de Visualizações:</strong> {channelData.avgViews.toLocaleString()}</p>
         <p><strong>Frequência de Vídeos:</strong> {channelData.monthlyVideos} vídeos/mês</p>
@@ -101,13 +97,6 @@ export default function YouTubeChannelAnalysis({ channelData }: YouTubeChannelAn
         <Progress value={(score / 50) * 100} className="h-3" />
         <Badge variant="outline" className="text-white">{classification}</Badge>
       </div>
-
-      <Button 
-        onClick={() => window.open(`mailto:${channelData.email}?subject=Parceria YouTube&body=Olá ${channelData.name}, queremos fechar uma parceria com você!`)}
-        className="w-full"
-      >
-        Entrar em Contato
-      </Button>
     </Card>
   )
 }
