@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ProfessionalHeader } from '@/components/ProfessionalHeader';
 import { ProfessionalNavigation } from '@/components/ProfessionalNavigation';
@@ -6,7 +7,7 @@ import { ResultsTab } from '@/components/tabs/ResultsTab';
 import { AnalysisTab } from '@/components/tabs/AnalysisTab';
 import { SavedTab } from '@/components/tabs/SavedTab';
 import { useSavedChannels } from '@/hooks/useSavedChannels';
-import { PlanilhaTab } from '@/components/tabs/PlanilhaTab';
+import { NewPlanilhaTab, usePlanilhaData } from '@/components/tabs/NewPlanilhaTab';
 
 export interface SearchFilters {
   apiKey: string;
@@ -37,6 +38,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('results');
   
   const { savedChannels, saveChannel, removeChannel, isChannelSaved } = useSavedChannels();
+  const { planilhaChannels, addToPlanilha } = usePlanilhaData();
 
   const handleSendToAnalysis = (channel: Channel) => {
     if (!channelsForAnalysis.find(c => c.id === channel.id)) {
@@ -47,6 +49,11 @@ const Index = () => {
 
   const handleRemoveFromAnalysis = (channelId: string) => {
     setChannelsForAnalysis(prev => prev.filter(c => c.id !== channelId));
+  };
+
+  const handleSendToPlanilha = (channel: Channel) => {
+    addToPlanilha(channel);
+    setActiveTab('planilha');
   };
 
   const calculateChannelScore = (channel: any): number => {
@@ -171,6 +178,7 @@ const Index = () => {
             onRemoveFromAnalysis={handleRemoveFromAnalysis}
             onSaveChannel={saveChannel}
             isChannelSaved={isChannelSaved}
+            onSendToPlanilha={handleSendToPlanilha}
           />
         );
       case 'saved':
@@ -182,7 +190,7 @@ const Index = () => {
         );
       case 'planilha':
         return (
-          <PlanilhaTab />
+          <NewPlanilhaTab channelsData={planilhaChannels} />
         );
       default:
         return null;
@@ -198,6 +206,7 @@ const Index = () => {
         onTabChange={setActiveTab}
         analysisCount={channelsForAnalysis.length}
         savedCount={savedChannels.length}
+        planilhaCount={planilhaChannels.length}
       />
       
       <div className="flex w-full">

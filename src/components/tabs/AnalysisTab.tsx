@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { BarChart3, Target, Brain } from 'lucide-react';
+import { BarChart3, Target, Brain, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Channel } from '@/pages/Index';
 import YouTubeChannelAnalysis from '@/components/YouTubeChannelAnalysis';
@@ -20,13 +21,15 @@ interface AnalysisTabProps {
   onRemoveFromAnalysis: (channelId: string) => void;
   onSaveChannel: (channel: Channel) => void;
   isChannelSaved: (channelId: string) => boolean;
+  onSendToPlanilha?: (channel: Channel) => void;
 }
 
 export const AnalysisTab = ({ 
   channelsForAnalysis, 
   onRemoveFromAnalysis, 
   onSaveChannel,
-  isChannelSaved 
+  isChannelSaved,
+  onSendToPlanilha
 }: AnalysisTabProps) => {
   const [analyzedChannels, setAnalyzedChannels] = useState<Map<string, ChannelData>>(new Map());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -66,6 +69,10 @@ export const AnalysisTab = ({
       const analysisData = convertChannelToAnalysisData(channel);
       setAnalyzedChannels(prev => new Map(prev).set(channel.id, analysisData));
     }
+  };
+
+  const handleSendToPlanilha = (channel: Channel) => {
+    onSendToPlanilha?.(channel);
   };
 
   if (channelsForAnalysis.length === 0) {
@@ -172,6 +179,15 @@ export const AnalysisTab = ({
                     >
                       {isChannelSaved(channel.id) ? 'Salvo' : 'Salvar Canal'}
                     </Button>
+                    
+                    <Button 
+                      onClick={() => handleSendToPlanilha(channel)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <FileSpreadsheet className="h-4 w-4 mr-2" />
+                      Enviar para Planilha
+                    </Button>
+                    
                     <Button 
                       onClick={() => onRemoveFromAnalysis(channel.id)}
                       variant="outline"
