@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
@@ -55,13 +54,19 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     setEditingData({})
   }
 
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) {
-      return `${(num / 1000000).toFixed(1)}M`
-    } else if (num >= 1000) {
-      return `${(num / 1000).toFixed(1)}K`
+  const formatNumber = (num: number | undefined | null) => {
+    // Verificar se o valor é válido antes de formatar
+    if (num === undefined || num === null || isNaN(num)) {
+      return '0'
     }
-    return num.toLocaleString()
+    
+    const validNum = Number(num)
+    if (validNum >= 1000000) {
+      return `${(validNum / 1000000).toFixed(1)}M`
+    } else if (validNum >= 1000) {
+      return `${(validNum / 1000).toFixed(1)}K`
+    }
+    return validNum.toLocaleString()
   }
 
   const columns = useMemo(() => [
@@ -149,7 +154,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
       size: 100,
       cell: (info: any) => (
         <div className="text-center text-[#AAAAAA]">
-          {info.getValue()}
+          {info.getValue() || 0}
         </div>
       )
     },
@@ -159,7 +164,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
       size: 120,
       cell: (info: any) => (
         <div className="text-center text-green-400 font-medium">
-          {info.getValue()}%
+          {info.getValue() || '0.0'}%
         </div>
       )
     },
@@ -169,7 +174,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
       size: 120,
       cell: (info: any) => (
         <div className="text-center text-blue-400 font-medium">
-          {info.getValue()}%
+          {info.getValue() || '0'}%
         </div>
       )
     },
@@ -179,7 +184,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
       size: 80,
       cell: (info: any) => (
         <div className="text-center font-bold text-yellow-400">
-          {info.getValue()}
+          {info.getValue() || 0}
         </div>
       )
     },
@@ -188,7 +193,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
       header: 'Classificação',
       size: 160,
       cell: (info: any) => {
-        const value = info.getValue()
+        const value = info.getValue() || 'Não classificado'
         const getColor = (classification: string) => {
           switch (classification) {
             case 'Altíssimo Potencial': return 'text-green-400'
@@ -370,19 +375,18 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
   )
 }
 
-// Hook para controlar a planilha globalmente
 export const usePlanilhaData = () => {
   const [planilhaChannels, setPlanilhaChannels] = useState<ChannelData[]>([])
 
   const addToPlanilha = (channelData: any) => {
     const newChannel: ChannelData = {
       id: channelData.id || channelData.name,
-      photo: channelData.thumbnail || 'https://via.placeholder.com/64',
+      photo: channelData.thumbnail || channelData.photo || 'https://via.placeholder.com/64',
       name: channelData.title || channelData.name,
-      link: `https://youtube.com/channel/${channelData.id}`,
-      phone: '+55 11 00000-0000',
-      subscribers: channelData.subscriberCount || channelData.inscritos,
-      avgViews: channelData.avgViews || Math.floor(channelData.viewCount / 100),
+      link: channelData.link || `https://youtube.com/channel/${channelData.id}`,
+      phone: channelData.phone || '+55 11 00000-0000',
+      subscribers: channelData.subscriberCount || channelData.subscribers || 0,
+      avgViews: channelData.avgViews || 0,
       monthlyVideos: channelData.monthlyVideos || 10,
       engagement: channelData.engagement || '5.0',
       subGrowth: channelData.subGrowth || '15',

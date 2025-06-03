@@ -1,242 +1,218 @@
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Edit, Trash2, Phone, Mail, Calendar, ExternalLink } from 'lucide-react'
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle } from 'lucide-react'
 
-interface Partnership {
+interface PartnerData {
   id: string
-  foto: string
-  nome: string
-  link: string
-  contato: string
-  email: string
-  tipo: string
-  data: string
+  photo: string
+  name: string
+  phone: string
+  subscribers: number
+  avgViews: number
+  engagement: string
+  score: number
+  classification: string
   status: 'Interesse' | 'Negociando' | 'Fechado' | 'Rejeitado'
-  observacoes: string
-  valor?: string
-  prazo?: string
+  notes?: string
+  email?: string
 }
 
 interface PartnersTabProps {
-  partnershipsData?: Partnership[]
-  onAddPartnership?: (partnership: Partnership) => void
+  partnershipsData?: PartnerData[]
 }
 
-export const PartnersTab = ({ partnershipsData = [], onAddPartnership }: PartnersTabProps) => {
-  const [parcerias, setParcerias] = useState<Partnership[]>(partnershipsData)
-  const [showForm, setShowForm] = useState(false)
+export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
+  const [partners, setPartners] = useState<PartnerData[]>(partnershipsData)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingData, setEditingData] = useState<Partial<PartnerData>>({})
 
-  const [novaParceria, setNovaParceria] = useState({
-    foto: "https://via.placeholder.com/64",
-    nome: "",
-    link: "",
-    contato: "",
-    email: "",
-    tipo: "Publicidade",
-    data: new Date().toISOString().slice(0, 10),
-    status: "Interesse" as const,
-    observacoes: "",
-    valor: "",
-    prazo: ""
-  })
+  const statusColumns = [
+    { status: 'Interesse' as const, title: 'Interesse Inicial', color: 'bg-blue-500' },
+    { status: 'Negociando' as const, title: 'Em Negociação', color: 'bg-yellow-500' },
+    { status: 'Fechado' as const, title: 'Parcerias Fechadas', color: 'bg-green-500' },
+    { status: 'Rejeitado' as const, title: 'Rejeitados', color: 'bg-red-500' }
+  ]
 
-  const handleAdd = () => {
-    const newPartnership: Partnership = { 
-      ...novaParceria, 
-      id: Date.now().toString()
-    }
-    setParcerias([...parcerias, newPartnership])
-    onAddPartnership?.(newPartnership)
-    setNovaParceria({
-      foto: "https://via.placeholder.com/64",
-      nome: "",
-      link: "",
-      contato: "",
-      email: "",
-      tipo: "Publicidade",
-      data: new Date().toISOString().slice(0, 10),
-      status: "Interesse",
-      observacoes: "",
-      valor: "",
-      prazo: ""
-    })
-    setShowForm(false)
-  }
-
-  const handleDelete = (id: string) => {
-    setParcerias(parcerias.filter(p => p.id !== id))
-  }
-
-  const handleStatusChange = (id: string, newStatus: Partnership['status']) => {
-    setParcerias(parcerias.map(p => 
-      p.id === id ? { ...p, status: newStatus } : p
+  const handleStatusChange = (partnerId: string, newStatus: PartnerData['status']) => {
+    setPartners(prev => prev.map(partner => 
+      partner.id === partnerId ? { ...partner, status: newStatus } : partner
     ))
   }
 
-  const statusConfig = {
-    'Interesse': { color: 'bg-blue-100 text-blue-700 border-blue-200', bgColor: 'bg-blue-50' },
-    'Negociando': { color: 'bg-yellow-100 text-yellow-700 border-yellow-200', bgColor: 'bg-yellow-50' },
-    'Fechado': { color: 'bg-green-100 text-green-700 border-green-200', bgColor: 'bg-green-50' },
-    'Rejeitado': { color: 'bg-red-100 text-red-700 border-red-200', bgColor: 'bg-red-50' }
+  const handleEdit = (partner: PartnerData) => {
+    setEditingId(partner.id)
+    setEditingData(partner)
   }
 
-  const getParceirasByStatus = (status: Partnership['status']) => {
-    return parcerias.filter(p => p.status === status)
+  const handleSave = () => {
+    if (editingId && editingData) {
+      setPartners(prev => prev.map(partner => 
+        partner.id === editingId ? { ...partner, ...editingData } : partner
+      ))
+      setEditingId(null)
+      setEditingData({})
+    }
   }
 
-  const renderCard = (parceria: Partnership) => (
-    <Card key={parceria.id} className="mb-3 bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <img 
-              src={parceria.foto} 
-              alt={parceria.nome} 
-              className="w-10 h-10 rounded-full border-2 border-gray-200" 
-            />
-            <div>
-              <CardTitle className="text-sm font-semibold text-gray-800">{parceria.nome}</CardTitle>
-              <a 
-                href={parceria.link} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
-              >
-                <ExternalLink className="w-3 h-3" />
-                Ver Canal
-              </a>
+  const handleCancel = () => {
+    setEditingId(null)
+    setEditingData({})
+  }
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`
+    }
+    return num.toLocaleString()
+  }
+
+  const getPartnersByStatus = (status: PartnerData['status']) => {
+    return partners.filter(partner => partner.status === status)
+  }
+
+  const getStatusColor = (classification: string) => {
+    switch (classification) {
+      case 'Altíssimo Potencial': return 'bg-green-100 text-green-800 border-green-200'
+      case 'Grande Potencial': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'Médio Potencial': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  const renderPartnerCard = (partner: PartnerData) => {
+    const isEditing = editingId === partner.id
+
+    return (
+      <Card key={partner.id} className="bg-[#1E1E1E] border-[#333] mb-4 hover:shadow-lg transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <img 
+                src={partner.photo} 
+                alt={partner.name}
+                className="w-12 h-12 rounded-full border-2 border-[#444]"
+              />
+              <div>
+                {isEditing ? (
+                  <Input
+                    value={editingData.name || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-sm mb-1"
+                  />
+                ) : (
+                  <CardTitle className="text-white text-lg">{partner.name}</CardTitle>
+                )}
+                <Badge className={`text-xs ${getStatusColor(partner.classification)}`}>
+                  {partner.classification}
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 text-yellow-400" />
+                <span className="text-yellow-400 font-bold">{partner.score}</span>
+              </div>
+              
+              {isEditing ? (
+                <div className="flex gap-1">
+                  <Button onClick={handleSave} size="sm" className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0">
+                    <Check className="h-3 w-3" />
+                  </Button>
+                  <Button onClick={handleCancel} size="sm" variant="outline" className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] h-8 w-8 p-0">
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                <Button onClick={() => handleEdit(partner)} size="sm" variant="outline" className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] h-8 w-8 p-0">
+                  <Edit3 className="h-3 w-3" />
+                </Button>
+              )}
             </div>
           </div>
-          <div className="flex space-x-1">
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              onClick={() => setEditingId(parceria.id)}
-              className="h-6 w-6 p-0"
-            >
-              <Edit className="h-3 w-3" />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              onClick={() => handleDelete(parceria.id)}
-              className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
+        </CardHeader>
+        
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-[#AAAAAA]" />
+              <span className="text-[#AAAAAA]">Inscritos:</span>
+              <span className="text-white font-medium">{formatNumber(partner.subscribers)}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Youtube className="h-4 w-4 text-[#AAAAAA]" />
+              <span className="text-[#AAAAAA]">Avg Views:</span>
+              <span className="text-white font-medium">{formatNumber(partner.avgViews)}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Phone className="h-4 w-4 text-[#AAAAAA]" />
+              {isEditing ? (
+                <Input
+                  value={editingData.phone || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
+                  className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-6 flex-1"
+                />
+              ) : (
+                <>
+                  <span className="text-[#AAAAAA]">Tel:</span>
+                  <span className="text-white font-medium">{partner.phone}</span>
+                </>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4 text-[#AAAAAA]" />
+              <span className="text-[#AAAAAA]">Eng:</span>
+              <span className="text-green-400 font-medium">{partner.engagement}%</span>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0 space-y-2">
-        <div className="flex items-center text-xs text-gray-600">
-          <Phone className="w-3 h-3 mr-1" />
-          {parceria.contato}
-        </div>
-        {parceria.email && (
-          <div className="flex items-center text-xs text-gray-600">
-            <Mail className="w-3 h-3 mr-1" />
-            {parceria.email}
-          </div>
-        )}
-        <div className="flex items-center text-xs text-gray-600">
-          <Calendar className="w-3 h-3 mr-1" />
-          {parceria.data}
-        </div>
-        <div className="space-y-1">
-          <div className="text-xs font-medium text-gray-700">Tipo: {parceria.tipo}</div>
-          {parceria.valor && (
-            <div className="text-xs text-gray-600">Valor: {parceria.valor}</div>
+          
+          {isEditing ? (
+            <div className="space-y-2">
+              <Input
+                placeholder="Email (opcional)"
+                value={editingData.email || ''}
+                onChange={(e) => setEditingData(prev => ({ ...prev, email: e.target.value }))}
+                className="bg-[#2A2A2A] border-[#525252] text-white text-sm"
+              />
+              <textarea
+                placeholder="Observações..."
+                value={editingData.notes || ''}
+                onChange={(e) => setEditingData(prev => ({ ...prev, notes: e.target.value }))}
+                className="w-full bg-[#2A2A2A] border border-[#525252] text-white text-sm rounded-md p-2 h-16 resize-none"
+              />
+            </div>
+          ) : (
+            <>
+              {partner.email && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="h-4 w-4 text-[#AAAAAA]" />
+                  <span className="text-blue-400">{partner.email}</span>
+                </div>
+              )}
+              
+              {partner.notes && (
+                <div className="bg-[#2A2A2A] p-2 rounded text-sm text-[#CCCCCC]">
+                  {partner.notes}
+                </div>
+              )}
+            </>
           )}
-          {parceria.prazo && (
-            <div className="text-xs text-gray-600">Prazo: {parceria.prazo}</div>
-          )}
-        </div>
-        {parceria.observacoes && (
-          <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
-            {parceria.observacoes}
-          </div>
-        )}
-        <Select value={parceria.status} onValueChange={(value) => handleStatusChange(parceria.id, value as Partnership['status'])}>
-          <SelectTrigger className="h-6 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Interesse">Interesse</SelectItem>
-            <SelectItem value="Negociando">Negociando</SelectItem>
-            <SelectItem value="Fechado">Fechado</SelectItem>
-            <SelectItem value="Rejeitado">Rejeitado</SelectItem>
-          </SelectContent>
-        </Select>
-      </CardContent>
-    </Card>
-  )
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-white">Sistema de Parcerias</h1>
-        <Button 
-          onClick={() => setShowForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Parceria
-        </Button>
-      </div>
-
-      {showForm && (
-        <Card className="bg-[#1E1E1E] border-[#525252] p-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Input 
-              placeholder="Nome do Canal" 
-              value={novaParceria.nome} 
-              onChange={e => setNovaParceria({ ...novaParceria, nome: e.target.value })}
-              className="bg-[#2A2A2A] border-[#525252] text-white"
-            />
-            <Input 
-              placeholder="Link do Canal" 
-              value={novaParceria.link} 
-              onChange={e => setNovaParceria({ ...novaParceria, link: e.target.value })}
-              className="bg-[#2A2A2A] border-[#525252] text-white"
-            />
-            <Input 
-              placeholder="Telefone" 
-              value={novaParceria.contato} 
-              onChange={e => setNovaParceria({ ...novaParceria, contato: e.target.value })}
-              className="bg-[#2A2A2A] border-[#525252] text-white"
-            />
-            <Input 
-              placeholder="Email" 
-              value={novaParceria.email} 
-              onChange={e => setNovaParceria({ ...novaParceria, email: e.target.value })}
-              className="bg-[#2A2A2A] border-[#525252] text-white"
-            />
-            <Input 
-              placeholder="Tipo de Parceria" 
-              value={novaParceria.tipo} 
-              onChange={e => setNovaParceria({ ...novaParceria, tipo: e.target.value })}
-              className="bg-[#2A2A2A] border-[#525252] text-white"
-            />
-            <Input 
-              placeholder="Valor estimado" 
-              value={novaParceria.valor} 
-              onChange={e => setNovaParceria({ ...novaParceria, valor: e.target.value })}
-              className="bg-[#2A2A2A] border-[#525252] text-white"
-            />
-            <Input 
-              placeholder="Prazo" 
-              value={novaParceria.prazo} 
-              onChange={e => setNovaParceria({ ...novaParceria, prazo: e.target.value })}
-              className="bg-[#2A2A2A] border-[#525252] text-white"
-            />
-            <Select value={novaParceria.status} onValueChange={(value) => setNovaParceria({ ...novaParceria, status: value as Partnership['status'] })}>
+          
+          <div className="pt-2">
+            <Select 
+              value={partner.status} 
+              onValueChange={(value) => handleStatusChange(partner.id, value as PartnerData['status'])}
+            >
               <SelectTrigger className="bg-[#2A2A2A] border-[#525252] text-white">
                 <SelectValue />
               </SelectTrigger>
@@ -247,41 +223,54 @@ export const PartnersTab = ({ partnershipsData = [], onAddPartnership }: Partner
                 <SelectItem value="Rejeitado">Rejeitado</SelectItem>
               </SelectContent>
             </Select>
-            <div className="md:col-span-2">
-              <Textarea 
-                placeholder="Observações" 
-                value={novaParceria.observacoes} 
-                onChange={e => setNovaParceria({ ...novaParceria, observacoes: e.target.value })}
-                className="bg-[#2A2A2A] border-[#525252] text-white"
-              />
-            </div>
-            <div className="md:col-span-2 flex space-x-2">
-              <Button onClick={handleAdd} className="bg-green-600 hover:bg-green-700">
-                Adicionar Parceria
-              </Button>
-              <Button onClick={() => setShowForm(false)} variant="outline" className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]">
-                Cancelar
-              </Button>
-            </div>
           </div>
-        </Card>
-      )}
+        </CardContent>
+      </Card>
+    )
+  }
 
-      {/* Colunas estilo Trello */}
+  if (partners.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="bg-green-600 p-8 rounded-full mb-8 shadow-xl">
+          <User className="h-16 w-16 text-white" />
+        </div>
+        <h3 className="text-3xl font-bold text-white mb-4">
+          Nenhuma Parceria Registrada
+        </h3>
+        <p className="text-[#AAAAAA] max-w-lg text-lg leading-relaxed">
+          Envie canais da aba Análise ou Planilha para começar a gerenciar suas parcerias.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-white">Gestão de Parcerias</h2>
+          <p className="text-[#AAAAAA]">{partners.length} parceria(s) registrada(s)</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {(['Interesse', 'Negociando', 'Fechado', 'Rejeitado'] as const).map(status => (
-          <div key={status} className={`rounded-lg p-4 ${statusConfig[status].bgColor} border-2 ${statusConfig[status].color.split(' ')[2]}`}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-800">{status}</h3>
-              <Badge className={statusConfig[status].color}>
-                {getParceirasByStatus(status).length}
+        {statusColumns.map(column => (
+          <div key={column.status} className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${column.color}`}></div>
+              <h3 className="text-white font-semibold">{column.title}</h3>
+              <Badge variant="secondary" className="bg-[#333] text-[#AAAAAA]">
+                {getPartnersByStatus(column.status).length}
               </Badge>
             </div>
+            
             <div className="space-y-3">
-              {getParceirasByStatus(status).map(renderCard)}
-              {getParceirasByStatus(status).length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <div className="text-sm">Nenhuma parceria em {status.toLowerCase()}</div>
+              {getPartnersByStatus(column.status).map(partner => renderPartnerCard(partner))}
+              
+              {getPartnersByStatus(column.status).length === 0 && (
+                <div className="bg-[#1A1A1A] border border-dashed border-[#444] rounded-lg p-6 text-center">
+                  <p className="text-[#666] text-sm">Nenhuma parceria neste status</p>
                 </div>
               )}
             </div>
@@ -293,22 +282,22 @@ export const PartnersTab = ({ partnershipsData = [], onAddPartnership }: Partner
 }
 
 export const usePartnersData = () => {
-  const [partnerships, setPartnerships] = useState<Partnership[]>([])
+  const [partnerships, setPartnerships] = useState<PartnerData[]>([])
 
-  const addPartnership = (partnershipData: any) => {
-    const newPartnership: Partnership = {
-      id: Date.now().toString(),
-      foto: partnershipData.photo || partnershipData.thumbnail || 'https://via.placeholder.com/64',
-      nome: partnershipData.name || partnershipData.title,
-      link: partnershipData.link || `https://youtube.com/channel/${partnershipData.id}`,
-      contato: partnershipData.contato || '+55 11 00000-0000',
-      email: '',
-      tipo: 'Publicidade',
-      data: new Date().toISOString().slice(0, 10),
+  const addPartnership = (channelData: any) => {
+    const newPartnership: PartnerData = {
+      id: channelData.id || channelData.name || Date.now().toString(),
+      photo: channelData.thumbnail || channelData.photo || 'https://via.placeholder.com/64',
+      name: channelData.title || channelData.name,
+      phone: channelData.phone || '+55 11 00000-0000',
+      subscribers: channelData.subscriberCount || channelData.subscribers || 0,
+      avgViews: channelData.avgViews || 0,
+      engagement: channelData.engagement || '0.0',
+      score: channelData.score || 0,
+      classification: channelData.classification || 'Médio Potencial',
       status: 'Interesse',
-      observacoes: `Canal com ${partnershipData.subscribers || partnershipData.subscriberCount} inscritos`,
-      valor: '',
-      prazo: ''
+      notes: '',
+      email: ''
     }
     
     setPartnerships(prev => [...prev, newPartnership])
