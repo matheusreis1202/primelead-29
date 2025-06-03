@@ -16,6 +16,18 @@ export const EnhancedNavigation = ({
   planilhaCount = 0,
   partnersCount = 0
 }: EnhancedNavigationProps) => {
+  console.log('EnhancedNavigation render:', {
+    activeTab,
+    analysisCount,
+    planilhaCount,
+    partnersCount
+  });
+
+  // Ensure all counts are numbers and not undefined
+  const safeAnalysisCount = analysisCount || 0;
+  const safePlanilhaCount = planilhaCount || 0;
+  const safePartnersCount = partnersCount || 0;
+
   const tabs = [
     { 
       id: 'results', 
@@ -27,21 +39,21 @@ export const EnhancedNavigation = ({
       id: 'analysis', 
       label: 'Análises', 
       icon: BarChart3, 
-      count: analysisCount,
+      count: safeAnalysisCount,
       description: 'Análises detalhadas'
     },
     { 
       id: 'planilha', 
       label: 'Planilha', 
       icon: FileSpreadsheet, 
-      count: planilhaCount,
+      count: safePlanilhaCount,
       description: 'Dados exportados'
     },
     { 
       id: 'partners', 
       label: 'Parceiros', 
       icon: Handshake, 
-      count: partnersCount,
+      count: safePartnersCount,
       description: 'Gestão de parcerias'
     }
   ];

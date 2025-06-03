@@ -11,6 +11,11 @@ interface ChannelResultsProps {
 }
 
 export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsProps) => {
+  console.log('ChannelResults render:', { channelsLength: channels?.length || 0 });
+
+  // Ensure channels is always an array
+  const safeChannels = channels || [];
+
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M`;
@@ -55,12 +60,12 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
           variant="secondary" 
           className="text-xs px-3 py-1 bg-[#FF0000] text-white border-0 rounded-lg"
         >
-          {channels.length} canais descobertos
+          {safeChannels.length} canais descobertos
         </Badge>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {channels.map((channel, index) => {
+        {safeChannels.map((channel, index) => {
           const ScoreIcon = getScoreIcon(channel.score);
           const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
           

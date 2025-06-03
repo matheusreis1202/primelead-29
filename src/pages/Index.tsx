@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ModernHeader } from '@/components/ModernHeader';
@@ -50,6 +51,14 @@ const Index = () => {
   const [savedChannels, setSavedChannels] = useState<Channel[]>([]);
   const { partnerships, addPartnership } = usePartnersData();
 
+  console.log('Index component render:', {
+    channels: channels?.length || 0,
+    channelsForAnalysis: channelsForAnalysis?.length || 0,
+    savedChannels: savedChannels?.length || 0,
+    partnerships: partnerships?.length || 0,
+    activeTab
+  });
+
   const handleSearch = async (filters: SearchFilters) => {
     setIsLoading(true);
     setError(null);
@@ -83,12 +92,12 @@ const Index = () => {
   };
 
   const handleSendToAnalysis = (channel: Channel) => {
-    setChannelsForAnalysis(prev => [...prev, channel]);
+    setChannelsForAnalysis(prev => [...(prev || []), channel]);
     setActiveTab('analysis');
   };
 
   const handleSaveToSpreadsheet = (channel: Channel) => {
-    setSavedChannels(prev => [...prev, channel]);
+    setSavedChannels(prev => [...(prev || []), channel]);
   };
 
   const handleSendToPartners = (channelData: any) => {
@@ -101,7 +110,7 @@ const Index = () => {
       case 'results':
         return (
           <ResultsTab
-            channels={channels}
+            channels={channels || []}
             isLoading={isLoading}
             error={error}
             onSendToAnalysis={handleSendToAnalysis}
@@ -110,8 +119,8 @@ const Index = () => {
       case 'analysis':
         return (
           <AnalysisTab
-            channels={channelsForAnalysis}
-            onRemoveChannel={(id) => setChannelsForAnalysis(prev => prev.filter(c => c.id !== id))}
+            channels={channelsForAnalysis || []}
+            onRemoveChannel={(id) => setChannelsForAnalysis(prev => (prev || []).filter(c => c.id !== id))}
             onSendToPartners={handleSendToPartners}
             onSaveToSpreadsheet={handleSaveToSpreadsheet}
           />
@@ -119,12 +128,12 @@ const Index = () => {
       case 'planilha':
         return (
           <NewPlanilhaTab
-            savedChannels={savedChannels}
+            savedChannels={savedChannels || []}
             onSendToPartners={handleSendToPartners}
           />
         );
       case 'partners':
-        return <PartnersTab partnershipsData={partnerships} />;
+        return <PartnersTab partnershipsData={partnerships || []} />;
       default:
         return null;
     }
@@ -140,9 +149,9 @@ const Index = () => {
           <EnhancedNavigation
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            analysisCount={channelsForAnalysis.length}
-            planilhaCount={savedChannels.length}
-            partnersCount={partnerships.length}
+            analysisCount={(channelsForAnalysis || []).length}
+            planilhaCount={(savedChannels || []).length}
+            partnersCount={(partnerships || []).length}
           />
           
           <main className="flex-1 p-6 overflow-auto">
