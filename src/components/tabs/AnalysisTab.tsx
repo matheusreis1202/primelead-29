@@ -16,20 +16,23 @@ interface ChannelData {
 }
 
 interface AnalysisTabProps {
-  channelsForAnalysis: Channel[];
-  onRemoveFromAnalysis: (channelId: string) => void;
-  onSendToPlanilha?: (channel: any) => void;
+  channels: Channel[];
+  onRemoveChannel: (channelId: string) => void;
   onSendToPartners?: (channel: Channel) => void;
+  onSaveToSpreadsheet?: (channel: any) => void;
 }
 
 export const AnalysisTab = ({ 
-  channelsForAnalysis, 
-  onRemoveFromAnalysis, 
-  onSendToPlanilha,
-  onSendToPartners
+  channels, 
+  onRemoveChannel, 
+  onSendToPartners,
+  onSaveToSpreadsheet
 }: AnalysisTabProps) => {
   const [analyzedChannels, setAnalyzedChannels] = useState<Map<string, ChannelData>>(new Map());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Ensure channels is always an array
+  const safeChannels = channels || [];
 
   // Função para gerar dados consistentes baseados no ID do canal
   const generateConsistentData = (channelId: string, baseValue: number): number => {
@@ -92,7 +95,7 @@ export const AnalysisTab = ({
     // Simula análise de todos os canais
     const newAnalyzedChannels = new Map(analyzedChannels);
     
-    for (const channel of channelsForAnalysis) {
+    for (const channel of safeChannels) {
       if (!newAnalyzedChannels.has(channel.id)) {
         const analysisData = convertChannelToAnalysisData(channel);
         newAnalyzedChannels.set(channel.id, analysisData);
@@ -110,7 +113,7 @@ export const AnalysisTab = ({
     }
   };
 
-  const handleSendToPlanilha = (channel: Channel) => {
+  const handleSendToSpreadsheet = (channel: Channel) => {
     const analysisData = analyzedChannels.get(channel.id);
     
     if (analysisData) {
@@ -181,10 +184,10 @@ export const AnalysisTab = ({
         classification: classification
       };
       
-      onSendToPlanilha?.(channelForPlanilha);
+      onSaveToSpreadsheet?.(channelForPlanilha);
     } else {
       // Se não foi analisado ainda, enviar dados básicos
-      onSendToPlanilha?.(channel);
+      onSaveToSpreadsheet?.(channel);
     }
   };
 
@@ -197,7 +200,7 @@ export const AnalysisTab = ({
     window.open(channelSearchUrl, '_blank');
   };
 
-  if (channelsForAnalysis.length === 0) {
+  if (safeChannels.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <div className="bg-youtube-red p-8 rounded-full mb-8 shadow-xl futuristic-glow">
@@ -225,12 +228,12 @@ export const AnalysisTab = ({
               Análise Detalhada de Canais
             </h2>
             <p className="text-youtube-gray font-roboto">
-              {channelsForAnalysis.length} canal(is) na fila para análise
+              {safeChannels.length} canal(is) na fila para análise
             </p>
           </div>
         </div>
 
-        {channelsForAnalysis.length > analyzedChannels.size && (
+        {safeChannels.length > analyzedChannels.size && (
           <Button 
             onClick={handleAnalyzeAll}
             disabled={isAnalyzing}
@@ -252,7 +255,7 @@ export const AnalysisTab = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {channelsForAnalysis.map(channel => {
+        {safeChannels.map(channel => {
           const analysisData = analyzedChannels.get(channel.id);
           
           return (
@@ -282,7 +285,7 @@ export const AnalysisTab = ({
                       Analisar Canal
                     </Button>
                     <Button 
-                      onClick={() => onRemoveFromAnalysis(channel.id)}
+                      onClick={() => onRemoveChannel(channel.id)}
                       variant="outline"
                       className="border-[#333] bg-[#1f1f1f] text-[#AAAAAA] hover:bg-[#444] hover:border-[#444]"
                     >
@@ -295,7 +298,7 @@ export const AnalysisTab = ({
                   <YouTubeChannelAnalysis channelData={analysisData} />
                   <div className="p-4 border-t border-[#333] flex gap-2">
                     <Button 
-                      onClick={() => handleSendToPlanilha(channel)}
+                      onClick={() => handleSendToSpreadsheet(channel)}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       <FileSpreadsheet className="h-4 w-4 mr-2" />
@@ -311,7 +314,7 @@ export const AnalysisTab = ({
                     </Button>
                     
                     <Button 
-                      onClick={() => onRemoveFromAnalysis(channel.id)}
+                      onClick={() => onRemoveChannel(channel.id)}
                       variant="outline"
                       className="border-[#333] bg-[#1f1f1f] text-[#AAAAAA] hover:bg-[#444] hover:border-[#444]"
                     >

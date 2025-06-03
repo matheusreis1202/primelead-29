@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ModernHeader } from '@/components/ModernHeader';
@@ -128,7 +127,7 @@ const Index = () => {
       case 'planilha':
         return (
           <NewPlanilhaTab
-            savedChannels={savedChannels || []}
+            channels={savedChannels || []}
             onSendToPartners={handleSendToPartners}
           />
         );
