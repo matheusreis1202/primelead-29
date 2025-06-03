@@ -76,6 +76,11 @@ export const AnalysisTab = ({
     onSendToPartners?.(channel);
   };
 
+  const handleVerContatos = (channel: Channel) => {
+    const channelSearchUrl = `https://www.youtube.com/@${channel.title.replace(/\s+/g, '')}/about`;
+    window.open(channelSearchUrl, '_blank');
+  };
+
   if (channelsForAnalysis.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -179,6 +184,14 @@ export const AnalysisTab = ({
                     >
                       <FileSpreadsheet className="h-4 w-4 mr-2" />
                       Enviar para Planilha
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => handleVerContatos(channel)}
+                      className="flex-1 bg-[#FF0000] hover:bg-[#CC0000] text-white"
+                    >
+                      <Contact className="h-4 w-4 mr-2" />
+                      Contato
                     </Button>
                     
                     <Button 

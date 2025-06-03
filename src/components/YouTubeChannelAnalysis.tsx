@@ -1,11 +1,9 @@
-
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { Channel } from "@/pages/Index"
-import { Contact } from "lucide-react"
 
 interface ChannelData {
   name: string
@@ -133,11 +131,6 @@ export default function YouTubeChannelAnalysis({ channelData }: YouTubeChannelAn
     return 'text-red-400';
   }
 
-  const handleVerContatos = () => {
-    const channelSearchUrl = `https://www.youtube.com/@${channelData.name.replace(/\s+/g, '')}/about`;
-    window.open(channelSearchUrl, '_blank');
-  }
-
   const engagementRate = ((channelData.avgLikes + channelData.avgComments) / channelData.avgViews * 100);
 
   return (
@@ -160,16 +153,6 @@ export default function YouTubeChannelAnalysis({ channelData }: YouTubeChannelAn
           <Badge className={`${getClassificationColor(classification)} text-white`}>
             {classification}
           </Badge>
-        </div>
-
-        <div className="pt-4">
-          <Button 
-            onClick={handleVerContatos}
-            className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white"
-          >
-            <Contact className="h-4 w-4 mr-2" />
-            Ver Contatos
-          </Button>
         </div>
       </CardContent>
     </Card>
