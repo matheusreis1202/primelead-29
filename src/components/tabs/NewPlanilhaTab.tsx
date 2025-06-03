@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
@@ -77,31 +78,31 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     {
       accessorKey: 'photo',
       header: 'Canal',
-      size: 250,
+      size: 280,
       cell: (info: any) => {
         const channel = info.row.original
         const id = channel.id || channel.name
         const isEditing = editingId === id
         
         return (
-          <div className="p-3">
+          <div className="p-2">
             {/* Foto e Nome */}
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <img 
                 src={info.getValue()} 
                 alt="foto" 
-                className="w-12 h-12 rounded-full border border-[#525252] flex-shrink-0" 
+                className="w-10 h-10 rounded-full border border-[#525252] flex-shrink-0" 
               />
               <div className="flex-1 min-w-0">
                 {isEditing ? (
                   <Input
                     value={editingData.name || ''}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-sm h-7"
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-6"
                     placeholder="Nome do canal"
                   />
                 ) : (
-                  <div className="font-medium text-white text-sm mb-1 truncate" title={channel.name}>
+                  <div className="font-medium text-white text-xs mb-1 truncate" title={channel.name}>
                     {channel.name}
                   </div>
                 )}
@@ -109,15 +110,15 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
             </div>
 
             {/* Informações de Contato */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               {/* Link do Canal */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <ExternalLink className="h-3 w-3 text-[#FF0000] flex-shrink-0" />
                 {isEditing ? (
                   <Input
                     value={editingData.link || ''}
                     onChange={(e) => handleInputChange('link', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-6 flex-1"
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-[10px] h-5 flex-1"
                     placeholder="Link do canal"
                   />
                 ) : (
@@ -125,7 +126,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
                     href={channel.link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-400 text-xs hover:underline truncate flex-1"
+                    className="text-blue-400 text-[10px] hover:underline truncate flex-1"
                     title={channel.link}
                   >
                     {channel.link || 'Link não informado'}
@@ -134,34 +135,34 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
               </div>
 
               {/* Email */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Mail className="h-3 w-3 text-green-400 flex-shrink-0" />
                 {isEditing ? (
                   <Input
                     value={editingData.email || ''}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-6 flex-1"
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-[10px] h-5 flex-1"
                     placeholder="Email de contato"
                   />
                 ) : (
-                  <div className="text-green-400 text-xs truncate flex-1" title={channel.email}>
+                  <div className="text-green-400 text-[10px] truncate flex-1" title={channel.email}>
                     {channel.email || 'Email não informado'}
                   </div>
                 )}
               </div>
 
               {/* Telefone */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Phone className="h-3 w-3 text-blue-400 flex-shrink-0" />
                 {isEditing ? (
                   <Input
                     value={editingData.phone || ''}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-6 flex-1"
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-[10px] h-5 flex-1"
                     placeholder="Telefone"
                   />
                 ) : (
-                  <div className="text-blue-400 text-xs" title={channel.phone}>
+                  <div className="text-blue-400 text-[10px]" title={channel.phone}>
                     {channel.phone || 'Telefone não informado'}
                   </div>
                 )}
@@ -174,10 +175,10 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     { 
       accessorKey: 'subscribers', 
       header: 'Inscritos',
-      size: 100,
+      size: 120,
       cell: (info: any) => (
         <div className="text-center p-2">
-          <div className="font-bold text-white text-sm mb-1">
+          <div className="font-bold text-white text-base mb-1">
             {formatNumber(info.getValue())}
           </div>
           <div className="text-xs text-[#AAAAAA]">inscritos</div>
@@ -187,10 +188,10 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     { 
       accessorKey: 'avgViews', 
       header: 'Média Views',
-      size: 100,
+      size: 120,
       cell: (info: any) => (
         <div className="text-center p-2">
-          <div className="font-bold text-blue-400 text-sm mb-1">
+          <div className="font-bold text-blue-400 text-base mb-1">
             {formatNumber(info.getValue())}
           </div>
           <div className="text-xs text-[#AAAAAA]">views médias</div>
@@ -200,10 +201,10 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     { 
       accessorKey: 'monthlyVideos', 
       header: 'Frequência',
-      size: 90,
+      size: 110,
       cell: (info: any) => (
         <div className="text-center p-2">
-          <div className="font-bold text-yellow-400 text-sm mb-1">
+          <div className="font-bold text-yellow-400 text-base mb-1">
             {info.getValue() || 0}
           </div>
           <div className="text-xs text-[#AAAAAA]">vídeos/mês</div>
@@ -213,10 +214,10 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     { 
       accessorKey: 'engagement', 
       header: 'Engajamento',
-      size: 100,
+      size: 120,
       cell: (info: any) => (
         <div className="text-center p-2">
-          <div className="font-bold text-green-400 text-sm mb-1">
+          <div className="font-bold text-green-400 text-base mb-1">
             {info.getValue() || '0.0'}%
           </div>
           <div className="text-xs text-[#AAAAAA]">engajamento</div>
@@ -226,10 +227,10 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     { 
       accessorKey: 'subGrowth', 
       header: 'Crescimento',
-      size: 100,
+      size: 120,
       cell: (info: any) => (
         <div className="text-center p-2">
-          <div className="font-bold text-purple-400 text-sm mb-1">
+          <div className="font-bold text-purple-400 text-base mb-1">
             {info.getValue() || '0'}%
           </div>
           <div className="text-xs text-[#AAAAAA]">crescimento</div>
@@ -239,10 +240,10 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     { 
       accessorKey: 'score', 
       header: 'Score',
-      size: 80,
+      size: 100,
       cell: (info: any) => (
         <div className="text-center p-2">
-          <div className="font-bold text-yellow-400 text-lg mb-1">
+          <div className="font-bold text-yellow-400 text-xl mb-1">
             {info.getValue() || 0}
           </div>
           <div className="text-xs text-[#AAAAAA]">pontos</div>
@@ -252,7 +253,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     { 
       accessorKey: 'classification', 
       header: 'Classificação',
-      size: 120,
+      size: 140,
       cell: (info: any) => {
         const value = info.getValue() || 'Não classificado'
         const getColor = (classification: string) => {
@@ -265,7 +266,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
         }
         return (
           <div className="text-center p-2">
-            <div className={`font-medium ${getColor(value)} text-xs`}>
+            <div className={`font-medium ${getColor(value)} text-sm`}>
               {value}
             </div>
           </div>
@@ -275,30 +276,30 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     {
       id: 'actions',
       header: 'Ações',
-      size: 120,
+      size: 140,
       cell: (info: any) => {
         const channel = info.row.original
         const id = channel.id || channel.name
         const isEditing = editingId === id
         
         return (
-          <div className="flex gap-1 justify-center p-2">
+          <div className="flex gap-2 justify-center p-2">
             {isEditing ? (
               <>
                 <Button
                   onClick={handleSave}
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
+                  className="bg-green-600 hover:bg-green-700 text-white h-8 px-3"
                 >
-                  <Save className="h-3 w-3" />
+                  <Save className="h-4 w-4" />
                 </Button>
                 <Button
                   onClick={handleCancel}
                   size="sm"
                   variant="outline"
-                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-7 px-2"
+                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-8 px-3"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-4 w-4" />
                 </Button>
               </>
             ) : (
@@ -307,16 +308,16 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
                   onClick={() => handleEdit(channel)}
                   size="sm"
                   variant="outline"
-                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-7 px-2"
+                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-8 px-3"
                 >
-                  <Edit className="h-3 w-3" />
+                  <Edit className="h-4 w-4" />
                 </Button>
                 <Button
                   onClick={() => handleSendToPartners(channel)}
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
+                  className="bg-green-600 hover:bg-green-700 text-white h-8 px-3"
                 >
-                  <Handshake className="h-3 w-3" />
+                  <Handshake className="h-4 w-4" />
                 </Button>
               </>
             )}
@@ -376,11 +377,11 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
           placeholder="Buscar..."
           value={globalFilter ?? ''}
           onChange={e => setGlobalFilter(e.target.value)}
-          className="w-64 bg-[#1E1E1E] border-[#525252] text-white"
+          className="w-64 bg-[#1E1E1E] border-[#525252] text-white placeholder:text-[#AAAAAA]"
         />
         <Button 
           onClick={exportToExcel}
-          className="futuristic-button"
+          className="bg-[#FF0000] hover:bg-[#CC0000] text-white border-none"
         >
           Exportar para Excel
         </Button>
@@ -388,7 +389,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
 
       <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="min-w-[1100px]">
+          <div className="min-w-[1350px]">
             <table className="w-full">
               <thead className="bg-[#0D0D0D]">
                 {table.getHeaderGroups().map(headerGroup => (
@@ -396,7 +397,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
                     {headerGroup.headers.map(header => (
                       <th 
                         key={header.id} 
-                        className="px-2 py-3 text-center text-[#AAAAAA] font-medium text-sm"
+                        className="px-3 py-4 text-center text-[#AAAAAA] font-medium text-sm"
                         style={{ width: header.getSize() }}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -416,7 +417,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
                     {row.getVisibleCells().map(cell => (
                       <td 
                         key={cell.id} 
-                        className="px-2 py-2 align-top"
+                        className="px-3 py-3 align-top"
                         style={{ width: cell.column.getSize() }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
