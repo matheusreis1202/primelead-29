@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical } from 'lucide-react'
+import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical, DollarSign, Handshake } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface PartnerData {
@@ -21,6 +21,8 @@ interface PartnerData {
   status: 'Interesse' | 'Negociando' | 'Fechado' | 'Rejeitado'
   notes?: string
   email?: string
+  partnershipType?: string
+  investment?: string
 }
 
 interface PartnersTabProps {
@@ -149,8 +151,10 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
                     {partner.name}
                   </CardTitle>
                 )}
-                <Badge className={`text-xs px-1.5 py-0 ${getStatusColor(partner.classification)}`}>
-                  {partner.classification}
+                <Badge className={`text-[10px] px-1 py-0 h-4 ${getStatusColor(partner.classification)}`}>
+                  {partner.classification === 'Altíssimo Potencial' ? 'Alto' : 
+                   partner.classification === 'Grande Potencial' ? 'Grande' :
+                   partner.classification === 'Médio Potencial' ? 'Médio' : partner.classification}
                 </Badge>
               </div>
             </div>
@@ -213,14 +217,62 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
             </div>
           </div>
           
-          {isEditing ? (
-            <div className="space-y-2">
+          {/* Email */}
+          <div className="flex items-center gap-1 text-xs">
+            <Mail className="h-3 w-3 text-[#AAAAAA] flex-shrink-0" />
+            {isEditing ? (
               <Input
-                placeholder="Email (opcional)"
+                placeholder="Email"
                 value={editingData.email || ''}
                 onChange={(e) => setEditingData(prev => ({ ...prev, email: e.target.value }))}
-                className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-6"
+                className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-5 flex-1"
               />
+            ) : (
+              <span className="text-blue-400 text-xs truncate">{partner.email || 'Não informado'}</span>
+            )}
+          </div>
+
+          {/* Tipo de Parceria */}
+          <div className="flex items-center gap-1 text-xs">
+            <Handshake className="h-3 w-3 text-[#AAAAAA] flex-shrink-0" />
+            {isEditing ? (
+              <Select 
+                value={editingData.partnershipType || ''} 
+                onValueChange={(value) => setEditingData(prev => ({ ...prev, partnershipType: value }))}
+              >
+                <SelectTrigger className="bg-[#2A2A2A] border-[#525252] text-white h-5 text-xs flex-1">
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Patrocínio">Patrocínio</SelectItem>
+                  <SelectItem value="Colaboração">Colaboração</SelectItem>
+                  <SelectItem value="Afiliação">Afiliação</SelectItem>
+                  <SelectItem value="Brand Deal">Brand Deal</SelectItem>
+                  <SelectItem value="Outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <span className="text-purple-400 text-xs truncate">{partner.partnershipType || 'Não definido'}</span>
+            )}
+          </div>
+
+          {/* Investimento */}
+          <div className="flex items-center gap-1 text-xs">
+            <DollarSign className="h-3 w-3 text-[#AAAAAA] flex-shrink-0" />
+            {isEditing ? (
+              <Input
+                placeholder="Investimento"
+                value={editingData.investment || ''}
+                onChange={(e) => setEditingData(prev => ({ ...prev, investment: e.target.value }))}
+                className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-5 flex-1"
+              />
+            ) : (
+              <span className="text-green-400 text-xs truncate">{partner.investment || 'Não definido'}</span>
+            )}
+          </div>
+          
+          {isEditing && (
+            <div className="space-y-2">
               <textarea
                 placeholder="Observações..."
                 value={editingData.notes || ''}
@@ -228,21 +280,12 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
                 className="w-full bg-[#2A2A2A] border border-[#525252] text-white text-xs rounded-md p-2 h-12 resize-none"
               />
             </div>
-          ) : (
-            <>
-              {partner.email && (
-                <div className="flex items-center gap-1 text-xs">
-                  <Mail className="h-3 w-3 text-[#AAAAAA] flex-shrink-0" />
-                  <span className="text-blue-400 truncate">{partner.email}</span>
-                </div>
-              )}
-              
-              {partner.notes && (
-                <div className="bg-[#2A2A2A] p-2 rounded text-xs text-[#CCCCCC] border-l-2 border-[#FF0000]">
-                  {partner.notes}
-                </div>
-              )}
-            </>
+          )}
+          
+          {!isEditing && partner.notes && (
+            <div className="bg-[#2A2A2A] p-2 rounded text-xs text-[#CCCCCC] border-l-2 border-[#FF0000]">
+              {partner.notes}
+            </div>
           )}
           
           <div className="pt-1">
@@ -340,7 +383,9 @@ export const usePartnersData = () => {
       classification: channelData.classification || 'Médio Potencial',
       status: 'Interesse',
       notes: '',
-      email: ''
+      email: '',
+      partnershipType: '',
+      investment: ''
     }
     
     setPartnerships(prev => [...prev, newPartnership])
