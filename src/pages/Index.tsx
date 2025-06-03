@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ModernHeader } from '@/components/ModernHeader';
@@ -56,40 +55,114 @@ const Index = () => {
   const handleSearch = async (filters: SearchFilters) => {
     setIsLoading(true);
     setError(null);
+    setChannels([]);
     
     try {
       console.log('Searching with filters:', filters);
       
-      // Simulate API call with real YouTube API structure
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const canaisUnicos = new Set();
+      let nextPageToken = '';
+      const foundChannels: Channel[] = [];
       
-      // Generate mock channels based on search criteria
-      const mockChannels: Channel[] = Array.from({ length: Math.floor(Math.random() * 8) + 3 }, (_, index) => {
-        const baseId = Math.random().toString(36).substring(7);
-        const subscriberCount = Math.floor(Math.random() * (filters.maxInscritos - filters.minInscritos)) + filters.minInscritos;
-        const viewCount = subscriberCount * (Math.floor(Math.random() * 100) + 50);
+      while (canaisUnicos.size < 100) {
+        const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(filters.nicho)}&regionCode=${filters.pais}&relevanceLanguage=${filters.idioma}&maxResults=50&pageToken=${nextPageToken}&key=${filters.apiKey}`;
         
-        return {
-          id: `channel_${baseId}_${index}`,
-          title: `Canal ${filters.nicho} ${index + 1}`,
-          description: `Canal especializado em ${filters.nicho} com conteúdo de qualidade para o público ${filters.pais}.`,
-          thumbnail: `https://via.placeholder.com/88x88?text=${filters.nicho[0]?.toUpperCase() || 'C'}${index + 1}`,
-          subscriberCount,
-          viewCount,
-          videoCount: Math.floor(Math.random() * 200) + 50,
-          publishedAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-          country: filters.pais,
-          language: filters.idioma,
-          score: Math.floor(Math.random() * 40) + 60, // 60-100
-          category: filters.nicho
-        };
+        const searchResp = await fetch(searchUrl);
+        const searchData = await searchResp.json();
+
+        if (!searchData.items) break;
+
+        for (const item of searchData.items) {
+          const channelId = item.snippet.channelId;
+          if (canaisUnicos.has(channelId)) continue;
+          canaisUnicos.add(channelId);
+
+          const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${channelId}&key=${filters.apiKey}`;
+          const channelResp = await fetch(channelUrl);
+          const channelData = await channelResp.json();
+
+          if (!channelData.items || channelData.items.length === 0) continue;
+
+          const canal = channelData.items[0];
+          const inscritoCount = parseInt(canal.statistics.subscriberCount || '0');
+          const viewCount = parseInt(canal.statistics.viewCount || '0');
+          const videoCount = parseInt(canal.statistics.videoCount || '0');
+
+          if (inscritoCount >= filters.minInscritos && inscritoCount <= filters.maxInscritos && viewCount >= filters.minViews) {
+            const uploadsPlaylistId = canal.contentDetails?.relatedPlaylists?.uploads;
+            let atendeFrequencia = true;
+
+            if (filters.freqMinima > 0 && uploadsPlaylistId) {
+              const playlistUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=10&key=${filters.apiKey}`;
+              const playlistResp = await fetch(playlistUrl);
+              const playlistData = await playlistResp.json();
+
+              if (playlistData.items && playlistData.items.length > 0) {
+                const datas = playlistData.items.map((p: any) => new Date(p.snippet.publishedAt));
+                datas.sort((a: Date, b: Date) => b.getTime() - a.getTime());
+
+                if (datas.length >= 2) {
+                  const dias = (datas[0].getTime() - datas[datas.length - 1].getTime()) / (1000 * 60 * 60 * 24);
+                  const freqAtual = datas.length / (dias / 7);
+                  atendeFrequencia = freqAtual >= filters.freqMinima;
+                }
+              }
+            }
+
+            if (atendeFrequencia) {
+              // Calcular score baseado no engajamento
+              const engagementRate = videoCount > 0 ? (viewCount / videoCount / inscritoCount) * 100 : 0;
+              const score = Math.min(100, Math.max(60, 70 + engagementRate * 5));
+
+              const channel: Channel = {
+                id: canal.id,
+                title: canal.snippet.title,
+                description: canal.snippet.description || '',
+                thumbnail: canal.snippet.thumbnails?.high?.url || canal.snippet.thumbnails?.default?.url || '',
+                subscriberCount: inscritoCount,
+                viewCount: viewCount,
+                videoCount: videoCount,
+                publishedAt: canal.snippet.publishedAt,
+                country: canal.snippet.country || filters.pais,
+                language: canal.snippet.defaultLanguage || filters.idioma,
+                score: Math.round(score),
+                category: filters.nicho
+              };
+
+              foundChannels.push(channel);
+              console.log('Canal encontrado:', channel);
+            }
+          }
+
+          if (canaisUnicos.size >= 100) break;
+        }
+
+        if (!searchData.nextPageToken) break;
+        nextPageToken = searchData.nextPageToken;
+      }
+
+      // Ordenar por score e número de inscritos
+      foundChannels.sort((a, b) => {
+        if (a.score !== b.score) return b.score - a.score;
+        return b.subscriberCount - a.subscriberCount;
       });
+
+      console.log('Canais encontrados:', foundChannels);
+      setChannels(foundChannels);
+
+      if (foundChannels.length === 0) {
+        setError('Nenhum canal encontrado com os filtros selecionados.');
+      }
       
-      console.log('Generated channels:', mockChannels);
-      setChannels(mockChannels);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Search error:', err);
-      setError('Erro ao buscar canais. Verifique sua chave da API e tente novamente.');
+      if (err.message?.includes('403') || err.message?.includes('API key')) {
+        setError('Chave da API inválida ou sem permissões. Verifique sua chave da API do YouTube.');
+      } else if (err.message?.includes('quota')) {
+        setError('Cota da API excedida. Tente novamente mais tarde.');
+      } else {
+        setError('Erro ao buscar canais. Verifique sua conexão e tente novamente.');
+      }
     } finally {
       setIsLoading(false);
     }
