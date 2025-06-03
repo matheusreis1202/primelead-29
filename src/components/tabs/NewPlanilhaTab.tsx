@@ -3,10 +3,11 @@ import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Handshake } from 'lucide-react'
+import { Handshake, Edit, Save, X } from 'lucide-react'
 import * as XLSX from 'xlsx'
 
 interface ChannelData {
+  id?: string
   photo: string
   name: string
   link: string
@@ -29,62 +30,233 @@ interface NewPlanilhaTabProps {
 export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartners }: NewPlanilhaTabProps) => {
   const [data, setData] = useState<ChannelData[]>(channelsData)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingData, setEditingData] = useState<Partial<ChannelData>>({})
+
+  const handleEdit = (channel: ChannelData) => {
+    const id = channel.id || channel.name
+    setEditingId(id)
+    setEditingData(channel)
+  }
+
+  const handleSave = () => {
+    if (editingId && editingData) {
+      setData(prev => prev.map(channel => {
+        const id = channel.id || channel.name
+        return id === editingId ? { ...channel, ...editingData } : channel
+      }))
+      setEditingId(null)
+      setEditingData({})
+    }
+  }
+
+  const handleCancel = () => {
+    setEditingId(null)
+    setEditingData({})
+  }
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`
+    }
+    return num.toLocaleString()
+  }
 
   const columns = useMemo(() => [
     {
       accessorKey: 'photo',
       header: 'Foto',
+      size: 80,
       cell: (info: any) => (
-        <img 
-          src={info.getValue()} 
-          alt="foto" 
-          width={40} 
-          height={40} 
-          className="rounded-full border border-[#525252]" 
-        />
+        <div className="flex justify-center">
+          <img 
+            src={info.getValue()} 
+            alt="foto" 
+            className="w-10 h-10 rounded-full border border-[#525252]" 
+          />
+        </div>
       )
     },
     { 
       accessorKey: 'name', 
-      header: 'Nome'
+      header: 'Nome',
+      size: 180,
+      cell: (info: any) => {
+        const channel = info.row.original
+        const id = channel.id || channel.name
+        const isEditing = editingId === id
+        
+        return isEditing ? (
+          <Input
+            value={editingData.name || ''}
+            onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
+            className="bg-[#2A2A2A] border-[#525252] text-white text-sm h-8"
+          />
+        ) : (
+          <div className="font-medium text-white truncate" title={info.getValue()}>
+            {info.getValue()}
+          </div>
+        )
+      }
     },
     {
-      accessorKey: 'link',
-      header: 'Link',
+      accessorKey: 'phone',
+      header: 'Telefone',
+      size: 150,
+      cell: (info: any) => {
+        const channel = info.row.original
+        const id = channel.id || channel.name
+        const isEditing = editingId === id
+        
+        return isEditing ? (
+          <Input
+            value={editingData.phone || ''}
+            onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
+            className="bg-[#2A2A2A] border-[#525252] text-white text-sm h-8"
+          />
+        ) : (
+          <div className="text-[#AAAAAA] text-sm">
+            {info.getValue()}
+          </div>
+        )
+      }
+    },
+    { 
+      accessorKey: 'subscribers', 
+      header: 'Inscritos',
+      size: 120,
       cell: (info: any) => (
-        <a 
-          href={info.getValue()} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-blue-400 underline hover:text-blue-300"
-        >
-          {info.getValue()}
-        </a>
+        <div className="text-center font-medium text-white">
+          {formatNumber(info.getValue())}
+        </div>
       )
     },
-    { accessorKey: 'phone', header: 'Telefone' },
-    { accessorKey: 'subscribers', header: 'Inscritos' },
-    { accessorKey: 'avgViews', header: 'Média Views' },
-    { accessorKey: 'monthlyVideos', header: 'Freq (mês)' },
-    { accessorKey: 'engagement', header: 'Engajamento (%)' },
-    { accessorKey: 'subGrowth', header: 'Crescimento (%)' },
-    { accessorKey: 'score', header: 'Score' },
-    { accessorKey: 'classification', header: 'Classificação' },
+    { 
+      accessorKey: 'avgViews', 
+      header: 'Média Views',
+      size: 120,
+      cell: (info: any) => (
+        <div className="text-center text-[#AAAAAA]">
+          {formatNumber(info.getValue())}
+        </div>
+      )
+    },
+    { 
+      accessorKey: 'monthlyVideos', 
+      header: 'Freq/mês',
+      size: 100,
+      cell: (info: any) => (
+        <div className="text-center text-[#AAAAAA]">
+          {info.getValue()}
+        </div>
+      )
+    },
+    { 
+      accessorKey: 'engagement', 
+      header: 'Engajamento',
+      size: 120,
+      cell: (info: any) => (
+        <div className="text-center text-green-400 font-medium">
+          {info.getValue()}%
+        </div>
+      )
+    },
+    { 
+      accessorKey: 'subGrowth', 
+      header: 'Crescimento',
+      size: 120,
+      cell: (info: any) => (
+        <div className="text-center text-blue-400 font-medium">
+          {info.getValue()}%
+        </div>
+      )
+    },
+    { 
+      accessorKey: 'score', 
+      header: 'Score',
+      size: 80,
+      cell: (info: any) => (
+        <div className="text-center font-bold text-yellow-400">
+          {info.getValue()}
+        </div>
+      )
+    },
+    { 
+      accessorKey: 'classification', 
+      header: 'Classificação',
+      size: 160,
+      cell: (info: any) => {
+        const value = info.getValue()
+        const getColor = (classification: string) => {
+          switch (classification) {
+            case 'Altíssimo Potencial': return 'text-green-400'
+            case 'Grande Potencial': return 'text-blue-400'
+            case 'Médio Potencial': return 'text-yellow-400'
+            default: return 'text-gray-400'
+          }
+        }
+        return (
+          <div className={`text-center font-medium ${getColor(value)} text-sm`}>
+            {value}
+          </div>
+        )
+      }
+    },
     {
       id: 'actions',
       header: 'Ações',
-      cell: (info: any) => (
-        <Button
-          onClick={() => handleSendToPartners(info.row.original)}
-          size="sm"
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          <Handshake className="h-4 w-4 mr-1" />
-          Parceria Fechada
-        </Button>
-      )
+      size: 200,
+      cell: (info: any) => {
+        const channel = info.row.original
+        const id = channel.id || channel.name
+        const isEditing = editingId === id
+        
+        return (
+          <div className="flex gap-2 justify-center">
+            {isEditing ? (
+              <>
+                <Button
+                  onClick={handleSave}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white h-8 px-2"
+                >
+                  <Save className="h-3 w-3" />
+                </Button>
+                <Button
+                  onClick={handleCancel}
+                  size="sm"
+                  variant="outline"
+                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-8 px-2"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={() => handleEdit(channel)}
+                  size="sm"
+                  variant="outline"
+                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-8 px-2"
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+                <Button
+                  onClick={() => handleSendToPartners(channel)}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white h-8 px-2"
+                >
+                  <Handshake className="h-3 w-3" />
+                </Button>
+              </>
+            )}
+          </div>
+        )
+      }
     }
-  ], [])
+  ], [editingId, editingData])
 
   const table = useReactTable({
     data,
@@ -96,24 +268,6 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     globalFilterFn: (row, columnId, filterValue) =>
       String(row.getValue(columnId)).toLowerCase().includes(filterValue.toLowerCase())
   })
-
-  const addChannel = () => {
-    const newChannel: ChannelData = {
-      photo: 'https://via.placeholder.com/64',
-      name: 'Canal Exemplo',
-      link: 'https://youtube.com/channel/UC123456',
-      phone: '+55 11 91234-5678',
-      subscribers: 150000,
-      avgViews: 50000,
-      monthlyVideos: 12,
-      engagement: '7.5',
-      subGrowth: '20',
-      score: 42,
-      classification: 'Grande Potencial'
-    }
-    setData(prev => [...prev, newChannel])
-    onAddChannel?.(newChannel)
-  }
 
   const handleSendToPartners = (channel: ChannelData) => {
     onSendToPartners?.(channel)
@@ -156,13 +310,6 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
           className="w-64 bg-[#1E1E1E] border-[#525252] text-white"
         />
         <Button 
-          onClick={addChannel}
-          variant="outline"
-          className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]"
-        >
-          Enviar informações
-        </Button>
-        <Button 
           onClick={exportToExcel}
           className="futuristic-button"
         >
@@ -171,42 +318,52 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
       </div>
 
       <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
-        <div className="max-h-[600px] overflow-auto">
-          <table className="w-full">
-            <thead className="bg-[#0D0D0D]">
-              {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id} className="border-b border-[#525252]">
-                  {headerGroup.headers.map(header => (
-                    <th 
-                      key={header.id} 
-                      className="px-4 py-3 text-left text-[#AAAAAA] font-medium"
-                    >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map(row => (
-                <tr 
-                  key={row.id} 
-                  className="border-b border-[#525252] hover:bg-[#2A2A2A] transition-colors"
-                >
-                  {row.getVisibleCells().map(cell => (
-                    <td key={cell.id} className="px-4 py-3 text-white">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {table.getRowModel().rows.length === 0 && (
-            <div className="text-center py-8 text-[#AAAAAA]">
-              Nenhum canal encontrado
-            </div>
-          )}
+        <div className="overflow-x-auto">
+          <div className="min-w-[1200px]">
+            <table className="w-full">
+              <thead className="bg-[#0D0D0D]">
+                {table.getHeaderGroups().map(headerGroup => (
+                  <tr key={headerGroup.id} className="border-b border-[#525252]">
+                    {headerGroup.headers.map(header => (
+                      <th 
+                        key={header.id} 
+                        className="px-4 py-4 text-center text-[#AAAAAA] font-medium text-sm"
+                        style={{ width: header.getSize() }}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row, index) => (
+                  <tr 
+                    key={row.id} 
+                    className={`border-b border-[#525252] hover:bg-[#2A2A2A] transition-colors ${
+                      index % 2 === 0 ? 'bg-[#1A1A1A]' : 'bg-[#1E1E1E]'
+                    }`}
+                  >
+                    {row.getVisibleCells().map(cell => (
+                      <td 
+                        key={cell.id} 
+                        className="px-4 py-4"
+                        style={{ width: cell.column.getSize() }}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {table.getRowModel().rows.length === 0 && (
+              <div className="text-center py-12 text-[#AAAAAA]">
+                <div className="text-lg mb-2">Nenhum canal encontrado</div>
+                <div className="text-sm">Adicione canais através da aba de Análise</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -219,10 +376,11 @@ export const usePlanilhaData = () => {
 
   const addToPlanilha = (channelData: any) => {
     const newChannel: ChannelData = {
+      id: channelData.id || channelData.name,
       photo: channelData.thumbnail || 'https://via.placeholder.com/64',
       name: channelData.title || channelData.name,
       link: `https://youtube.com/channel/${channelData.id}`,
-      phone: '+55 11 00000-0000', // Placeholder
+      phone: '+55 11 00000-0000',
       subscribers: channelData.subscriberCount || channelData.inscritos,
       avgViews: channelData.avgViews || Math.floor(channelData.viewCount / 100),
       monthlyVideos: channelData.monthlyVideos || 10,
