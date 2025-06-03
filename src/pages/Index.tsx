@@ -41,7 +41,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [channelsForAnalysis, setChannelsForAnalysis] = useState<Channel[]>([]);
-  const [savedChannels, setSavedChannels] = useState<Channel[]>([]);
+  const [savedChannels, setSavedChannels] = useState<any[]>([]);
   const { partnerships, addPartnership } = usePartnersData();
 
   console.log('Index component render:', {
@@ -173,8 +173,28 @@ const Index = () => {
     setActiveTab('analysis');
   };
 
-  const handleSaveToSpreadsheet = (channel: Channel) => {
-    setSavedChannels(prev => [...(prev || []), channel]);
+  const handleSaveToSpreadsheet = (channelData: any) => {
+    console.log('Salvando canal na planilha:', channelData);
+    
+    // Converter dados do canal para o formato da planilha
+    const planilhaChannel = {
+      id: channelData.id,
+      photo: channelData.photo || channelData.thumbnail || 'https://via.placeholder.com/64',
+      name: channelData.name || channelData.title,
+      link: channelData.link || `https://youtube.com/channel/${channelData.id}`,
+      phone: channelData.phone || '+55 11 00000-0000',
+      email: channelData.email || `contato@${(channelData.name || channelData.title || 'canal').replace(/\s+/g, '').toLowerCase()}.com`,
+      subscribers: channelData.subscribers || channelData.subscriberCount || 0,
+      avgViews: channelData.avgViews || Math.floor((channelData.viewCount || 0) / Math.max(channelData.videoCount || 10, 1)),
+      monthlyVideos: channelData.monthlyVideos || Math.floor(Math.random() * 15) + 5,
+      engagement: channelData.engagement || ((Math.random() * 5) + 2).toFixed(1),
+      subGrowth: channelData.subGrowth || Math.floor(Math.random() * 20) + 5,
+      score: channelData.score || Math.floor(Math.random() * 40) + 60,
+      classification: channelData.classification || 'Médio Potencial'
+    };
+    
+    setSavedChannels(prev => [...(prev || []), planilhaChannel]);
+    console.log('Canal salvo na planilha:', planilhaChannel);
   };
 
   const handleSendToPartners = (channelData: any) => {

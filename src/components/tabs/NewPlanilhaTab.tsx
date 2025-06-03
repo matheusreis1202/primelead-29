@@ -22,16 +22,20 @@ interface ChannelData {
 }
 
 interface NewPlanilhaTabProps {
-  channelsData?: ChannelData[]
-  onAddChannel?: (channel: ChannelData) => void
+  savedChannels: ChannelData[]
   onSendToPartners?: (channel: ChannelData) => void
 }
 
-export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartners }: NewPlanilhaTabProps) => {
-  const [data, setData] = useState<ChannelData[]>(channelsData)
+export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaTabProps) => {
+  const [data, setData] = useState<ChannelData[]>(savedChannels)
   const [globalFilter, setGlobalFilter] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingData, setEditingData] = useState<Partial<ChannelData>>({})
+
+  // Update local data when savedChannels changes
+  React.useEffect(() => {
+    setData(savedChannels)
+  }, [savedChannels])
 
   const handleEdit = (channel: ChannelData) => {
     const id = channel.id || channel.name
