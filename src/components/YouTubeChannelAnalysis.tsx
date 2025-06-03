@@ -103,41 +103,73 @@ export default function YouTubeChannelAnalysis({ channelData }: YouTubeChannelAn
     }
   }
 
+  const getSubscribersColor = (subs: number) => {
+    if (subs > 500000) return 'text-green-400';
+    if (subs > 100000) return 'text-yellow-400';
+    return 'text-red-400';
+  }
+
+  const getViewsColor = (views: number) => {
+    if (views > 50000) return 'text-green-400';
+    if (views > 10000) return 'text-yellow-400';
+    return 'text-red-400';
+  }
+
+  const getFrequencyColor = (freq: number) => {
+    if (freq >= 10) return 'text-green-400';
+    if (freq >= 5) return 'text-yellow-400';
+    return 'text-red-400';
+  }
+
+  const getEngagementColor = (engagement: number) => {
+    if (engagement > 5) return 'text-green-400';
+    if (engagement > 2) return 'text-yellow-400';
+    return 'text-red-400';
+  }
+
+  const getGrowthColor = (growth: number) => {
+    if (growth > 20) return 'text-green-400';
+    if (growth > 5) return 'text-yellow-400';
+    return 'text-red-400';
+  }
+
   const handleVerContatos = () => {
-    // Criar URL do YouTube baseado no nome do canal
     const channelSearchUrl = `https://www.youtube.com/@${channelData.name.replace(/\s+/g, '')}/about`;
     window.open(channelSearchUrl, '_blank');
   }
 
+  const engagementRate = ((channelData.avgLikes + channelData.avgComments) / channelData.avgViews * 100);
+
   return (
     <Card className="bg-[#1e1e1e] border border-[#333] text-white">
       <CardContent className="p-6 space-y-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white">Análise do Canal</h2>
-          <Button 
-            onClick={handleVerContatos}
-            className="bg-[#22c55e] hover:bg-[#16a34a] text-white"
-          >
-            <Contact className="h-4 w-4 mr-2" />
-            Ver Contatos
-          </Button>
-        </div>
+        <h2 className="text-2xl font-bold text-white mb-4">Análise do Canal</h2>
         
         <div className="space-y-2 text-white">
           <p><strong>Nome:</strong> {channelData.name}</p>
-          <p><strong>Inscritos:</strong> {formatNumber(channelData.subscribers)}</p>
-          <p><strong>Média de Visualizações:</strong> {formatNumber(channelData.avgViews)}</p>
-          <p><strong>Frequência de Vídeos:</strong> {channelData.monthlyVideos} vídeos/mês</p>
-          <p><strong>Engajamento:</strong> {((channelData.avgLikes + channelData.avgComments) / channelData.avgViews * 100).toFixed(2)}%</p>
-          <p><strong>Crescimento:</strong> {channelData.subGrowth}% nos últimos 90 dias</p>
+          <p><strong>Inscritos:</strong> <span className={getSubscribersColor(channelData.subscribers)}>{formatNumber(channelData.subscribers)}</span></p>
+          <p><strong>Média de Visualizações:</strong> <span className={getViewsColor(channelData.avgViews)}>{formatNumber(channelData.avgViews)}</span></p>
+          <p><strong>Frequência de Vídeos:</strong> <span className={getFrequencyColor(channelData.monthlyVideos)}>{channelData.monthlyVideos} vídeos/mês</span></p>
+          <p><strong>Engajamento:</strong> <span className={getEngagementColor(engagementRate)}>{engagementRate.toFixed(2)}%</span></p>
+          <p><strong>Crescimento:</strong> <span className={getGrowthColor(channelData.subGrowth)}>{channelData.subGrowth}% nos últimos 90 dias</span></p>
         </div>
 
         <div className="space-y-2">
           <p className="text-white"><strong>Score:</strong> {score} / 50</p>
-          <Progress value={(score / 50) * 100} className="h-3 bg-[#333]" />
+          <Progress value={(score / 50) * 100} className="h-3 bg-[#333] [&>div]:bg-[#FF0000]" />
           <Badge className={`${getClassificationColor(classification)} text-white`}>
             {classification}
           </Badge>
+        </div>
+
+        <div className="pt-4">
+          <Button 
+            onClick={handleVerContatos}
+            className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white"
+          >
+            <Contact className="h-4 w-4 mr-2" />
+            Ver Contatos
+          </Button>
         </div>
       </CardContent>
     </Card>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { BarChart3, Target, Brain, FileSpreadsheet, Contact } from 'lucide-react';
@@ -180,14 +179,6 @@ export const AnalysisTab = ({
                     >
                       <FileSpreadsheet className="h-4 w-4 mr-2" />
                       Enviar para Planilha
-                    </Button>
-                    
-                    <Button 
-                      onClick={() => handleSendToPartners(channel)}
-                      className="flex-1 bg-[#22c55e] hover:bg-[#16a34a] text-white"
-                    >
-                      <Contact className="h-4 w-4 mr-2" />
-                      Ver Contatos
                     </Button>
                     
                     <Button 
