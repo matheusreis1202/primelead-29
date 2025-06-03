@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { Channel } from "@/pages/Index"
+import { Contact } from "lucide-react"
 
 interface ChannelData {
   name: string
@@ -31,6 +32,15 @@ export default function YouTubeChannelAnalysis({ channelData }: YouTubeChannelAn
       setClassification(getClassification(computedScore))
     }
   }, [channelData])
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`;
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`;
+    }
+    return num.toLocaleString();
+  };
 
   const calculateScore = (data: ChannelData) => {
     let score = 0
@@ -80,23 +90,56 @@ export default function YouTubeChannelAnalysis({ channelData }: YouTubeChannelAn
     return "Baixo Potencial"
   }
 
-  return (
-    <Card className="p-6 space-y-4">
-      <h2 className="text-2xl font-bold text-white">Análise do Canal</h2>
-      <div className="space-y-2 text-white">
-        <p><strong>Nome:</strong> {channelData.name}</p>
-        <p><strong>Inscritos:</strong> {channelData.subscribers.toLocaleString()}</p>
-        <p><strong>Média de Visualizações:</strong> {channelData.avgViews.toLocaleString()}</p>
-        <p><strong>Frequência de Vídeos:</strong> {channelData.monthlyVideos} vídeos/mês</p>
-        <p><strong>Engajamento:</strong> {((channelData.avgLikes + channelData.avgComments) / channelData.avgViews * 100).toFixed(2)}%</p>
-        <p><strong>Crescimento:</strong> {channelData.subGrowth}% nos últimos 90 dias</p>
-      </div>
+  const getClassificationColor = (classification: string) => {
+    switch (classification) {
+      case 'Altíssimo Potencial':
+        return 'bg-green-500';
+      case 'Grande Potencial':
+        return 'bg-blue-500';
+      case 'Médio Potencial':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-500';
+    }
+  }
 
-      <div className="space-y-2">
-        <p className="text-white"><strong>Score:</strong> {score} / 50</p>
-        <Progress value={(score / 50) * 100} className="h-3" />
-        <Badge variant="outline" className="text-white">{classification}</Badge>
-      </div>
+  const handleVerContatos = () => {
+    // Criar URL do YouTube baseado no nome do canal
+    const channelSearchUrl = `https://www.youtube.com/@${channelData.name.replace(/\s+/g, '')}/about`;
+    window.open(channelSearchUrl, '_blank');
+  }
+
+  return (
+    <Card className="bg-[#1e1e1e] border border-[#333] text-white">
+      <CardContent className="p-6 space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-white">Análise do Canal</h2>
+          <Button 
+            onClick={handleVerContatos}
+            className="bg-[#22c55e] hover:bg-[#16a34a] text-white"
+          >
+            <Contact className="h-4 w-4 mr-2" />
+            Ver Contatos
+          </Button>
+        </div>
+        
+        <div className="space-y-2 text-white">
+          <p><strong>Nome:</strong> {channelData.name}</p>
+          <p><strong>Inscritos:</strong> {formatNumber(channelData.subscribers)}</p>
+          <p><strong>Média de Visualizações:</strong> {formatNumber(channelData.avgViews)}</p>
+          <p><strong>Frequência de Vídeos:</strong> {channelData.monthlyVideos} vídeos/mês</p>
+          <p><strong>Engajamento:</strong> {((channelData.avgLikes + channelData.avgComments) / channelData.avgViews * 100).toFixed(2)}%</p>
+          <p><strong>Crescimento:</strong> {channelData.subGrowth}% nos últimos 90 dias</p>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-white"><strong>Score:</strong> {score} / 50</p>
+          <Progress value={(score / 50) * 100} className="h-3 bg-[#333]" />
+          <Badge className={`${getClassificationColor(classification)} text-white`}>
+            {classification}
+          </Badge>
+        </div>
+      </CardContent>
     </Card>
   )
 }
