@@ -269,17 +269,17 @@ export const PartnersTab = ({ partnershipsData = [], onAddPartnership }: Partner
 
       {/* Colunas estilo Trello */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {['Interesse', 'Negociando', 'Fechado', 'Rejeitado'].map(status => (
-          <div key={status} className={`rounded-lg p-4 ${statusConfig[status as Partnership['status']].bgColor} border-2 ${statusConfig[status as Partnership['status']].color.split(' ')[2]}`}>
+        {(['Interesse', 'Negociando', 'Fechado', 'Rejeitado'] as const).map(status => (
+          <div key={status} className={`rounded-lg p-4 ${statusConfig[status].bgColor} border-2 ${statusConfig[status].color.split(' ')[2]}`}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-800">{status}</h3>
-              <Badge className={statusConfig[status as Partnership['status']].color}>
-                {getParceirasByStatus(status as Partnership['status']).length}
+              <Badge className={statusConfig[status].color}>
+                {getParceirasByStatus(status).length}
               </Badge>
             </div>
             <div className="space-y-3">
-              {getParceirasByStatus(status as Partnership['status']).map(renderCard)}
-              {getParceirasByStatus(status as Partnership['status']).length === 0 && (
+              {getParceirasByStatus(status).map(renderCard)}
+              {getParceirasByStatus(status).length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                   <div className="text-sm">Nenhuma parceria em {status.toLowerCase()}</div>
                 </div>

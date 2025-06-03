@@ -18,7 +18,7 @@ interface ChannelData {
 interface AnalysisTabProps {
   channelsForAnalysis: Channel[];
   onRemoveFromAnalysis: (channelId: string) => void;
-  onSendToPlanilha?: (channel: Channel) => void;
+  onSendToPlanilha?: (channel: any) => void;
   onSendToPartners?: (channel: Channel) => void;
 }
 
@@ -32,15 +32,18 @@ export const AnalysisTab = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const convertChannelToAnalysisData = (channel: Channel): ChannelData => {
-    // Simulando dados para demonstração - em um cenário real, estes dados viriam da API
+    // Calculando dados mais realistas baseados no canal
+    const avgViews = Math.floor(channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 50)));
+    const engagementRate = (avgViews / channel.subscriberCount) * 100;
+    
     return {
       name: channel.title,
       subscribers: channel.subscriberCount,
-      avgViews: Math.floor(channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 100))),
-      monthlyVideos: Math.floor(Math.random() * 30) + 1,
-      avgLikes: Math.floor(Math.random() * 5000) + 100,
-      avgComments: Math.floor(Math.random() * 500) + 10,
-      subGrowth: Math.floor(Math.random() * 100) + 1
+      avgViews: avgViews,
+      monthlyVideos: Math.floor(Math.random() * 20) + 5, // Entre 5-25 vídeos por mês
+      avgLikes: Math.floor(avgViews * 0.05), // 5% de likes em relação às views
+      avgComments: Math.floor(avgViews * 0.01), // 1% de comentários em relação às views
+      subGrowth: Math.floor(Math.random() * 50) + 10 // Entre 10-60% de crescimento
     };
   };
 
@@ -69,7 +72,75 @@ export const AnalysisTab = ({
   };
 
   const handleSendToPlanilha = (channel: Channel) => {
-    onSendToPlanilha?.(channel);
+    const analysisData = analyzedChannels.get(channel.id);
+    
+    if (analysisData) {
+      // Calculando engajamento real
+      const engagementRate = ((analysisData.avgLikes + analysisData.avgComments) / analysisData.avgViews * 100).toFixed(1);
+      
+      // Calculando score baseado nos dados analisados
+      const calculateScore = (data: ChannelData) => {
+        let score = 0;
+        
+        // Pontuação baseada em inscritos
+        if (data.subscribers > 1000000) score += 20;
+        else if (data.subscribers > 500000) score += 15;
+        else if (data.subscribers > 100000) score += 10;
+        else if (data.subscribers > 10000) score += 5;
+        
+        // Pontuação baseada em views médias
+        if (data.avgViews > 100000) score += 20;
+        else if (data.avgViews > 50000) score += 15;
+        else if (data.avgViews > 10000) score += 10;
+        else if (data.avgViews > 1000) score += 5;
+        
+        // Pontuação baseada em frequência
+        if (data.monthlyVideos > 20) score += 15;
+        else if (data.monthlyVideos > 10) score += 10;
+        else if (data.monthlyVideos > 5) score += 5;
+        
+        // Pontuação baseada em engajamento
+        const engagement = (data.avgLikes + data.avgComments) / data.avgViews * 100;
+        if (engagement > 10) score += 15;
+        else if (engagement > 5) score += 10;
+        else if (engagement > 2) score += 5;
+        
+        // Pontuação baseada em crescimento
+        if (data.subGrowth > 50) score += 10;
+        else if (data.subGrowth > 20) score += 7;
+        else if (data.subGrowth > 10) score += 5;
+        
+        return Math.min(score, 100); // Máximo 100
+      };
+      
+      const score = calculateScore(analysisData);
+      
+      // Classificação baseada no score
+      let classification = 'Baixo Potencial';
+      if (score >= 80) classification = 'Altíssimo Potencial';
+      else if (score >= 60) classification = 'Grande Potencial';
+      else if (score >= 40) classification = 'Médio Potencial';
+      
+      const channelForPlanilha = {
+        id: channel.id,
+        photo: channel.thumbnail,
+        name: analysisData.name,
+        link: `https://youtube.com/channel/${channel.id}`,
+        phone: '+55 11 00000-0000',
+        subscribers: analysisData.subscribers,
+        avgViews: analysisData.avgViews,
+        monthlyVideos: analysisData.monthlyVideos,
+        engagement: engagementRate,
+        subGrowth: analysisData.subGrowth.toString(),
+        score: score,
+        classification: classification
+      };
+      
+      onSendToPlanilha?.(channelForPlanilha);
+    } else {
+      // Se não foi analisado ainda, enviar dados básicos
+      onSendToPlanilha?.(channel);
+    }
   };
 
   const handleSendToPartners = (channel: Channel) => {
