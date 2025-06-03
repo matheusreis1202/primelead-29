@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ModernHeader } from '@/components/ModernHeader';
@@ -10,20 +11,14 @@ import { PartnersTab, usePartnersData } from '@/components/tabs/PartnersTab';
 import { EnhancedLoading } from '@/components/EnhancedLoading';
 
 export interface SearchFilters {
-  keyword: string;
-  minSubscribers: number;
-  maxSubscribers: number;
+  apiKey: string;
+  nicho: string;
+  pais: string;
+  idioma: string;
+  minInscritos: number;
+  maxInscritos: number;
   minViews: number;
-  maxViews: number;
-  category: string;
-  language: string;
-  location: string;
-  uploadFrequency: string;
-  channelAge: string;
-  verifiedOnly: boolean;
-  monetizedOnly: boolean;
-  sortBy: string;
-  sortOrder: string;
+  freqMinima: number;
 }
 
 export interface Channel {
@@ -51,10 +46,10 @@ const Index = () => {
   const { partnerships, addPartnership } = usePartnersData();
 
   console.log('Index component render:', {
-    channels: channels?.length || 0,
-    channelsForAnalysis: channelsForAnalysis?.length || 0,
-    savedChannels: savedChannels?.length || 0,
-    partnerships: partnerships?.length || 0,
+    channels: (channels || []).length,
+    channelsForAnalysis: (channelsForAnalysis || []).length,
+    savedChannels: (savedChannels || []).length,
+    partnerships: (partnerships || []).length,
     activeTab
   });
 
@@ -63,28 +58,38 @@ const Index = () => {
     setError(null);
     
     try {
+      console.log('Searching with filters:', filters);
+      
+      // Simulate API call with real YouTube API structure
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const mockChannels: Channel[] = [
-        {
-          id: '1',
-          title: 'Canal Premium Tech',
-          description: 'Canal especializado em tecnologia e inovação com conteúdo premium para profissionais.',
-          thumbnail: 'https://via.placeholder.com/88x88',
-          subscriberCount: 250000,
-          viewCount: 5000000,
-          videoCount: 150,
-          publishedAt: '2020-01-15',
-          country: 'BR',
-          language: 'pt',
-          score: 92,
-          category: 'Technology'
-        }
-      ];
+      // Generate mock channels based on search criteria
+      const mockChannels: Channel[] = Array.from({ length: Math.floor(Math.random() * 8) + 3 }, (_, index) => {
+        const baseId = Math.random().toString(36).substring(7);
+        const subscriberCount = Math.floor(Math.random() * (filters.maxInscritos - filters.minInscritos)) + filters.minInscritos;
+        const viewCount = subscriberCount * (Math.floor(Math.random() * 100) + 50);
+        
+        return {
+          id: `channel_${baseId}_${index}`,
+          title: `Canal ${filters.nicho} ${index + 1}`,
+          description: `Canal especializado em ${filters.nicho} com conteúdo de qualidade para o público ${filters.pais}.`,
+          thumbnail: `https://via.placeholder.com/88x88?text=${filters.nicho[0]?.toUpperCase() || 'C'}${index + 1}`,
+          subscriberCount,
+          viewCount,
+          videoCount: Math.floor(Math.random() * 200) + 50,
+          publishedAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+          country: filters.pais,
+          language: filters.idioma,
+          score: Math.floor(Math.random() * 40) + 60, // 60-100
+          category: filters.nicho
+        };
+      });
       
+      console.log('Generated channels:', mockChannels);
       setChannels(mockChannels);
     } catch (err) {
-      setError('Erro ao buscar canais. Tente novamente.');
+      console.error('Search error:', err);
+      setError('Erro ao buscar canais. Verifique sua chave da API e tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +132,7 @@ const Index = () => {
       case 'planilha':
         return (
           <NewPlanilhaTab
-            channels={savedChannels || []}
+            savedChannels={savedChannels || []}
             onSendToPartners={handleSendToPartners}
           />
         );

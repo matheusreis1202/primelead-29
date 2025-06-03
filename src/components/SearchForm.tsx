@@ -27,6 +27,7 @@ export const SearchForm = ({ onSearch, isLoading }: SearchFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!filters.apiKey || !filters.nicho) return;
+    console.log('Submitting search with filters:', filters);
     onSearch(filters);
   };
 
