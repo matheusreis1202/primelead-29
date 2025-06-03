@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { BarChart3, Target, Brain, FileSpreadsheet, Handshake } from 'lucide-react';
+import { BarChart3, Target, Brain, FileSpreadsheet, Contact } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Channel } from '@/pages/Index';
 import YouTubeChannelAnalysis from '@/components/YouTubeChannelAnalysis';
@@ -164,16 +164,16 @@ export const AnalysisTab = ({
                     <Button 
                       onClick={() => onRemoveFromAnalysis(channel.id)}
                       variant="outline"
-                      className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]"
+                      className="border-[#333] bg-[#1f1f1f] text-[#AAAAAA] hover:bg-[#444] hover:border-[#444]"
                     >
                       Remover
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg overflow-hidden">
+                <div className="bg-[#1E1E1E] border border-[#333] rounded-lg overflow-hidden">
                   <YouTubeChannelAnalysis channelData={analysisData} />
-                  <div className="p-4 border-t border-[#525252] flex gap-2">
+                  <div className="p-4 border-t border-[#333] flex gap-2">
                     <Button 
                       onClick={() => handleSendToPlanilha(channel)}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
@@ -184,16 +184,16 @@ export const AnalysisTab = ({
                     
                     <Button 
                       onClick={() => handleSendToPartners(channel)}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      className="flex-1 bg-[#22c55e] hover:bg-[#16a34a] text-white"
                     >
-                      <Handshake className="h-4 w-4 mr-2" />
-                      Parceria Fechada
+                      <Contact className="h-4 w-4 mr-2" />
+                      Ver Contatos
                     </Button>
                     
                     <Button 
                       onClick={() => onRemoveFromAnalysis(channel.id)}
                       variant="outline"
-                      className="border-[#525252] text-[#AAAAAA] hover:bg-[#525252]"
+                      className="border-[#333] bg-[#1f1f1f] text-[#AAAAAA] hover:bg-[#444] hover:border-[#444]"
                     >
                       Remover
                     </Button>
