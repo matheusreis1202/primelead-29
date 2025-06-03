@@ -1,8 +1,9 @@
+
 import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Handshake, Edit, Save, X } from 'lucide-react'
+import { Handshake, Edit, Save, X, ExternalLink, Mail, Phone } from 'lucide-react'
 import * as XLSX from 'xlsx'
 
 interface ChannelData {
@@ -11,6 +12,7 @@ interface ChannelData {
   name: string
   link: string
   phone: string
+  email: string
   subscribers: number
   avgViews: number
   monthlyVideos: number
@@ -55,7 +57,6 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
   }
 
   const formatNumber = (num: number | undefined | null) => {
-    // Verificar se o valor é válido antes de formatar
     if (num === undefined || num === null || isNaN(num)) {
       return '0'
     }
@@ -72,58 +73,97 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
   const columns = useMemo(() => [
     {
       accessorKey: 'photo',
-      header: 'Foto',
-      size: 80,
-      cell: (info: any) => (
-        <div className="flex justify-center">
-          <img 
-            src={info.getValue()} 
-            alt="foto" 
-            className="w-10 h-10 rounded-full border border-[#525252]" 
-          />
-        </div>
-      )
-    },
-    { 
-      accessorKey: 'name', 
-      header: 'Nome',
-      size: 180,
+      header: 'Canal',
+      size: 300,
       cell: (info: any) => {
         const channel = info.row.original
         const id = channel.id || channel.name
         const isEditing = editingId === id
         
-        return isEditing ? (
-          <Input
-            value={editingData.name || ''}
-            onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
-            className="bg-[#2A2A2A] border-[#525252] text-white text-sm h-8"
-          />
-        ) : (
-          <div className="font-medium text-white truncate" title={info.getValue()}>
-            {info.getValue()}
-          </div>
-        )
-      }
-    },
-    {
-      accessorKey: 'phone',
-      header: 'Telefone',
-      size: 150,
-      cell: (info: any) => {
-        const channel = info.row.original
-        const id = channel.id || channel.name
-        const isEditing = editingId === id
-        
-        return isEditing ? (
-          <Input
-            value={editingData.phone || ''}
-            onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
-            className="bg-[#2A2A2A] border-[#525252] text-white text-sm h-8"
-          />
-        ) : (
-          <div className="text-[#AAAAAA] text-sm">
-            {info.getValue()}
+        return (
+          <div className="p-4">
+            {/* Foto e Nome */}
+            <div className="flex items-center gap-4 mb-4">
+              <img 
+                src={info.getValue()} 
+                alt="foto" 
+                className="w-16 h-16 rounded-full border border-[#525252] flex-shrink-0" 
+              />
+              <div className="flex-1 min-w-0">
+                {isEditing ? (
+                  <Input
+                    value={editingData.name || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, name: e.target.value }))}
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-sm h-8 mb-2"
+                    placeholder="Nome do canal"
+                  />
+                ) : (
+                  <div className="font-medium text-white text-lg mb-2 truncate" title={channel.name}>
+                    {channel.name}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Informações de Contato */}
+            <div className="space-y-3">
+              {/* Link do Canal */}
+              <div className="flex items-center gap-2">
+                <ExternalLink className="h-4 w-4 text-[#FF0000] flex-shrink-0" />
+                {isEditing ? (
+                  <Input
+                    value={editingData.link || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, link: e.target.value }))}
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-7 flex-1"
+                    placeholder="Link do canal"
+                  />
+                ) : (
+                  <a 
+                    href={channel.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-400 text-xs hover:underline truncate flex-1"
+                    title={channel.link}
+                  >
+                    {channel.link || 'Link não informado'}
+                  </a>
+                )}
+              </div>
+
+              {/* Email */}
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-green-400 flex-shrink-0" />
+                {isEditing ? (
+                  <Input
+                    value={editingData.email || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, email: e.target.value }))}
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-7 flex-1"
+                    placeholder="Email de contato"
+                  />
+                ) : (
+                  <div className="text-green-400 text-xs truncate flex-1" title={channel.email}>
+                    {channel.email || 'Email não informado'}
+                  </div>
+                )}
+              </div>
+
+              {/* Telefone */}
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                {isEditing ? (
+                  <Input
+                    value={editingData.phone || ''}
+                    onChange={(e) => setEditingData(prev => ({ ...prev, phone: e.target.value }))}
+                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-7 flex-1"
+                    placeholder="Telefone"
+                  />
+                ) : (
+                  <div className="text-blue-400 text-xs" title={channel.phone}>
+                    {channel.phone || 'Telefone não informado'}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )
       }
@@ -287,6 +327,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
     const worksheetData = data.map(row => ({
       Nome: row.name,
       Link: row.link,
+      Email: row.email,
       Telefone: row.phone,
       Inscritos: row.subscribers,
       'Média Views': row.avgViews,
@@ -324,7 +365,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
 
       <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="min-w-[1200px]">
+          <div className="min-w-[1400px]">
             <table className="w-full">
               <thead className="bg-[#0D0D0D]">
                 {table.getHeaderGroups().map(headerGroup => (
@@ -352,7 +393,7 @@ export const NewPlanilhaTab = ({ channelsData = [], onAddChannel, onSendToPartne
                     {row.getVisibleCells().map(cell => (
                       <td 
                         key={cell.id} 
-                        className="px-4 py-4"
+                        className="px-4 py-4 align-top"
                         style={{ width: cell.column.getSize() }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -385,6 +426,7 @@ export const usePlanilhaData = () => {
       name: channelData.title || channelData.name,
       link: channelData.link || `https://youtube.com/channel/${channelData.id}`,
       phone: channelData.phone || '+55 11 00000-0000',
+      email: channelData.email || 'contato@exemplo.com',
       subscribers: channelData.subscriberCount || channelData.subscribers || 0,
       avgViews: channelData.avgViews || 0,
       monthlyVideos: channelData.monthlyVideos || 10,
