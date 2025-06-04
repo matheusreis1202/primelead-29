@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,7 +15,8 @@ import {
   Eye,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  AlertCircle
 } from 'lucide-react';
 import { EmailCampaignForm } from '@/components/EmailCampaignForm';
 import { EmailTemplateLibrary } from '@/components/EmailTemplateLibrary';
@@ -34,6 +34,7 @@ export interface EmailCampaign {
   createdAt: string;
   scheduledAt?: string;
   sentAt?: string;
+  externalContacts?: any[];
   stats: {
     sent: number;
     delivered: number;
@@ -77,9 +78,11 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
       content: campaignData.content || '',
       template: campaignData.template || 'basic',
       recipients: campaignData.recipients || [],
-      status: 'draft',
+      status: campaignData.status || 'draft',
       createdAt: new Date().toISOString(),
-      stats: {
+      sentAt: campaignData.sentAt,
+      externalContacts: campaignData.externalContacts || [],
+      stats: campaignData.stats || {
         sent: 0,
         delivered: 0,
         opened: 0,
@@ -92,58 +95,114 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
     setCampaigns(prev => [...prev, newCampaign]);
     setIsCreatingCampaign(false);
 
+    const statusMessage = newCampaign.status === 'sent' 
+      ? `Campanha enviada com sucesso! ${newCampaign.stats.delivered} emails entregues.`
+      : `${newCampaign.name} foi salva como rascunho.`;
+
     toast({
-      title: "Campanha criada!",
-      description: `${newCampaign.name} foi criada com sucesso.`,
+      title: newCampaign.status === 'sent' ? "Campanha enviada!" : "Campanha criada!",
+      description: statusMessage,
     });
+
+    console.log('Nova campanha criada:', newCampaign);
   };
 
-  const handleSendCampaign = (campaignId: string) => {
+  const handleUpdateCampaign = (campaignData: Partial<EmailCampaign>) => {
+    if (!editingCampaign) return;
+
     setCampaigns(prev => prev.map(campaign => {
-      if (campaign.id === campaignId) {
-        const sentCount = campaign.recipients.length;
-        return {
+      if (campaign.id === editingCampaign.id) {
+        const updatedCampaign = {
           ...campaign,
-          status: 'sent' as const,
-          sentAt: new Date().toISOString(),
-          stats: {
-            ...campaign.stats,
-            sent: sentCount,
-            delivered: Math.floor(sentCount * 0.95),
-            opened: Math.floor(sentCount * 0.25),
-            clicked: Math.floor(sentCount * 0.05)
-          }
+          ...campaignData,
+          updatedAt: new Date().toISOString()
         };
+        console.log('Campanha atualizada:', updatedCampaign);
+        return updatedCampaign;
       }
       return campaign;
     }));
 
+    setEditingCampaign(null);
+
+    const statusMessage = campaignData.status === 'sent' 
+      ? `Campanha enviada com sucesso! ${campaignData.stats?.delivered || 0} emails entregues.`
+      : 'Campanha atualizada com sucesso.';
+
     toast({
-      title: "Campanha enviada!",
-      description: "Sua campanha foi enviada com sucesso.",
+      title: campaignData.status === 'sent' ? "Campanha enviada!" : "Campanha atualizada!",
+      description: statusMessage,
     });
   };
 
+  const handleSendCampaign = async (campaignId: string) => {
+    const campaign = campaigns.find(c => c.id === campaignId);
+    if (!campaign) return;
+
+    // Simular processo de envio
+    toast({
+      title: "Iniciando envio",
+      description: `Enviando ${campaign.name} para ${campaign.recipients.length} contatos...`,
+    });
+
+    // Simular delay de envio
+    setTimeout(() => {
+      setCampaigns(prev => prev.map(campaign => {
+        if (campaign.id === campaignId) {
+          const sentCount = campaign.recipients.length;
+          const updatedCampaign = {
+            ...campaign,
+            status: 'sent' as const,
+            sentAt: new Date().toISOString(),
+            stats: {
+              ...campaign.stats,
+              sent: sentCount,
+              delivered: Math.floor(sentCount * 0.95),
+              opened: Math.floor(sentCount * 0.25),
+              clicked: Math.floor(sentCount * 0.05),
+              bounced: Math.floor(sentCount * 0.05),
+              unsubscribed: Math.floor(sentCount * 0.01)
+            }
+          };
+          console.log('Campanha enviada:', updatedCampaign);
+          return updatedCampaign;
+        }
+        return campaign;
+      }));
+
+      toast({
+        title: "Campanha enviada!",
+        description: "Sua campanha foi enviada com sucesso.",
+      });
+    }, 2000);
+  };
+
   const handleDeleteCampaign = (campaignId: string) => {
+    const campaign = campaigns.find(c => c.id === campaignId);
     setCampaigns(prev => prev.filter(campaign => campaign.id !== campaignId));
     
     toast({
       title: "Campanha removida!",
-      description: "A campanha foi removida com sucesso.",
+      description: `"${campaign?.name}" foi removida com sucesso.`,
     });
+
+    console.log('Campanha removida:', campaignId);
   };
 
   const getStatusBadge = (status: EmailCampaign['status']) => {
     const statusConfig = {
-      draft: { label: 'Rascunho', color: 'bg-gray-500' },
-      scheduled: { label: 'Agendada', color: 'bg-blue-500' },
-      sent: { label: 'Enviada', color: 'bg-green-500' },
-      failed: { label: 'Falhou', color: 'bg-red-500' }
+      draft: { label: 'Rascunho', color: 'bg-gray-500', icon: Edit },
+      scheduled: { label: 'Agendada', color: 'bg-blue-500', icon: Clock },
+      sent: { label: 'Enviada', color: 'bg-green-500', icon: CheckCircle },
+      failed: { label: 'Falhou', color: 'bg-red-500', icon: XCircle }
     };
 
     const config = statusConfig[status];
+    const Icon = config.icon;
+    
     return (
-      <Badge className={`${config.color} text-white`}>
+      <Badge className={`${config.color} text-white flex items-center gap-1`}>
+        <Icon className="h-3 w-3" />
         {config.label}
       </Badge>
     );
@@ -158,6 +217,25 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
       minute: '2-digit'
     });
   };
+
+  // Combinar todos os contatos (YouTube + externos das campanhas)
+  const allContactsForList = useMemo(() => {
+    const externalContacts = campaigns.flatMap(campaign => 
+      campaign.externalContacts || []
+    );
+    
+    return [
+      ...emailContacts,
+      ...externalContacts.map(contact => ({
+        ...contact,
+        channel: contact.name,
+        subscribers: 0,
+        engagement: '0',
+        score: 50,
+        tags: ['external']
+      }))
+    ];
+  }, [emailContacts, campaigns]);
 
   return (
     <div className="space-y-6">
@@ -179,7 +257,7 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - atualizado com dados mais precisos */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-4">
           <div className="flex items-center gap-2 text-[#AAAAAA] mb-1">
@@ -192,9 +270,9 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
         <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-4">
           <div className="flex items-center gap-2 text-[#AAAAAA] mb-1">
             <Users className="h-4 w-4" />
-            <span className="text-sm">Contatos</span>
+            <span className="text-sm">Contatos Totais</span>
           </div>
-          <div className="text-2xl font-bold text-white">{emailContacts.length}</div>
+          <div className="text-2xl font-bold text-white">{allContactsForList.length}</div>
         </div>
         
         <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-4">
@@ -262,6 +340,15 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
             />
           )}
 
+          {editingCampaign && (
+            <EmailCampaignForm
+              contacts={emailContacts}
+              onSave={handleUpdateCampaign}
+              onCancel={() => setEditingCampaign(null)}
+              editingCampaign={editingCampaign}
+            />
+          )}
+
           <div className="grid gap-4">
             {campaigns.map((campaign) => (
               <div key={campaign.id} className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-6">
@@ -270,6 +357,11 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-white">{campaign.name}</h3>
                       {getStatusBadge(campaign.status)}
+                      {(campaign.externalContacts?.length || 0) > 0 && (
+                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-400">
+                          +{campaign.externalContacts?.length} externos
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-[#AAAAAA] text-sm mb-2">{campaign.subject}</p>
                     <div className="flex items-center gap-4 text-sm text-[#AAAAAA]">
@@ -281,6 +373,12 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
                         <Users className="h-3 w-3" />
                         {campaign.recipients.length} destinatários
                       </span>
+                      {campaign.sentAt && (
+                        <span className="flex items-center gap-1">
+                          <Send className="h-3 w-3" />
+                          Enviada em {formatDate(campaign.sentAt)}
+                        </span>
+                      )}
                     </div>
                   </div>
                   
@@ -365,12 +463,11 @@ export const EmailMarketingTab = ({ contacts }: EmailMarketingTabProps) => {
         </TabsContent>
 
         <TabsContent value="contacts">
-          <ContactsList contacts={emailContacts} />
+          <ContactsList contacts={allContactsForList} />
         </TabsContent>
 
         <TabsContent value="templates">
           <EmailTemplateLibrary onSelectTemplate={(template) => {
-            // Implementar seleção de template
             console.log('Template selecionado:', template);
           }} />
         </TabsContent>
