@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical, DollarSign, Handshake, Calendar, TrendingUp, Eye, Settings, Shield, Sync as SyncIcon } from 'lucide-react'
+import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical, DollarSign, Handshake, Calendar, TrendingUp, Eye, Settings, Shield, RotateCw as SyncIcon } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { PartnersAnalytics } from '@/components/PartnersAnalytics'
 import { PartnerCommunication } from '@/components/PartnerCommunication'
