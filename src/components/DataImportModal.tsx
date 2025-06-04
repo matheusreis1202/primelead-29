@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, FileText, AlertCircle, CheckCircle, Download, Mapping } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, Download, MapPin } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 interface ChannelData {
@@ -267,7 +267,7 @@ export const DataImportModal = ({ isOpen, onClose, onImport }: DataImportModalPr
           {step === 'mapping' && (
             <div className="space-y-4">
               <div className="text-center mb-6">
-                <Mapping className="h-12 w-12 text-[#FF0000] mx-auto mb-4" />
+                <MapPin className="h-12 w-12 text-[#FF0000] mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">Mapear Campos</h3>
                 <p className="text-[#AAAAAA]">
                   Associe as colunas do seu arquivo aos campos do sistema
