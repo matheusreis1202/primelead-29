@@ -140,6 +140,132 @@
     animation: scale-in 0.4s ease-out;
   }
 
+  /* PWA e Mobile Optimizations */
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px;
+    }
+
+    .mobile-optimized {
+      padding: 1rem;
+    }
+
+    .mobile-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .mobile-hidden {
+      display: none;
+    }
+
+    .mobile-stack {
+      flex-direction: column;
+    }
+
+    /* Touch targets para mobile */
+    button, .clickable {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Cards responsivos */
+    .partner-card {
+      margin-bottom: 0.75rem;
+    }
+
+    /* Tabs mobile friendly */
+    .mobile-tabs {
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .mobile-tabs::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .text-responsive {
+      font-size: 0.875rem;
+    }
+
+    .title-responsive {
+      font-size: 1.5rem;
+    }
+
+    .button-mobile {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  /* PWA Específico */
+  @media (display-mode: standalone) {
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .pwa-safe-area {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+  }
+
+  /* Offline indicator */
+  .offline-indicator {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: #FF6B35;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    z-index: 1000;
+    animation: fade-in 0.3s ease-out;
+  }
+
+  /* Drag and drop mobile support */
+  @media (max-width: 768px) {
+    .drag-disabled {
+      pointer-events: none;
+    }
+
+    .mobile-drag-handle {
+      display: block;
+      padding: 0.5rem;
+      cursor: grab;
+    }
+
+    .mobile-drag-handle:active {
+      cursor: grabbing;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    :root {
+      --background: 0 0 0;
+      --foreground: 255 255 255;
+      --border: 255 255 255;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
   /* Remover efeitos excessivos */
   .glass-card,
   .modern-stats-card,
@@ -149,5 +275,43 @@
   .futuristic-button,
   .futuristic-glow {
     @apply bg-transparent border-none shadow-none;
+  }
+
+  /* Loading states para offline */
+  .loading-skeleton {
+    background: linear-gradient(90deg, #1E1E1E 25%, #2A2A2A 50%, #1E1E1E 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Focus visible para acessibilidade */
+  .focus-visible {
+    outline: 2px solid #FF0000;
+    outline-offset: 2px;
+  }
+
+  /* Print styles para relatórios */
+  @media print {
+    body {
+      background: white;
+      color: black;
+    }
+
+    .no-print {
+      display: none;
+    }
+
+    .print-break {
+      page-break-before: always;
+    }
   }
 }

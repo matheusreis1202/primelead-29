@@ -6,11 +6,14 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical, DollarSign, Handshake, Calendar, TrendingUp, Eye } from 'lucide-react'
+import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical, DollarSign, Handshake, Calendar, TrendingUp, Eye, Settings, Shield, Sync as SyncIcon } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { PartnersAnalytics } from '@/components/PartnersAnalytics'
 import { PartnerCommunication } from '@/components/PartnerCommunication'
 import { PartnerFollowUps } from '@/components/PartnerFollowUps'
+import { PartnerSync } from '@/components/PartnerSync'
+import { PartnerOfflineSync } from '@/components/PartnerOfflineSync'
+import { PartnerCompliance } from '@/components/PartnerCompliance'
 
 interface PartnerData {
   id: string
@@ -68,6 +71,8 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
   const [communications, setCommunications] = useState<CommunicationEntry[]>([])
   const [followUps, setFollowUps] = useState<FollowUp[]>([])
   const [showAnalytics, setShowAnalytics] = useState(true)
+  const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false)
+  const [activeAdvancedTab, setActiveAdvancedTab] = useState('sync')
   const { toast } = useToast()
 
   const statusColumns = [
@@ -110,6 +115,36 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
     })
   }
 
+  // Nova função para sincronização de dados
+  const handleDataSync = (syncData: any) => {
+    console.log('Dados sincronizados:', syncData);
+    
+    // Atualizar partners com dados das outras abas
+    if (syncData.analysisChannels?.length > 0) {
+      const newPartners = syncData.analysisChannels.map((channel: any) => ({
+        id: channel.id || Date.now().toString(),
+        photo: channel.thumbnail || 'https://via.placeholder.com/64',
+        name: channel.title || channel.name,
+        phone: '+55 11 00000-0000',
+        subscribers: channel.subscriberCount || 0,
+        avgViews: channel.avgViews || 0,
+        engagement: '0.0',
+        score: channel.score || 70,
+        classification: 'Médio Potencial',
+        status: 'Interesse' as const,
+        email: `contato@${(channel.title || 'canal').replace(/\s+/g, '').toLowerCase()}.com`
+      }));
+      
+      setPartners(prev => [...prev, ...newPartners.filter(np => !prev.find(p => p.id === np.id))]);
+    }
+    
+    toast({
+      title: "Dados sincronizados",
+      description: "Informações atualizadas das outras abas",
+    });
+  };
+
+  // Status and editing handlers
   const handleStatusChange = (partnerId: string, newStatus: PartnerData['status']) => {
     setPartners(prev => prev.map(partner => 
       partner.id === partnerId ? { ...partner, status: newStatus } : partner
@@ -551,10 +586,86 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
             <TrendingUp className="h-4 w-4 mr-2" />
             {showAnalytics ? 'Ocultar' : 'Mostrar'} Analytics
           </Button>
+          <Button
+            onClick={() => setShowAdvancedFeatures(!showAdvancedFeatures)}
+            variant="outline"
+            className="border-[#525252] bg-[#2A2A2A] text-white"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Recursos Avançados
+          </Button>
         </div>
       </div>
 
       {showAnalytics && <PartnersAnalytics partners={partners} />}
+
+      {/* Funcionalidades Avançadas */}
+      {showAdvancedFeatures && (
+        <Card className="bg-[#1E1E1E] border-[#333]">
+          <CardHeader>
+            <CardTitle className="text-white">Recursos Avançados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeAdvancedTab} onValueChange={setActiveAdvancedTab}>
+              <TabsList className="grid w-full grid-cols-3 bg-[#2A2A2A]">
+                <TabsTrigger value="sync" className="text-white data-[state=active]:bg-[#FF0000]">
+                  <SyncIcon className="h-4 w-4 mr-2" />
+                  Sincronização
+                </TabsTrigger>
+                <TabsTrigger value="offline" className="text-white data-[state=active]:bg-[#FF0000]">
+                  Modo Offline
+                </TabsTrigger>
+                <TabsTrigger value="compliance" className="text-white data-[state=active]:bg-[#FF0000]">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Compliance
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="sync" className="mt-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <PartnerSync 
+                    onDataSync={handleDataSync}
+                    lastSyncTime={localStorage.getItem('lastPartnerSync') || undefined}
+                  />
+                  
+                  <Card className="bg-[#2A2A2A] border-[#525252]">
+                    <CardHeader>
+                      <CardTitle className="text-white text-lg">Integração Cross-Tab</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-[#AAAAAA] text-sm">
+                        Sincronização automática com:
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-white text-sm">Aba Análise</span>
+                          <Badge className="bg-green-500/20 text-green-400 text-xs">Ativo</Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-white text-sm">Email Marketing</span>
+                          <Badge className="bg-blue-500/20 text-blue-400 text-xs">Integrado</Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-white text-sm">Planilha</span>
+                          <Badge className="bg-purple-500/20 text-purple-400 text-xs">Sincronizado</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="offline" className="mt-4">
+                <PartnerOfflineSync />
+              </TabsContent>
+              
+              <TabsContent value="compliance" className="mt-4">
+                <PartnerCompliance />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
         {statusColumns.map(column => (
