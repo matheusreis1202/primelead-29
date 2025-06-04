@@ -1,12 +1,16 @@
-
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical, DollarSign, Handshake } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { User, Mail, Phone, Youtube, Star, Edit3, Check, X, MessageCircle, Plus, GripVertical, DollarSign, Handshake, Calendar, TrendingUp, Eye } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { PartnersAnalytics } from '@/components/PartnersAnalytics'
+import { PartnerCommunication } from '@/components/PartnerCommunication'
+import { PartnerFollowUps } from '@/components/PartnerFollowUps'
 
 interface PartnerData {
   id: string
@@ -23,6 +27,32 @@ interface PartnerData {
   email?: string
   partnershipType?: string
   investment?: string
+  proposedValue?: string
+  negotiatedValue?: string
+  finalValue?: string
+  roi?: string
+  nextFollowUp?: string
+  lastContact?: string
+  priority?: 'low' | 'medium' | 'high' | 'urgent'
+}
+
+interface CommunicationEntry {
+  id: string
+  type: 'email' | 'whatsapp' | 'call' | 'meeting' | 'note'
+  date: string
+  content: string
+  status?: 'sent' | 'delivered' | 'read' | 'replied'
+}
+
+interface FollowUp {
+  id: string
+  partnerId: string
+  title: string
+  description: string
+  dueDate: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  status: 'pending' | 'completed' | 'overdue'
+  type: 'call' | 'email' | 'meeting' | 'proposal' | 'contract' | 'payment'
 }
 
 interface PartnersTabProps {
@@ -34,6 +64,10 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingData, setEditingData] = useState<Partial<PartnerData>>({})
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
+  const [selectedPartner, setSelectedPartner] = useState<PartnerData | null>(null)
+  const [communications, setCommunications] = useState<CommunicationEntry[]>([])
+  const [followUps, setFollowUps] = useState<FollowUp[]>([])
+  const [showAnalytics, setShowAnalytics] = useState(true)
   const { toast } = useToast()
 
   const statusColumns = [
@@ -121,13 +155,26 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
     }
   }
 
+  const getPriorityColor = (priority?: string) => {
+    switch (priority) {
+      case 'urgent': return 'border-l-4 border-red-500'
+      case 'high': return 'border-l-4 border-orange-500'
+      case 'medium': return 'border-l-4 border-yellow-500'
+      case 'low': return 'border-l-4 border-green-500'
+      default: return ''
+    }
+  }
+
   const renderPartnerCard = (partner: PartnerData) => {
     const isEditing = editingId === partner.id
+    const partnerCommunications = communications.filter(c => c.content.includes(partner.name))
+    const partnerFollowUps = followUps.filter(f => f.partnerId === partner.id)
+    const hasOverdueFollowUps = partnerFollowUps.some(f => f.status === 'overdue')
 
     return (
       <Card 
         key={partner.id} 
-        className="bg-[#1E1E1E] border-[#333] mb-3 hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing h-fit"
+        className={`bg-[#1E1E1E] border-[#333] mb-3 hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing h-fit ${getPriorityColor(partner.priority)}`}
         draggable={!isEditing}
         onDragStart={(e) => handleDragStart(e, partner.id)}
       >
@@ -151,11 +198,18 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
                     {partner.name}
                   </CardTitle>
                 )}
-                <Badge className={`text-[10px] px-1 py-0 h-4 ${getStatusColor(partner.classification)}`}>
-                  {partner.classification === 'Altíssimo Potencial' ? 'Alto' : 
-                   partner.classification === 'Grande Potencial' ? 'Grande' :
-                   partner.classification === 'Médio Potencial' ? 'Médio' : partner.classification}
-                </Badge>
+                <div className="flex items-center gap-1">
+                  <Badge className={`text-[10px] px-1 py-0 h-4 ${getStatusColor(partner.classification)}`}>
+                    {partner.classification === 'Altíssimo Potencial' ? 'Alto' : 
+                     partner.classification === 'Grande Potencial' ? 'Grande' :
+                     partner.classification === 'Médio Potencial' ? 'Médio' : partner.classification}
+                  </Badge>
+                  {hasOverdueFollowUps && (
+                    <Badge className="bg-red-500/20 text-red-400 text-[10px] px-1 py-0 h-4">
+                      Atrasado
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
             
@@ -177,9 +231,132 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
                   </Button>
                 </div>
               ) : (
-                <Button onClick={() => handleEdit(partner)} size="sm" variant="outline" className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] h-6 w-6 p-0">
-                  <Edit3 className="h-3 w-3" />
-                </Button>
+                <div className="flex gap-1">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button 
+                        onClick={() => setSelectedPartner(partner)}
+                        size="sm" 
+                        variant="outline" 
+                        className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] h-6 w-6 p-0"
+                      >
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0D0D0D] border-[#333]">
+                      <DialogHeader>
+                        <DialogTitle className="text-white text-xl">
+                          Detalhes - {partner.name}
+                        </DialogTitle>
+                      </DialogHeader>
+                      
+                      <Tabs defaultValue="details" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 bg-[#1E1E1E]">
+                          <TabsTrigger value="details" className="text-white data-[state=active]:bg-[#FF0000]">
+                            Detalhes
+                          </TabsTrigger>
+                          <TabsTrigger value="communication" className="text-white data-[state=active]:bg-[#FF0000]">
+                            Comunicação
+                          </TabsTrigger>
+                          <TabsTrigger value="followups" className="text-white data-[state=active]:bg-[#FF0000]">
+                            Follow-ups
+                          </TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="details" className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-white text-sm">Valor Proposto</label>
+                              <Input
+                                value={partner.proposedValue || ''}
+                                onChange={(e) => setPartners(prev => prev.map(p => 
+                                  p.id === partner.id ? { ...p, proposedValue: e.target.value } : p
+                                ))}
+                                placeholder="R$ 5.000"
+                                className="bg-[#2A2A2A] border-[#525252] text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-white text-sm">Valor Negociado</label>
+                              <Input
+                                value={partner.negotiatedValue || ''}
+                                onChange={(e) => setPartners(prev => prev.map(p => 
+                                  p.id === partner.id ? { ...p, negotiatedValue: e.target.value } : p
+                                ))}
+                                placeholder="R$ 4.500"
+                                className="bg-[#2A2A2A] border-[#525252] text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-white text-sm">Valor Final</label>
+                              <Input
+                                value={partner.finalValue || ''}
+                                onChange={(e) => setPartners(prev => prev.map(p => 
+                                  p.id === partner.id ? { ...p, finalValue: e.target.value } : p
+                                ))}
+                                placeholder="R$ 4.200"
+                                className="bg-[#2A2A2A] border-[#525252] text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-white text-sm">ROI Esperado</label>
+                              <Input
+                                value={partner.roi || ''}
+                                onChange={(e) => setPartners(prev => prev.map(p => 
+                                  p.id === partner.id ? { ...p, roi: e.target.value } : p
+                                ))}
+                                placeholder="300%"
+                                className="bg-[#2A2A2A] border-[#525252] text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-white text-sm">Prioridade</label>
+                              <Select 
+                                value={partner.priority || 'medium'} 
+                                onValueChange={(value) => setPartners(prev => prev.map(p => 
+                                  p.id === partner.id ? { ...p, priority: value as PartnerData['priority'] } : p
+                                ))}
+                              >
+                                <SelectTrigger className="bg-[#2A2A2A] border-[#525252] text-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="low">Baixa</SelectItem>
+                                  <SelectItem value="medium">Média</SelectItem>
+                                  <SelectItem value="high">Alta</SelectItem>
+                                  <SelectItem value="urgent">Urgente</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="communication">
+                          <PartnerCommunication
+                            partnerId={partner.id}
+                            partnerName={partner.name}
+                            communications={partnerCommunications}
+                            onAddCommunication={handleAddCommunication}
+                          />
+                        </TabsContent>
+                        
+                        <TabsContent value="followups">
+                          <PartnerFollowUps
+                            partnerId={partner.id}
+                            followUps={followUps}
+                            onAddFollowUp={handleAddFollowUp}
+                            onUpdateFollowUp={handleUpdateFollowUp}
+                            onDeleteFollowUp={handleDeleteFollowUp}
+                          />
+                        </TabsContent>
+                      </Tabs>
+                    </DialogContent>
+                  </Dialog>
+                  
+                  <Button onClick={() => handleEdit(partner)} size="sm" variant="outline" className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] h-6 w-6 p-0">
+                    <Edit3 className="h-3 w-3" />
+                  </Button>
+                </div>
               )}
             </div>
           </div>
@@ -332,7 +509,19 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
           <h2 className="text-3xl font-bold text-white">Gestão de Parcerias</h2>
           <p className="text-[#AAAAAA]">{partners.length} parceria(s) registrada(s)</p>
         </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowAnalytics(!showAnalytics)}
+            variant="outline"
+            className="border-[#525252] bg-[#2A2A2A] text-white"
+          >
+            <TrendingUp className="h-4 w-4 mr-2" />
+            {showAnalytics ? 'Ocultar' : 'Mostrar'} Analytics
+          </Button>
+        </div>
       </div>
+
+      {showAnalytics && <PartnersAnalytics partners={partners} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
         {statusColumns.map(column => (
@@ -367,6 +556,8 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
   )
 }
 
+// ... keep existing code (usePartnersData hook)
+
 export const usePartnersData = () => {
   const [partnerships, setPartnerships] = useState<PartnerData[]>([])
 
@@ -385,7 +576,8 @@ export const usePartnersData = () => {
       notes: '',
       email: '',
       partnershipType: '',
-      investment: ''
+      investment: '',
+      priority: 'medium'
     }
     
     setPartnerships(prev => [...prev, newPartnership])
