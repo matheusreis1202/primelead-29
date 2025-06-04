@@ -364,13 +364,17 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
           <div className="p-2 min-w-0">
             <div className="flex items-center gap-3 mb-2">
               <img 
-                src={channel.photo} 
+                src={channel.photo || 'https://via.placeholder.com/40'} 
                 alt="foto" 
                 className="w-10 h-10 rounded-full border border-[#525252] flex-shrink-0" 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://via.placeholder.com/40';
+                }}
               />
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-white text-sm mb-1 truncate" title={channel.name}>
-                  {channel.name}
+                  {channel.name || 'Nome não informado'}
                 </div>
                 <Badge 
                   variant="secondary" 
@@ -389,7 +393,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
               <div className="flex items-center gap-1">
                 <ExternalLink className="h-3 w-3 text-[#FF0000] flex-shrink-0" />
                 <a 
-                  href={channel.link} 
+                  href={channel.link || '#'} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-blue-400 text-xs hover:underline truncate flex-1"
@@ -420,50 +424,62 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     { 
       accessorKey: 'subscribers', 
       header: 'Inscritos',
-      cell: ({ getValue }) => (
-        <div className="text-center p-2">
-          <div className="font-bold text-white text-sm mb-1">
-            {formatNumber(getValue() as number)}
+      cell: ({ getValue }) => {
+        const value = getValue() as number;
+        return (
+          <div className="text-center p-2">
+            <div className="font-bold text-white text-sm mb-1">
+              {formatNumber(value)}
+            </div>
+            <div className="text-xs text-[#AAAAAA]">inscritos</div>
           </div>
-          <div className="text-xs text-[#AAAAAA]">inscritos</div>
-        </div>
-      )
+        )
+      }
     },
     { 
       accessorKey: 'avgViews', 
       header: 'Média Views',
-      cell: ({ getValue }) => (
-        <div className="text-center p-2">
-          <div className="font-bold text-blue-400 text-sm mb-1">
-            {formatNumber(getValue() as number)}
+      cell: ({ getValue }) => {
+        const value = getValue() as number;
+        return (
+          <div className="text-center p-2">
+            <div className="font-bold text-blue-400 text-sm mb-1">
+              {formatNumber(value)}
+            </div>
+            <div className="text-xs text-[#AAAAAA]">views médias</div>
           </div>
-          <div className="text-xs text-[#AAAAAA]">views médias</div>
-        </div>
-      )
+        )
+      }
     },
     { 
       accessorKey: 'engagement', 
       header: 'Engajamento',
-      cell: ({ getValue }) => (
-        <div className="text-center p-2">
-          <div className="font-bold text-green-400 text-sm mb-1">
-            {getValue() || '0.0'}%
+      cell: ({ getValue }) => {
+        const value = getValue() as string;
+        return (
+          <div className="text-center p-2">
+            <div className="font-bold text-green-400 text-sm mb-1">
+              {value || '0.0'}%
+            </div>
+            <div className="text-xs text-[#AAAAAA]">engajamento</div>
           </div>
-          <div className="text-xs text-[#AAAAAA]">engajamento</div>
-        </div>
-      )
+        )
+      }
     },
     { 
       accessorKey: 'score', 
       header: 'Score',
-      cell: ({ getValue }) => (
-        <div className="text-center p-2">
-          <div className="font-bold text-yellow-400 text-lg mb-1">
-            {getValue() || 0}
+      cell: ({ getValue }) => {
+        const value = getValue() as number;
+        return (
+          <div className="text-center p-2">
+            <div className="font-bold text-yellow-400 text-lg mb-1">
+              {value || 0}
+            </div>
+            <div className="text-xs text-[#AAAAAA]">pontos</div>
           </div>
-          <div className="text-xs text-[#AAAAAA]">pontos</div>
-        </div>
-      )
+        )
+      }
     },
     {
       id: 'actions',
