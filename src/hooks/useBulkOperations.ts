@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 
-export const useBulkOperations = <T extends { id: string | undefined; name: string }>(items: T[]) => {
+export const useBulkOperations = <T extends { id?: string; name: string }>(items: T[]) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const isSelected = useCallback((item: T) => {

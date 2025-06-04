@@ -3,11 +3,14 @@ import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Handshake, Edit, ExternalLink, Mail, Phone } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Handshake, Edit, ExternalLink, Mail, Phone, BarChart3, Upload, Download, Settings } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { ChannelEditModal } from '@/components/ChannelEditModal'
 import { AdvancedTableFilters } from '@/components/AdvancedTableFilters'
 import { BulkOperationsToolbar } from '@/components/BulkOperationsToolbar'
+import { PlanilhaAnalytics } from '@/components/PlanilhaAnalytics'
+import { DataImportModal } from '@/components/DataImportModal'
 import { useBulkOperations } from '@/hooks/useBulkOperations'
 
 interface ChannelData {
@@ -44,6 +47,8 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
   const [data, setData] = useState<ChannelData[]>(savedChannels)
   const [editingChannel, setEditingChannel] = useState<ChannelData | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('table')
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     scoreRange: 'all',
@@ -143,6 +148,10 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
       const updatedId = updatedChannel.id || updatedChannel.name;
       return id === updatedId ? updatedChannel : channel;
     }));
+  }
+
+  const handleImport = (importedChannels: ChannelData[]) => {
+    setData(prev => [...prev, ...importedChannels]);
   }
 
   const formatNumber = (num: number | undefined | null) => {
@@ -343,7 +352,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         )
       }
     }
-  ], [bulkOps])
+  ], [bulkOps, onSendToPartners])
 
   const table = useReactTable({
     data: filteredData,
@@ -354,77 +363,113 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Planilha Sofisticada</h1>
-        <Button 
-          onClick={() => exportToExcel()}
-          className="bg-[#FF0000] hover:bg-[#CC0000] text-white border-none"
-        >
-          Exportar Tudo para Excel
-        </Button>
+        <h1 className="text-3xl font-bold text-white">CRM de Canais</h1>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setIsImportModalOpen(true)}
+            variant="outline"
+            className="border-[#525252] text-[#AAAAAA] hover:text-white hover:bg-[#333]"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importar Dados
+          </Button>
+          <Button 
+            onClick={() => exportToExcel()}
+            className="bg-[#FF0000] hover:bg-[#CC0000] text-white border-none"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Exportar Excel
+          </Button>
+        </div>
       </div>
 
-      <AdvancedTableFilters
-        onFiltersChange={setFilters}
-        totalItems={data.length}
-        filteredItems={filteredData.length}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-[#1E1E1E] border border-[#525252]">
+          <TabsTrigger 
+            value="table" 
+            className="data-[state=active]:bg-[#FF0000] data-[state=active]:text-white text-[#AAAAAA]"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Tabela de Canais
+          </TabsTrigger>
+          <TabsTrigger 
+            value="analytics" 
+            className="data-[state=active]:bg-[#FF0000] data-[state=active]:text-white text-[#AAAAAA]"
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Analytics & Insights
+          </TabsTrigger>
+        </TabsList>
 
-      <BulkOperationsToolbar
-        selectedItems={bulkOps.getSelectedItems()}
-        onExportSelected={exportToExcel}
-        onSendToPartners={handleBulkSendToPartners}
-        onDeleteSelected={handleBulkDelete}
-        onClearSelection={bulkOps.clearSelection}
-      />
+        <TabsContent value="table" className="space-y-4">
+          <AdvancedTableFilters
+            onFiltersChange={setFilters}
+            totalItems={data.length}
+            filteredItems={filteredData.length}
+          />
 
-      <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id} className="border-b border-[#525252] hover:bg-transparent">
-                {headerGroup.headers.map(header => (
-                  <TableHead 
-                    key={header.id} 
-                    className="bg-[#0D0D0D] text-[#AAAAAA] font-medium border-r border-[#525252] last:border-r-0"
-                  >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
+          <BulkOperationsToolbar
+            selectedItems={bulkOps.getSelectedItems()}
+            onExportSelected={exportToExcel}
+            onSendToPartners={handleBulkSendToPartners}
+            onDeleteSelected={handleBulkDelete}
+            onClearSelection={bulkOps.clearSelection}
+          />
+
+          <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map(headerGroup => (
+                  <TableRow key={headerGroup.id} className="border-b border-[#525252] hover:bg-transparent">
+                    {headerGroup.headers.map(header => (
+                      <TableHead 
+                        key={header.id} 
+                        className="bg-[#0D0D0D] text-[#AAAAAA] font-medium border-r border-[#525252] last:border-r-0"
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row, index) => (
-              <TableRow 
-                key={row.id} 
-                className={`border-b border-[#525252] ${
-                  index % 2 === 0 ? 'bg-[#1A1A1A]' : 'bg-[#1E1E1E]'
-                } hover:bg-[#2A2A2A] transition-colors`}
-              >
-                {row.getVisibleCells().map(cell => (
-                  <TableCell 
-                    key={cell.id} 
-                    className="border-r border-[#525252] last:border-r-0 p-2"
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row, index) => (
+                  <TableRow 
+                    key={row.id} 
+                    className={`border-b border-[#525252] ${
+                      index % 2 === 0 ? 'bg-[#1A1A1A]' : 'bg-[#1E1E1E]'
+                    } hover:bg-[#2A2A2A] transition-colors`}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+                    {row.getVisibleCells().map(cell => (
+                      <TableCell 
+                        key={cell.id} 
+                        className="border-r border-[#525252] last:border-r-0 p-2"
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        
-        {filteredData.length === 0 && (
-          <div className="text-center py-12 text-[#AAAAAA]">
-            <div className="text-lg mb-2">
-              {data.length === 0 ? 'Nenhum canal encontrado' : 'Nenhum canal corresponde aos filtros'}
-            </div>
-            <div className="text-sm">
-              {data.length === 0 ? 'Adicione canais através da aba de Análise' : 'Tente ajustar os filtros de busca'}
-            </div>
+              </TableBody>
+            </Table>
+            
+            {filteredData.length === 0 && (
+              <div className="text-center py-12 text-[#AAAAAA]">
+                <div className="text-lg mb-2">
+                  {data.length === 0 ? 'Nenhum canal encontrado' : 'Nenhum canal corresponde aos filtros'}
+                </div>
+                <div className="text-sm">
+                  {data.length === 0 ? 'Adicione canais através da aba de Análise ou importe dados' : 'Tente ajustar os filtros de busca'}
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <PlanilhaAnalytics channels={data} />
+        </TabsContent>
+      </Tabs>
 
       <ChannelEditModal
         channel={editingChannel}
@@ -435,6 +480,12 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         }}
         onSave={handleSaveEdit}
       />
+
+      <DataImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImport}
+      />
     </div>
   )
 }
@@ -443,63 +494,54 @@ export const usePlanilhaData = () => {
   const [planilhaChannels, setPlanilhaChannels] = useState<ChannelData[]>([])
 
   const addToPlanilha = (channelData: any) => {
-    // Calcular engajamento real baseado nos dados do canal
     const calcularEngajamento = (channel: any) => {
-      // Usar dados reais de engajamento se disponíveis
       if (channel.engagement && typeof channel.engagement === 'string') {
         return channel.engagement
       }
       
-      // Se tem dados de análise detalhados, calcular baseado neles
       if (channel.avgLikes && channel.avgComments && channel.avgViews) {
         const totalInteractions = (channel.avgLikes + channel.avgComments)
         const engagementRate = (totalInteractions / channel.avgViews) * 100
-        return Math.min(engagementRate, 15).toFixed(1) // Máximo 15%
+        return Math.min(engagementRate, 15).toFixed(1)
       }
       
-      // Se tem dados básicos, calcular estimativa baseada no tamanho do canal
       const subscribers = channel.subscriberCount || channel.subscribers || 0
       const avgViews = channel.avgViews || (channel.viewCount / Math.max(channel.videoCount || 10, 1))
       
       if (avgViews && subscribers > 0) {
-        // Calcular taxa de visualização vs inscritos
         const viewRate = avgViews / subscribers
         
-        // Estimar engajamento baseado na taxa de visualização
         let estimatedEngagement
-        if (viewRate > 0.5) estimatedEngagement = 8.5 + Math.random() * 3 // 8.5-11.5%
-        else if (viewRate > 0.3) estimatedEngagement = 6.0 + Math.random() * 2.5 // 6.0-8.5%
-        else if (viewRate > 0.15) estimatedEngagement = 3.5 + Math.random() * 2.5 // 3.5-6.0%
-        else if (viewRate > 0.05) estimatedEngagement = 2.0 + Math.random() * 1.5 // 2.0-3.5%
-        else estimatedEngagement = 0.5 + Math.random() * 1.5 // 0.5-2.0%
+        if (viewRate > 0.5) estimatedEngagement = 8.5 + Math.random() * 3
+        else if (viewRate > 0.3) estimatedEngagement = 6.0 + Math.random() * 2.5
+        else if (viewRate > 0.15) estimatedEngagement = 3.5 + Math.random() * 2.5
+        else if (viewRate > 0.05) estimatedEngagement = 2.0 + Math.random() * 1.5
+        else estimatedEngagement = 0.5 + Math.random() * 1.5
         
         return estimatedEngagement.toFixed(1)
       }
       
-      // Valor padrão mais realista baseado no tamanho do canal
-      if (subscribers > 1000000) return (1.5 + Math.random() * 1.5).toFixed(1) // 1.5-3.0%
-      if (subscribers > 500000) return (2.0 + Math.random() * 2.0).toFixed(1) // 2.0-4.0%
-      if (subscribers > 100000) return (2.5 + Math.random() * 2.5).toFixed(1) // 2.5-5.0%
-      if (subscribers > 50000) return (3.0 + Math.random() * 3.0).toFixed(1) // 3.0-6.0%
-      if (subscribers > 10000) return (3.5 + Math.random() * 3.5).toFixed(1) // 3.5-7.0%
+      if (subscribers > 1000000) return (1.5 + Math.random() * 1.5).toFixed(1)
+      if (subscribers > 500000) return (2.0 + Math.random() * 2.0).toFixed(1)
+      if (subscribers > 100000) return (2.5 + Math.random() * 2.5).toFixed(1)
+      if (subscribers > 50000) return (3.0 + Math.random() * 3.0).toFixed(1)
+      if (subscribers > 10000) return (3.5 + Math.random() * 3.5).toFixed(1)
       
-      return (4.0 + Math.random() * 4.0).toFixed(1) // 4.0-8.0% para canais menores
+      return (4.0 + Math.random() * 4.0).toFixed(1)
     }
 
-    // Calcular crescimento baseado no tamanho e dados do canal
     const calcularCrescimento = (channel: any) => {
       if (channel.subGrowth) return channel.subGrowth.toString()
       
       const subscribers = channel.subscriberCount || channel.subscribers || 0
       
-      // Estimativas mais realistas baseadas no tamanho do canal
-      if (subscribers < 1000) return (15 + Math.random() * 25).toFixed(0) // 15-40%
-      if (subscribers < 10000) return (8 + Math.random() * 17).toFixed(0) // 8-25%
-      if (subscribers < 50000) return (5 + Math.random() * 10).toFixed(0) // 5-15%
-      if (subscribers < 100000) return (3 + Math.random() * 7).toFixed(0) // 3-10%
-      if (subscribers < 500000) return (2 + Math.random() * 6).toFixed(0) // 2-8%
-      if (subscribers < 1000000) return (1 + Math.random() * 4).toFixed(0) // 1-5%
-      return (0.5 + Math.random() * 2.5).toFixed(0) // 0.5-3%
+      if (subscribers < 1000) return (15 + Math.random() * 25).toFixed(0)
+      if (subscribers < 10000) return (8 + Math.random() * 17).toFixed(0)
+      if (subscribers < 50000) return (5 + Math.random() * 10).toFixed(0)
+      if (subscribers < 100000) return (3 + Math.random() * 7).toFixed(0)
+      if (subscribers < 500000) return (2 + Math.random() * 6).toFixed(0)
+      if (subscribers < 1000000) return (1 + Math.random() * 4).toFixed(0)
+      return (0.5 + Math.random() * 2.5).toFixed(0)
     }
 
     const newChannel: ChannelData = {
@@ -511,7 +553,7 @@ export const usePlanilhaData = () => {
       email: channelData.email || '',
       subscribers: channelData.subscriberCount || channelData.subscribers || 0,
       avgViews: channelData.avgViews || Math.floor((channelData.viewCount || 0) / Math.max(channelData.videoCount || 10, 1)),
-      monthlyVideos: channelData.monthlyVideos || Math.floor(Math.random() * 15) + 5, // 5-20 vídeos
+      monthlyVideos: channelData.monthlyVideos || Math.floor(Math.random() * 15) + 5,
       engagement: calcularEngajamento(channelData),
       subGrowth: calcularCrescimento(channelData),
       score: channelData.score || channelData.pontuacaoGeral || Math.floor(Math.random() * 40) + 30,
