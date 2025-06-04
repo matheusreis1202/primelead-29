@@ -1,5 +1,4 @@
-
-import { Target, BarChart3, FileSpreadsheet, Handshake } from 'lucide-react';
+import { Target, BarChart3, FileSpreadsheet, Handshake, Mail } from 'lucide-react';
 
 interface EnhancedNavigationProps {
   activeTab: string;
@@ -7,6 +6,7 @@ interface EnhancedNavigationProps {
   analysisCount: number;
   planilhaCount?: number;
   partnersCount?: number;
+  emailCampaignsCount?: number;
 }
 
 export const EnhancedNavigation = ({ 
@@ -14,19 +14,22 @@ export const EnhancedNavigation = ({
   onTabChange, 
   analysisCount, 
   planilhaCount = 0,
-  partnersCount = 0
+  partnersCount = 0,
+  emailCampaignsCount = 0
 }: EnhancedNavigationProps) => {
   console.log('EnhancedNavigation render:', {
     activeTab,
     analysisCount,
     planilhaCount,
-    partnersCount
+    partnersCount,
+    emailCampaignsCount
   });
 
   // Ensure all counts are numbers and not undefined
   const safeAnalysisCount = analysisCount || 0;
   const safePlanilhaCount = planilhaCount || 0;
   const safePartnersCount = partnersCount || 0;
+  const safeEmailCampaignsCount = emailCampaignsCount || 0;
 
   const tabs = [
     { 
@@ -48,6 +51,13 @@ export const EnhancedNavigation = ({
       icon: FileSpreadsheet, 
       count: safePlanilhaCount,
       description: 'Dados exportados'
+    },
+    { 
+      id: 'email', 
+      label: 'Email Marketing', 
+      icon: Mail, 
+      count: safeEmailCampaignsCount,
+      description: 'Campanhas de email'
     },
     { 
       id: 'partners', 

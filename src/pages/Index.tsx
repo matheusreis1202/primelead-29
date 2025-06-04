@@ -6,6 +6,7 @@ import { EnhancedSidebar } from '@/components/EnhancedSidebar';
 import { ResultsTab } from '@/components/tabs/ResultsTab';
 import { AnalysisTab } from '@/components/tabs/AnalysisTab';
 import { NewPlanilhaTab } from '@/components/tabs/NewPlanilhaTab';
+import { EmailMarketingTab } from '@/components/tabs/EmailMarketingTab';
 import { PartnersTab, usePartnersData } from '@/components/tabs/PartnersTab';
 import { EnhancedLoading } from '@/components/EnhancedLoading';
 
@@ -42,12 +43,14 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [channelsForAnalysis, setChannelsForAnalysis] = useState<Channel[]>([]);
   const [savedChannels, setSavedChannels] = useState<any[]>([]);
+  const [emailCampaigns, setEmailCampaigns] = useState<any[]>([]);
   const { partnerships, addPartnership } = usePartnersData();
 
   console.log('Index component render:', {
     channels: (channels || []).length,
     channelsForAnalysis: (channelsForAnalysis || []).length,
     savedChannels: (savedChannels || []).length,
+    emailCampaigns: (emailCampaigns || []).length,
     partnerships: (partnerships || []).length,
     activeTab
   });
@@ -229,6 +232,12 @@ const Index = () => {
             onSendToPartners={handleSendToPartners}
           />
         );
+      case 'email':
+        return (
+          <EmailMarketingTab
+            contacts={savedChannels || []}
+          />
+        );
       case 'partners':
         return <PartnersTab partnershipsData={partnerships || []} />;
       default:
@@ -248,6 +257,7 @@ const Index = () => {
             onTabChange={setActiveTab}
             analysisCount={(channelsForAnalysis || []).length}
             planilhaCount={(savedChannels || []).length}
+            emailCampaignsCount={(emailCampaigns || []).length}
             partnersCount={(partnerships || []).length}
           />
           
