@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, SlidersHorizontal, Grid2X2, List, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, Grid2X2, List, ArrowUp, ArrowDown } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
 interface ResultsFiltersProps {
@@ -14,7 +14,7 @@ interface ResultsFiltersProps {
   viewMode: 'grid' | 'list';
 }
 
-export const ResultsFilters = ({ 
+export const ResultsFilters = React.memo(({ 
   channels, 
   onFiltersChange, 
   onViewModeChange, 
@@ -26,17 +26,22 @@ export const ResultsFilters = ({
   const [scoreFilter, setScoreFilter] = useState<'all' | 'premium' | 'good' | 'average'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
-  // Get unique categories from channels
-  const categories = Array.from(new Set(channels.map(c => c.category).filter(Boolean)));
+  // Get unique categories from channels (memoized for performance)
+  const categories = useMemo(() => 
+    Array.from(new Set(channels.map(c => c.category).filter(Boolean))), 
+    [channels]
+  );
 
-  const applyFilters = () => {
+  // Apply filters and sorting (memoized for performance)
+  const filteredChannels = useMemo(() => {
     let filtered = [...channels];
 
     // Apply search filter
-    if (searchTerm) {
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(channel => 
-        channel.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        channel.description.toLowerCase().includes(searchTerm.toLowerCase())
+        channel.title.toLowerCase().includes(searchLower) ||
+        (channel.description && channel.description.toLowerCase().includes(searchLower))
       );
     }
 
@@ -86,13 +91,13 @@ export const ResultsFilters = ({
       return sortOrder === 'desc' ? bValue - aValue : aValue - bValue;
     });
 
-    onFiltersChange(filtered);
-  };
+    return filtered;
+  }, [channels, searchTerm, sortBy, sortOrder, scoreFilter, categoryFilter]);
 
-  // Apply filters whenever any filter changes
+  // Update filtered channels when filters change
   React.useEffect(() => {
-    applyFilters();
-  }, [searchTerm, sortBy, sortOrder, scoreFilter, categoryFilter, channels]);
+    onFiltersChange(filteredChannels);
+  }, [filteredChannels, onFiltersChange]);
 
   const toggleSortOrder = () => {
     setSortOrder(current => current === 'desc' ? 'asc' : 'desc');
@@ -103,14 +108,14 @@ export const ResultsFilters = ({
       <CardContent className="p-4">
         <div className="flex flex-wrap items-center gap-4">
           {/* Search */}
-          <div className="relative min-w-0 flex-1">
+          <div className="relative min-w-0 flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#AAAAAA]" />
             <input
               type="text"
               placeholder="Buscar por nome ou descrição..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-[#0D0D0D] border border-[#333] rounded-lg text-white placeholder-[#AAAAAA] focus:border-[#FF0000] focus:outline-none"
+              className="w-full pl-10 pr-4 py-2 bg-[#0D0D0D] border border-[#333] rounded-lg text-white placeholder-[#AAAAAA] focus:border-[#FF0000] focus:outline-none transition-colors"
             />
           </div>
 
@@ -132,7 +137,7 @@ export const ResultsFilters = ({
               variant="outline"
               size="sm"
               onClick={toggleSortOrder}
-              className="border-[#333] text-[#AAAAAA] hover:text-white hover:bg-[#333]"
+              className="border-[#333] text-[#AAAAAA] hover:text-white hover:bg-[#333] transition-colors"
             >
               {sortOrder === 'desc' ? <ArrowDown className="h-4 w-4" /> : <ArrowUp className="h-4 w-4" />}
             </Button>
@@ -174,7 +179,7 @@ export const ResultsFilters = ({
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewModeChange('grid')}
-              className={`rounded-none border-0 ${
+              className={`rounded-none border-0 transition-colors ${
                 viewMode === 'grid' 
                   ? 'bg-[#FF0000] text-white' 
                   : 'text-[#AAAAAA] hover:text-white hover:bg-[#333]'
@@ -186,7 +191,7 @@ export const ResultsFilters = ({
               variant={viewMode === 'list' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewModeChange('list')}
-              className={`rounded-none border-0 ${
+              className={`rounded-none border-0 transition-colors ${
                 viewMode === 'list' 
                   ? 'bg-[#FF0000] text-white' 
                   : 'text-[#AAAAAA] hover:text-white hover:bg-[#333]'
@@ -198,24 +203,28 @@ export const ResultsFilters = ({
         </div>
 
         {/* Active Filters */}
-        <div className="flex flex-wrap gap-2 mt-3">
-          {searchTerm && (
-            <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
-              Busca: {searchTerm}
-            </Badge>
-          )}
-          {scoreFilter !== 'all' && (
-            <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
-              Score: {scoreFilter === 'premium' ? 'Premium' : scoreFilter === 'good' ? 'Bom' : 'Médio'}
-            </Badge>
-          )}
-          {categoryFilter !== 'all' && (
-            <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
-              Categoria: {categoryFilter}
-            </Badge>
-          )}
-        </div>
+        {(searchTerm || scoreFilter !== 'all' || categoryFilter !== 'all') && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {searchTerm && (
+              <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
+                Busca: {searchTerm}
+              </Badge>
+            )}
+            {scoreFilter !== 'all' && (
+              <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
+                Score: {scoreFilter === 'premium' ? 'Premium' : scoreFilter === 'good' ? 'Bom' : 'Médio'}
+              </Badge>
+            )}
+            {categoryFilter !== 'all' && (
+              <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
+                Categoria: {categoryFilter}
+              </Badge>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
-};
+});
+
+ResultsFilters.displayName = 'ResultsFilters';
