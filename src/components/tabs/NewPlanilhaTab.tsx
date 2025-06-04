@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
@@ -9,6 +8,13 @@ import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { Handshake, Edit, ExternalLink, Mail, Phone, BarChart3, Upload, Download, Settings } from 'lucide-react'
 import * as XLSX from 'xlsx'
+import { ChannelEditModal } from '@/components/ChannelEditModal'
+import { AdvancedTableFilters } from '@/components/AdvancedTableFilters'
+import { BulkOperationsToolbar } from '@/components/BulkOperationsToolbar'
+import { PlanilhaAnalytics } from '@/components/PlanilhaAnalytics'
+import { DataImportModal } from '@/components/DataImportModal'
+import { TablePagination } from '@/components/TablePagination'
+import { LiveStatsCard } from '@/components/LiveStatsCard'
 import { useBulkOperations } from '@/hooks/useBulkOperations'
 import { ChannelClassificationService } from '@/services/channelClassificationService'
 
@@ -43,7 +49,10 @@ interface FilterState {
 }
 
 export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaTabProps) => {
-  const [data, setData] = useState<ChannelData[]>(savedChannels || [])
+  const [data, setData] = useState<ChannelData[]>(savedChannels)
+  const [editingChannel, setEditingChannel] = useState<ChannelData | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('table')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(25)
@@ -60,14 +69,12 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
 
   // Update local data when savedChannels changes
   React.useEffect(() => {
-    if (savedChannels && savedChannels.length > 0) {
-      const updatedChannels = savedChannels.map(channel => ({
-        ...channel,
-        classification: ChannelClassificationService.classifyChannel(channel),
-        score: ChannelClassificationService.calculateQualityScore(channel)
-      }));
-      setData(updatedChannels)
-    }
+    const updatedChannels = savedChannels.map(channel => ({
+      ...channel,
+      classification: ChannelClassificationService.classifyChannel(channel),
+      score: ChannelClassificationService.calculateQualityScore(channel)
+    }));
+    setData(updatedChannels)
   }, [savedChannels])
 
   // Apply filters and sorting
@@ -151,6 +158,45 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
 
   const bulkOps = useBulkOperations(paginatedData);
 
+  const handleEdit = (channel: ChannelData) => {
+    setEditingChannel(channel);
+    setIsEditModalOpen(true);
+  }
+
+  const handleSaveEdit = (updatedChannel: ChannelData) => {
+    const reclassifiedChannel = {
+      ...updatedChannel,
+      classification: ChannelClassificationService.classifyChannel(updatedChannel),
+      score: ChannelClassificationService.calculateQualityScore(updatedChannel)
+    };
+
+    setData(prev => prev.map(channel => {
+      const id = channel.id || channel.name;
+      const updatedId = reclassifiedChannel.id || reclassifiedChannel.name;
+      return id === updatedId ? reclassifiedChannel : channel;
+    }));
+
+    toast({
+      title: "Canal atualizado!",
+      description: `${reclassifiedChannel.name} foi atualizado com sucesso.`,
+    });
+  }
+
+  const handleImport = (importedChannels: ChannelData[]) => {
+    const processedChannels = importedChannels.map(channel => ({
+      ...channel,
+      classification: ChannelClassificationService.classifyChannel(channel),
+      score: ChannelClassificationService.calculateQualityScore(channel)
+    }));
+
+    setData(prev => [...prev, ...processedChannels]);
+
+    toast({
+      title: "Importação concluída!",
+      description: `${processedChannels.length} canais foram importados e classificados automaticamente.`,
+    });
+  }
+
   const formatNumber = (num: number | undefined | null) => {
     if (num === undefined || num === null || isNaN(num)) {
       return '0'
@@ -175,77 +221,50 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
       return
     }
 
-    try {
-      const worksheetData = channels.map(row => ({
-        Nome: row.name,
-        Link: row.link,
-        Email: row.email,
-        Telefone: row.phone,
-        Inscritos: row.subscribers,
-        'Média Views': row.avgViews,
-        'Frequência': row.monthlyVideos,
-        'Engajamento (%)': row.engagement,
-        'Crescimento (%)': row.subGrowth,
-        Score: row.score,
-        Classificação: row.classification
-      }))
-      
-      const worksheet = XLSX.utils.json_to_sheet(worksheetData)
-      const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais')
-      XLSX.writeFile(workbook, `planilha_canais_${new Date().toISOString().split('T')[0]}.xlsx`)
+    const worksheetData = channels.map(row => ({
+      Nome: row.name,
+      Link: row.link,
+      Email: row.email,
+      Telefone: row.phone,
+      Inscritos: row.subscribers,
+      'Média Views': row.avgViews,
+      'Frequência': row.monthlyVideos,
+      'Engajamento (%)': row.engagement,
+      'Crescimento (%)': row.subGrowth,
+      Score: row.score,
+      Classificação: row.classification
+    }))
+    
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais')
+    XLSX.writeFile(workbook, `planilha_canais_${new Date().toISOString().split('T')[0]}.xlsx`)
 
-      toast({
-        title: "Exportação concluída!",
-        description: `${channels.length} canais foram exportados para Excel.`,
-      });
-    } catch (error) {
-      console.error('Erro na exportação:', error);
-      toast({
-        title: "Erro na exportação",
-        description: "Ocorreu um erro ao exportar os dados.",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Exportação concluída!",
+      description: `${channels.length} canais foram exportados para Excel.`,
+    });
   }
 
   const handleBulkSendToPartners = (channels: ChannelData[]) => {
-    try {
-      channels.forEach(channel => onSendToPartners?.(channel));
-      bulkOps.clearSelection();
+    channels.forEach(channel => onSendToPartners?.(channel));
+    bulkOps.clearSelection();
 
-      toast({
-        title: "Canais enviados!",
-        description: `${channels.length} canais foram enviados para parceiros.`,
-      });
-    } catch (error) {
-      console.error('Erro ao enviar para parceiros:', error);
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao enviar os canais.",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Canais enviados!",
+      description: `${channels.length} canais foram enviados para parceiros.`,
+    });
   }
 
   const handleBulkDelete = (channels: ChannelData[]) => {
-    try {
-      const channelsToDelete = new Set(channels.map(c => c.id || c.name));
-      setData(prev => prev.filter(channel => !channelsToDelete.has(channel.id || channel.name)));
-      bulkOps.clearSelection();
+    const channelsToDelete = new Set(channels.map(c => c.id || c.name));
+    setData(prev => prev.filter(channel => !channelsToDelete.has(channel.id || channel.name)));
+    bulkOps.clearSelection();
 
-      toast({
-        title: "Canais removidos!",
-        description: `${channels.length} canais foram removidos da planilha.`,
-      });
-    } catch (error) {
-      console.error('Erro ao remover canais:', error);
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao remover os canais.",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Canais removidos!",
+      description: `${channels.length} canais foram removidos da planilha.`,
+    });
   }
 
   const columns = useMemo(() => [
@@ -277,7 +296,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
           <div className="p-2 min-w-0">
             <div className="flex items-center gap-3 mb-2">
               <img 
-                src={info.getValue() || 'https://via.placeholder.com/64'} 
+                src={info.getValue()} 
                 alt="foto" 
                 className="w-10 h-10 rounded-full border border-[#525252] flex-shrink-0" 
               />
@@ -387,6 +406,14 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         return (
           <div className="flex gap-1 justify-center p-2">
             <Button
+              onClick={() => handleEdit(channel)}
+              size="sm"
+              variant="outline"
+              className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-7 px-2"
+            >
+              <Edit className="h-3 w-3" />
+            </Button>
+            <Button
               onClick={() => onSendToPartners?.(channel)}
               size="sm"
               className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
@@ -410,6 +437,14 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-white">CRM de Canais</h1>
         <div className="flex gap-2">
+          <Button
+            onClick={() => setIsImportModalOpen(true)}
+            variant="outline"
+            className="border-[#525252] text-[#AAAAAA] hover:text-white hover:bg-[#333]"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importar Dados
+          </Button>
           <Button 
             onClick={() => exportToExcel()}
             className="bg-[#FF0000] hover:bg-[#CC0000] text-white border-none"
@@ -420,73 +455,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-4">
-          <div className="text-[#AAAAAA] text-sm">Total de Canais</div>
-          <div className="text-2xl font-bold text-white">{data.length}</div>
-        </div>
-        <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-4">
-          <div className="text-[#AAAAAA] text-sm">Score Médio</div>
-          <div className="text-2xl font-bold text-yellow-400">
-            {data.length > 0 ? Math.round(data.reduce((sum, c) => sum + c.score, 0) / data.length) : 0}
-          </div>
-        </div>
-        <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-4">
-          <div className="text-[#AAAAAA] text-sm">Alta Qualidade</div>
-          <div className="text-2xl font-bold text-green-400">
-            {data.filter(c => c.score >= 70).length}
-          </div>
-        </div>
-        <div className="bg-[#1E1E1E] border border-[#525252] rounded-lg p-4">
-          <div className="text-[#AAAAAA] text-sm">Com Contato</div>
-          <div className="text-2xl font-bold text-blue-400">
-            {data.filter(c => c.email && c.phone).length}
-          </div>
-        </div>
-      </div>
-
-      {/* Bulk Operations */}
-      {bulkOps.selectedCount > 0 && (
-        <div className="bg-[#FF0000]/10 border-[#FF0000]/30 border rounded-lg p-3">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-white font-medium">
-                {bulkOps.selectedCount} canal{bulkOps.selectedCount > 1 ? 'is' : ''} selecionado{bulkOps.selectedCount > 1 ? 's' : ''}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={bulkOps.clearSelection}
-                className="text-[#AAAAAA] hover:text-white h-7"
-              >
-                Limpar seleção
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => exportToExcel(bulkOps.getSelectedItems())}
-                size="sm"
-                variant="outline"
-                className="border-[#FF0000]/50 bg-[#FF0000]/10 text-[#FF0000] hover:bg-[#FF0000]/20 h-8"
-              >
-                <Download className="h-3 w-3 mr-1" />
-                Exportar
-              </Button>
-              
-              <Button
-                onClick={() => handleBulkSendToPartners(bulkOps.getSelectedItems())}
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white h-8"
-              >
-                <Handshake className="h-3 w-3 mr-1" />
-                Enviar para Parceiros
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LiveStatsCard channels={data} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-[#1E1E1E] border border-[#525252]">
@@ -502,11 +471,25 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
             className="data-[state=active]:bg-[#FF0000] data-[state=active]:text-white text-[#AAAAAA]"
           >
             <BarChart3 className="h-4 w-4 mr-2" />
-            Analytics
+            Analytics & Insights
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="table" className="space-y-4">
+          <AdvancedTableFilters
+            onFiltersChange={setFilters}
+            totalItems={data.length}
+            filteredItems={filteredData.length}
+          />
+
+          <BulkOperationsToolbar
+            selectedItems={bulkOps.getSelectedItems()}
+            onExportSelected={exportToExcel}
+            onSendToPartners={handleBulkSendToPartners}
+            onDeleteSelected={handleBulkDelete}
+            onClearSelection={bulkOps.clearSelection}
+          />
+
           <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
             <Table>
               <TableHeader>
@@ -550,49 +533,47 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
                   {data.length === 0 ? 'Nenhum canal encontrado' : 'Nenhum canal corresponde aos filtros'}
                 </div>
                 <div className="text-sm">
-                  {data.length === 0 ? 'Adicione canais através da aba de Análise' : 'Tente ajustar os filtros de busca'}
+                  {data.length === 0 ? 'Adicione canais através da aba de Análise ou importe dados' : 'Tente ajustar os filtros de busca'}
                 </div>
               </div>
             )}
 
-            {/* Simple Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 bg-[#1E1E1E] border-t border-[#525252]">
-                <div className="text-sm text-[#AAAAAA]">
-                  Página {currentPage} de {totalPages} • {filteredData.length} canais
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
-                    className="border-[#525252] bg-[#0D0D0D] text-[#AAAAAA] hover:text-white hover:bg-[#333]"
-                  >
-                    Anterior
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
-                    className="border-[#525252] bg-[#0D0D0D] text-[#AAAAAA] hover:text-white hover:bg-[#333]"
-                  >
-                    Próxima
-                  </Button>
-                </div>
-              </div>
+            {filteredData.length > 0 && (
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                totalItems={filteredData.length}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newItemsPerPage) => {
+                  setItemsPerPage(newItemsPerPage);
+                  setCurrentPage(1);
+                }}
+              />
             )}
           </div>
         </TabsContent>
 
         <TabsContent value="analytics">
-          <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] p-6">
-            <h3 className="text-xl font-bold text-white mb-4">Analytics em Desenvolvimento</h3>
-            <p className="text-[#AAAAAA]">Funcionalidades de analytics serão implementadas em breve.</p>
-          </div>
+          <PlanilhaAnalytics channels={data} />
         </TabsContent>
       </Tabs>
+
+      <ChannelEditModal
+        channel={editingChannel}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingChannel(null);
+        }}
+        onSave={handleSaveEdit}
+      />
+
+      <DataImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImport}
+      />
     </div>
   )
 }
