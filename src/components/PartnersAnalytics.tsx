@@ -84,19 +84,19 @@ export const PartnersAnalytics = ({ partners }: PartnersAnalyticsProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6 px-3 sm:px-0">
       {metrics.map((metric, index) => (
         <Card key={index} className="bg-[#1E1E1E] border-[#333]">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${metric.bgColor}`}>
-                <metric.icon className={`h-4 w-4 ${metric.color}`} />
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <div className={`p-1.5 sm:p-2 rounded-lg ${metric.bgColor} self-start sm:self-auto flex-shrink-0`}>
+                <metric.icon className={`h-3 w-3 sm:h-4 sm:w-4 ${metric.color}`} />
               </div>
-              <div>
-                <div className={`text-lg font-bold ${metric.color}`}>
+              <div className="min-w-0 flex-1">
+                <div className={`text-base sm:text-lg font-bold ${metric.color} truncate`}>
                   {metric.value}
                 </div>
-                <div className="text-xs text-[#AAAAAA]">
+                <div className="text-[10px] sm:text-xs text-[#AAAAAA] leading-tight">
                   {metric.title}
                 </div>
               </div>
