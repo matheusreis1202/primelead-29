@@ -1,9 +1,14 @@
 import React, { useState, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Handshake, Edit, Save, X, ExternalLink, Mail, Phone } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Handshake, Edit, ExternalLink, Mail, Phone } from 'lucide-react'
 import * as XLSX from 'xlsx'
+import { ChannelEditModal } from '@/components/ChannelEditModal'
+import { AdvancedTableFilters } from '@/components/AdvancedTableFilters'
+import { BulkOperationsToolbar } from '@/components/BulkOperationsToolbar'
+import { useBulkOperations } from '@/hooks/useBulkOperations'
 
 interface ChannelData {
   id?: string
@@ -26,41 +31,118 @@ interface NewPlanilhaTabProps {
   onSendToPartners?: (channel: ChannelData) => void
 }
 
+interface FilterState {
+  search: string;
+  scoreRange: 'all' | 'high' | 'medium' | 'low';
+  subscribersRange: 'all' | 'mega' | 'large' | 'medium' | 'small';
+  engagementRange: 'all' | 'high' | 'medium' | 'low';
+  sortBy: 'score' | 'subscribers' | 'avgViews' | 'engagement';
+  sortOrder: 'asc' | 'desc';
+}
+
 export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaTabProps) => {
   const [data, setData] = useState<ChannelData[]>(savedChannels)
-  const [globalFilter, setGlobalFilter] = useState('')
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingData, setEditingData] = useState<Partial<ChannelData>>({})
+  const [editingChannel, setEditingChannel] = useState<ChannelData | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    scoreRange: 'all',
+    subscribersRange: 'all',
+    engagementRange: 'all',
+    sortBy: 'score',
+    sortOrder: 'desc'
+  })
 
   // Update local data when savedChannels changes
   React.useEffect(() => {
     setData(savedChannels)
   }, [savedChannels])
 
-  const handleEdit = (channel: ChannelData) => {
-    const id = channel.id || channel.name
-    setEditingId(id)
-    setEditingData({ ...channel })
-  }
+  // Apply filters and sorting
+  const filteredData = useMemo(() => {
+    let filtered = [...data];
 
-  const handleSave = () => {
-    if (editingId && editingData) {
-      setData(prev => prev.map(channel => {
-        const id = channel.id || channel.name
-        return id === editingId ? { ...channel, ...editingData } : channel
-      }))
-      setEditingId(null)
-      setEditingData({})
+    // Apply search filter
+    if (filters.search.trim()) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(channel => 
+        channel.name.toLowerCase().includes(searchLower) ||
+        channel.email.toLowerCase().includes(searchLower) ||
+        channel.link.toLowerCase().includes(searchLower)
+      );
     }
+
+    // Apply score filter
+    if (filters.scoreRange !== 'all') {
+      filtered = filtered.filter(channel => {
+        const score = channel.score;
+        switch (filters.scoreRange) {
+          case 'high': return score >= 80;
+          case 'medium': return score >= 60 && score < 80;
+          case 'low': return score < 60;
+          default: return true;
+        }
+      });
+    }
+
+    // Apply subscribers filter
+    if (filters.subscribersRange !== 'all') {
+      filtered = filtered.filter(channel => {
+        const subs = channel.subscribers;
+        switch (filters.subscribersRange) {
+          case 'mega': return subs >= 1000000;
+          case 'large': return subs >= 100000 && subs < 1000000;
+          case 'medium': return subs >= 10000 && subs < 100000;
+          case 'small': return subs < 10000;
+          default: return true;
+        }
+      });
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue: number, bValue: number;
+      
+      switch (filters.sortBy) {
+        case 'score':
+          aValue = a.score;
+          bValue = b.score;
+          break;
+        case 'subscribers':
+          aValue = a.subscribers;
+          bValue = b.subscribers;
+          break;
+        case 'avgViews':
+          aValue = a.avgViews;
+          bValue = b.avgViews;
+          break;
+        case 'engagement':
+          aValue = parseFloat(a.engagement) || 0;
+          bValue = parseFloat(b.engagement) || 0;
+          break;
+        default:
+          return 0;
+      }
+
+      return filters.sortOrder === 'desc' ? bValue - aValue : aValue - bValue;
+    });
+
+    return filtered;
+  }, [data, filters]);
+
+  const bulkOps = useBulkOperations(filteredData);
+
+  const handleEdit = (channel: ChannelData) => {
+    setEditingChannel(channel);
+    setIsEditModalOpen(true);
   }
 
-  const handleCancel = () => {
-    setEditingId(null)
-    setEditingData({})
-  }
-
-  const handleInputChange = (field: keyof ChannelData, value: string | number) => {
-    setEditingData(prev => ({ ...prev, [field]: value }))
+  const handleSaveEdit = (updatedChannel: ChannelData) => {
+    setData(prev => prev.map(channel => {
+      const id = channel.id || channel.name;
+      const updatedId = updatedChannel.id || updatedChannel.name;
+      return id === updatedId ? updatedChannel : channel;
+    }));
   }
 
   const formatNumber = (num: number | undefined | null) => {
@@ -77,97 +159,109 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     return validNum.toLocaleString()
   }
 
+  const exportToExcel = (channels: ChannelData[] = filteredData) => {
+    if (channels.length === 0) {
+      alert("Não há canais para exportar!")
+      return
+    }
+
+    const worksheetData = channels.map(row => ({
+      Nome: row.name,
+      Link: row.link,
+      Email: row.email,
+      Telefone: row.phone,
+      Inscritos: row.subscribers,
+      'Média Views': row.avgViews,
+      'Frequência': row.monthlyVideos,
+      'Engajamento (%)': row.engagement,
+      'Crescimento (%)': row.subGrowth,
+      Score: row.score,
+      Classificação: row.classification
+    }))
+    
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais')
+    XLSX.writeFile(workbook, `planilha_canais_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  const handleBulkSendToPartners = (channels: ChannelData[]) => {
+    channels.forEach(channel => onSendToPartners?.(channel));
+    bulkOps.clearSelection();
+  }
+
+  const handleBulkDelete = (channels: ChannelData[]) => {
+    const channelsToDelete = new Set(channels.map(c => c.id || c.name));
+    setData(prev => prev.filter(channel => !channelsToDelete.has(channel.id || channel.name)));
+    bulkOps.clearSelection();
+  }
+
   const columns = useMemo(() => [
+    {
+      id: 'select',
+      header: ({ table }: any) => (
+        <Checkbox
+          checked={bulkOps.isAllSelected}
+          onCheckedChange={() => bulkOps.isAllSelected ? bulkOps.clearSelection() : bulkOps.selectAll()}
+          className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000]"
+        />
+      ),
+      cell: ({ row }: any) => (
+        <Checkbox
+          checked={bulkOps.isSelected(row.original)}
+          onCheckedChange={() => bulkOps.toggleSelection(row.original)}
+          className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000]"
+        />
+      ),
+      enableSorting: false,
+    },
     {
       accessorKey: 'photo',
       header: 'Canal',
       cell: (info: any) => {
         const channel = info.row.original
-        const id = channel.id || channel.name
-        const isEditing = editingId === id
         
         return (
           <div className="p-2 min-w-0">
-            {/* Foto e Nome */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-3 mb-2">
               <img 
                 src={info.getValue()} 
                 alt="foto" 
-                className="w-8 h-8 rounded-full border border-[#525252] flex-shrink-0" 
+                className="w-10 h-10 rounded-full border border-[#525252] flex-shrink-0" 
               />
               <div className="flex-1 min-w-0">
-                {isEditing ? (
-                  <Input
-                    value={editingData.name || ''}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-xs h-6"
-                    placeholder="Nome do canal"
-                  />
-                ) : (
-                  <div className="font-medium text-white text-xs mb-1 truncate" title={channel.name}>
-                    {channel.name}
-                  </div>
-                )}
+                <div className="font-medium text-white text-sm mb-1 truncate" title={channel.name}>
+                  {channel.name}
+                </div>
               </div>
             </div>
 
-            {/* Informações de Contato */}
-            <div className="space-y-1">
-              {/* Link do Canal */}
+            <div className="space-y-1 pl-13">
               <div className="flex items-center gap-1">
                 <ExternalLink className="h-3 w-3 text-[#FF0000] flex-shrink-0" />
-                {isEditing ? (
-                  <Input
-                    value={editingData.link || ''}
-                    onChange={(e) => handleInputChange('link', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-[10px] h-4 flex-1"
-                    placeholder="Link do canal"
-                  />
-                ) : (
-                  <a 
-                    href={channel.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-400 text-[10px] hover:underline truncate flex-1"
-                    title={channel.link}
-                  >
-                    {channel.link ? 'Ver canal' : 'Link não informado'}
-                  </a>
-                )}
+                <a 
+                  href={channel.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-400 text-xs hover:underline truncate flex-1"
+                  title={channel.link}
+                >
+                  {channel.link ? 'Ver canal' : 'Link não informado'}
+                </a>
               </div>
 
-              {/* Email */}
               <div className="flex items-center gap-1">
                 <Mail className="h-3 w-3 text-green-400 flex-shrink-0" />
-                {isEditing ? (
-                  <Input
-                    value={editingData.email || ''}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-[10px] h-4 flex-1"
-                    placeholder="Email de contato"
-                  />
-                ) : (
-                  <div className="text-green-400 text-[10px] truncate flex-1" title={channel.email}>
-                    {channel.email || 'Não informado'}
-                  </div>
-                )}
+                <div className="text-green-400 text-xs truncate flex-1" title={channel.email}>
+                  {channel.email || 'Não informado'}
+                </div>
               </div>
 
-              {/* Telefone */}
               <div className="flex items-center gap-1">
                 <Phone className="h-3 w-3 text-blue-400 flex-shrink-0" />
-                {isEditing ? (
-                  <Input
-                    value={editingData.phone || ''}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="bg-[#2A2A2A] border-[#525252] text-white text-[10px] h-4 flex-1"
-                    placeholder="Telefone"
-                  />
-                ) : (
-                  <div className="text-blue-400 text-[10px]" title={channel.phone}>
-                    {channel.phone || 'Não informado'}
-                  </div>
-                )}
+                <div className="text-blue-400 text-xs" title={channel.phone}>
+                  {channel.phone || 'Não informado'}
+                </div>
               </div>
             </div>
           </div>
@@ -199,18 +293,6 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
       )
     },
     { 
-      accessorKey: 'monthlyVideos', 
-      header: 'Frequência',
-      cell: (info: any) => (
-        <div className="text-center p-2">
-          <div className="font-bold text-yellow-400 text-sm mb-1">
-            {info.getValue() || 0}
-          </div>
-          <div className="text-xs text-[#AAAAAA]">vídeos/mês</div>
-        </div>
-      )
-    },
-    { 
       accessorKey: 'engagement', 
       header: 'Engajamento',
       cell: (info: any) => (
@@ -219,18 +301,6 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
             {info.getValue() || '0.0'}%
           </div>
           <div className="text-xs text-[#AAAAAA]">engajamento</div>
-        </div>
-      )
-    },
-    { 
-      accessorKey: 'subGrowth', 
-      header: 'Crescimento',
-      cell: (info: any) => (
-        <div className="text-center p-2">
-          <div className="font-bold text-purple-400 text-sm mb-1">
-            {info.getValue() || '0'}%
-          </div>
-          <div className="text-xs text-[#AAAAAA]">crescimento</div>
         </div>
       )
     },
@@ -246,183 +316,125 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         </div>
       )
     },
-    { 
-      accessorKey: 'classification', 
-      header: 'Classificação',
-      cell: (info: any) => {
-        const value = info.getValue() || 'Não classificado'
-        const getColor = (classification: string) => {
-          switch (classification) {
-            case 'Altíssimo Potencial': return 'text-green-400'
-            case 'Grande Potencial': return 'text-blue-400'
-            case 'Médio Potencial': return 'text-yellow-400'
-            default: return 'text-gray-400'
-          }
-        }
-        return (
-          <div className="text-center p-2">
-            <div className={`font-medium ${getColor(value)} text-xs`}>
-              {value}
-            </div>
-          </div>
-        )
-      }
-    },
     {
       id: 'actions',
       header: 'Ações',
       cell: (info: any) => {
         const channel = info.row.original
-        const id = channel.id || channel.name
-        const isEditing = editingId === id
         
         return (
           <div className="flex gap-1 justify-center p-2">
-            {isEditing ? (
-              <>
-                <Button
-                  onClick={handleSave}
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
-                >
-                  <Save className="h-3 w-3" />
-                </Button>
-                <Button
-                  onClick={handleCancel}
-                  size="sm"
-                  variant="outline"
-                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-7 px-2"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={() => handleEdit(channel)}
-                  size="sm"
-                  variant="outline"
-                  className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-7 px-2"
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
-                <Button
-                  onClick={() => handleSendToPartners(channel)}
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
-                >
-                  <Handshake className="h-3 w-3" />
-                </Button>
-              </>
-            )}
+            <Button
+              onClick={() => handleEdit(channel)}
+              size="sm"
+              variant="outline"
+              className="border-[#525252] bg-[#2A2A2A] text-[#AAAAAA] hover:bg-[#444] h-7 px-2"
+            >
+              <Edit className="h-3 w-3" />
+            </Button>
+            <Button
+              onClick={() => onSendToPartners?.(channel)}
+              size="sm"
+              className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
+            >
+              <Handshake className="h-3 w-3" />
+            </Button>
           </div>
         )
       }
     }
-  ], [editingId, editingData])
+  ], [bulkOps])
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
-    state: { globalFilter },
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: (row, columnId, filterValue) =>
-      String(row.getValue(columnId)).toLowerCase().includes(filterValue.toLowerCase())
   })
-
-  const handleSendToPartners = (channel: ChannelData) => {
-    onSendToPartners?.(channel)
-  }
-
-  const exportToExcel = () => {
-    if (data.length === 0) {
-      alert("Não há canais para exportar!")
-      return
-    }
-
-    const worksheetData = data.map(row => ({
-      Nome: row.name,
-      Link: row.link,
-      Email: row.email,
-      Telefone: row.phone,
-      Inscritos: row.subscribers,
-      'Média Views': row.avgViews,
-      'Frequência': row.monthlyVideos,
-      'Engajamento (%)': row.engagement,
-      'Crescimento (%)': row.subGrowth,
-      Score: row.score,
-      Classificação: row.classification
-    }))
-    
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData)
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais')
-    XLSX.writeFile(workbook, 'planilha_canais.xlsx')
-  }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-white">Planilha Sofisticada</h1>
-
-      <div className="flex space-x-4 flex-wrap gap-4">
-        <Input
-          placeholder="Buscar..."
-          value={globalFilter ?? ''}
-          onChange={e => setGlobalFilter(e.target.value)}
-          className="w-64 bg-[#1E1E1E] border-[#525252] text-white placeholder:text-[#AAAAAA]"
-        />
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-white">Planilha Sofisticada</h1>
         <Button 
-          onClick={exportToExcel}
+          onClick={() => exportToExcel()}
           className="bg-[#FF0000] hover:bg-[#CC0000] text-white border-none"
         >
-          Exportar para Excel
+          Exportar Tudo para Excel
         </Button>
       </div>
 
+      <AdvancedTableFilters
+        onFiltersChange={setFilters}
+        totalItems={data.length}
+        filteredItems={filteredData.length}
+      />
+
+      <BulkOperationsToolbar
+        selectedItems={bulkOps.getSelectedItems()}
+        onExportSelected={exportToExcel}
+        onSendToPartners={handleBulkSendToPartners}
+        onDeleteSelected={handleBulkDelete}
+        onClearSelection={bulkOps.clearSelection}
+      />
+
       <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
-        <div className="w-full">
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr_1.2fr_1fr] gap-0 w-full">
-            {/* Header */}
-            <div className="contents">
-              {table.getHeaderGroups().map(headerGroup => (
-                headerGroup.headers.map(header => (
-                  <div 
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id} className="border-b border-[#525252] hover:bg-transparent">
+                {headerGroup.headers.map(header => (
+                  <TableHead 
                     key={header.id} 
-                    className="bg-[#0D0D0D] px-2 py-3 text-center text-[#AAAAAA] font-medium text-sm border-b border-r border-[#525252] last:border-r-0"
+                    className="bg-[#0D0D0D] text-[#AAAAAA] font-medium border-r border-[#525252] last:border-r-0"
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
-                  </div>
-                ))
-              ))}
-            </div>
-
-            {/* Body */}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
             {table.getRowModel().rows.map((row, index) => (
-              <div key={row.id} className="contents">
+              <TableRow 
+                key={row.id} 
+                className={`border-b border-[#525252] ${
+                  index % 2 === 0 ? 'bg-[#1A1A1A]' : 'bg-[#1E1E1E]'
+                } hover:bg-[#2A2A2A] transition-colors`}
+              >
                 {row.getVisibleCells().map(cell => (
-                  <div 
+                  <TableCell 
                     key={cell.id} 
-                    className={`px-1 py-2 align-top border-b border-r border-[#525252] last:border-r-0 ${
-                      index % 2 === 0 ? 'bg-[#1A1A1A]' : 'bg-[#1E1E1E]'
-                    } hover:bg-[#2A2A2A] transition-colors`}
+                    className="border-r border-[#525252] last:border-r-0 p-2"
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </div>
+                  </TableCell>
                 ))}
-              </div>
+              </TableRow>
             ))}
-          </div>
-          
-          {table.getRowModel().rows.length === 0 && (
-            <div className="text-center py-12 text-[#AAAAAA]">
-              <div className="text-lg mb-2">Nenhum canal encontrado</div>
-              <div className="text-sm">Adicione canais através da aba de Análise</div>
+          </TableBody>
+        </Table>
+        
+        {filteredData.length === 0 && (
+          <div className="text-center py-12 text-[#AAAAAA]">
+            <div className="text-lg mb-2">
+              {data.length === 0 ? 'Nenhum canal encontrado' : 'Nenhum canal corresponde aos filtros'}
             </div>
-          )}
-        </div>
+            <div className="text-sm">
+              {data.length === 0 ? 'Adicione canais através da aba de Análise' : 'Tente ajustar os filtros de busca'}
+            </div>
+          </div>
+        )}
       </div>
+
+      <ChannelEditModal
+        channel={editingChannel}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingChannel(null);
+        }}
+        onSave={handleSaveEdit}
+      />
     </div>
   )
 }
