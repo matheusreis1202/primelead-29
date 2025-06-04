@@ -2,8 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { TrendingUp, Users, Eye, Star, Target, Phone, Mail, Calendar } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { TrendingUp, Users, Eye, Star, Target, Phone, Mail } from 'lucide-react';
 
 interface ChannelData {
   id?: string;
@@ -25,12 +25,12 @@ interface PlanilhaAnalyticsProps {
   channels: ChannelData[];
 }
 
-export const PlanilhaAnalytics = ({ channels }: PlanilhaAnalyticsProps) => {
+export const PlanilhaAnalytics = ({ channels = [] }: PlanilhaAnalyticsProps) => {
   // Calcular métricas
   const totalChannels = channels.length;
-  const totalSubscribers = channels.reduce((sum, channel) => sum + channel.subscribers, 0);
-  const avgScore = totalChannels > 0 ? channels.reduce((sum, channel) => sum + channel.score, 0) / totalChannels : 0;
-  const totalViews = channels.reduce((sum, channel) => sum + channel.avgViews, 0);
+  const totalSubscribers = channels.reduce((sum, channel) => sum + (channel.subscribers || 0), 0);
+  const avgScore = totalChannels > 0 ? channels.reduce((sum, channel) => sum + (channel.score || 0), 0) / totalChannels : 0;
+  const totalViews = channels.reduce((sum, channel) => sum + (channel.avgViews || 0), 0);
   
   // Canais com contato
   const channelsWithEmail = channels.filter(c => c.email && c.email.trim() !== '').length;
@@ -46,14 +46,14 @@ export const PlanilhaAnalytics = ({ channels }: PlanilhaAnalyticsProps) => {
   const classificationChartData = Object.entries(classificationData).map(([name, value]) => ({
     name,
     value,
-    percentage: ((value / totalChannels) * 100).toFixed(1)
+    percentage: totalChannels > 0 ? ((value / totalChannels) * 100).toFixed(1) : '0'
   }));
 
   // Distribuição por score
   const scoreRanges = {
-    'Alto (80+)': channels.filter(c => c.score >= 80).length,
-    'Médio (60-79)': channels.filter(c => c.score >= 60 && c.score < 80).length,
-    'Baixo (<60)': channels.filter(c => c.score < 60).length
+    'Alto (80+)': channels.filter(c => (c.score || 0) >= 80).length,
+    'Médio (60-79)': channels.filter(c => (c.score || 0) >= 60 && (c.score || 0) < 80).length,
+    'Baixo (<60)': channels.filter(c => (c.score || 0) < 60).length
   };
 
   const scoreChartData = Object.entries(scoreRanges).map(([name, value]) => ({
@@ -64,10 +64,10 @@ export const PlanilhaAnalytics = ({ channels }: PlanilhaAnalyticsProps) => {
 
   // Distribuição por tamanho (inscritos)
   const sizeRanges = {
-    '1M+': channels.filter(c => c.subscribers >= 1000000).length,
-    '100K-1M': channels.filter(c => c.subscribers >= 100000 && c.subscribers < 1000000).length,
-    '10K-100K': channels.filter(c => c.subscribers >= 10000 && c.subscribers < 100000).length,
-    '<10K': channels.filter(c => c.subscribers < 10000).length
+    '1M+': channels.filter(c => (c.subscribers || 0) >= 1000000).length,
+    '100K-1M': channels.filter(c => (c.subscribers || 0) >= 100000 && (c.subscribers || 0) < 1000000).length,
+    '10K-100K': channels.filter(c => (c.subscribers || 0) >= 10000 && (c.subscribers || 0) < 100000).length,
+    '<10K': channels.filter(c => (c.subscribers || 0) < 10000).length
   };
 
   const sizeChartData = Object.entries(sizeRanges).map(([name, value]) => ({
@@ -78,7 +78,7 @@ export const PlanilhaAnalytics = ({ channels }: PlanilhaAnalyticsProps) => {
 
   // Top performers
   const topChannels = [...channels]
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => (b.score || 0) - (a.score || 0))
     .slice(0, 5);
 
   const COLORS = ['#FF0000', '#FF3333', '#FF6666', '#FF9999', '#FFCCCC'];
@@ -91,6 +91,25 @@ export const PlanilhaAnalytics = ({ channels }: PlanilhaAnalyticsProps) => {
     }
     return num.toLocaleString();
   };
+
+  const getClassificationColor = (classification: string): string => {
+    switch (classification) {
+      case 'Alto Potencial': return '#22c55e';
+      case 'Médio Potencial': return '#eab308';
+      case 'Baixo Potencial': return '#f97316';
+      case 'Micro Influencer': return '#8b5cf6';
+      default: return '#6b7280';
+    }
+  };
+
+  if (totalChannels === 0) {
+    return (
+      <div className="text-center py-12 text-[#AAAAAA]">
+        <div className="text-lg mb-2">Nenhum canal encontrado</div>
+        <div className="text-sm">Adicione canais através da aba de Análise para ver os analytics</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -282,7 +301,13 @@ export const PlanilhaAnalytics = ({ channels }: PlanilhaAnalyticsProps) => {
                   </div>
                   <div className="text-right">
                     <p className="text-yellow-400 font-bold text-lg">{channel.score}</p>
-                    <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000]">
+                    <Badge 
+                      variant="secondary" 
+                      style={{ 
+                        backgroundColor: `${getClassificationColor(channel.classification)}20`,
+                        color: getClassificationColor(channel.classification)
+                      }}
+                    >
                       {channel.classification}
                     </Badge>
                   </div>

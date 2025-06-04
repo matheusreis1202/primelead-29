@@ -1,5 +1,6 @@
+
 import React, { useState, useMemo } from 'react'
-import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender, ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -16,7 +17,6 @@ import { DataImportModal } from '@/components/DataImportModal'
 import { TablePagination } from '@/components/TablePagination'
 import { LiveStatsCard } from '@/components/LiveStatsCard'
 import { useBulkOperations } from '@/hooks/useBulkOperations'
-import { ChannelClassificationService } from '@/services/channelClassificationService'
 
 interface ChannelData {
   id?: string
@@ -48,8 +48,76 @@ interface FilterState {
   sortOrder: 'asc' | 'desc';
 }
 
+// Serviço de classificação de canais interno
+const classifyChannel = (channel: ChannelData): string => {
+  const score = channel.score || 0;
+  const subscribers = channel.subscribers || 0;
+  const engagement = parseFloat(channel.engagement) || 0;
+
+  if (score >= 85 || (subscribers >= 500000 && engagement >= 5)) {
+    return 'Alto Potencial';
+  } else if (score >= 70 || (subscribers >= 100000 && engagement >= 3)) {
+    return 'Médio Potencial';
+  } else if (score >= 50 || subscribers >= 10000) {
+    return 'Baixo Potencial';
+  } else {
+    return 'Micro Influencer';
+  }
+};
+
+const calculateQualityScore = (channel: ChannelData): number => {
+  const subscribers = channel.subscribers || 0;
+  const avgViews = channel.avgViews || 0;
+  const engagement = parseFloat(channel.engagement) || 0;
+  const monthlyVideos = channel.monthlyVideos || 0;
+
+  let score = 0;
+
+  // Score baseado em inscritos (0-30 pontos)
+  if (subscribers >= 1000000) score += 30;
+  else if (subscribers >= 500000) score += 25;
+  else if (subscribers >= 100000) score += 20;
+  else if (subscribers >= 50000) score += 15;
+  else if (subscribers >= 10000) score += 10;
+  else score += 5;
+
+  // Score baseado em views (0-25 pontos)
+  const viewRatio = subscribers > 0 ? avgViews / subscribers : 0;
+  if (viewRatio >= 0.3) score += 25;
+  else if (viewRatio >= 0.2) score += 20;
+  else if (viewRatio >= 0.1) score += 15;
+  else if (viewRatio >= 0.05) score += 10;
+  else score += 5;
+
+  // Score baseado em engajamento (0-25 pontos)
+  if (engagement >= 8) score += 25;
+  else if (engagement >= 5) score += 20;
+  else if (engagement >= 3) score += 15;
+  else if (engagement >= 1) score += 10;
+  else score += 5;
+
+  // Score baseado em frequência (0-20 pontos)
+  if (monthlyVideos >= 15) score += 20;
+  else if (monthlyVideos >= 10) score += 15;
+  else if (monthlyVideos >= 5) score += 10;
+  else if (monthlyVideos >= 2) score += 5;
+  else score += 2;
+
+  return Math.min(100, Math.max(0, score));
+};
+
+const getClassificationColor = (classification: string): string => {
+  switch (classification) {
+    case 'Alto Potencial': return '#22c55e';
+    case 'Médio Potencial': return '#eab308';
+    case 'Baixo Potencial': return '#f97316';
+    case 'Micro Influencer': return '#8b5cf6';
+    default: return '#6b7280';
+  }
+};
+
 export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaTabProps) => {
-  const [data, setData] = useState<ChannelData[]>(savedChannels)
+  const [data, setData] = useState<ChannelData[]>(savedChannels || [])
   const [editingChannel, setEditingChannel] = useState<ChannelData | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
@@ -69,12 +137,12 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
 
   // Update local data when savedChannels changes
   React.useEffect(() => {
-    const updatedChannels = savedChannels.map(channel => ({
+    const updatedChannels = (savedChannels || []).map(channel => ({
       ...channel,
-      classification: ChannelClassificationService.classifyChannel(channel),
-      score: ChannelClassificationService.calculateQualityScore(channel)
+      classification: classifyChannel(channel),
+      score: calculateQualityScore(channel)
     }));
-    setData(updatedChannels)
+    setData(updatedChannels);
   }, [savedChannels])
 
   // Apply filters and sorting
@@ -166,8 +234,8 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
   const handleSaveEdit = (updatedChannel: ChannelData) => {
     const reclassifiedChannel = {
       ...updatedChannel,
-      classification: ChannelClassificationService.classifyChannel(updatedChannel),
-      score: ChannelClassificationService.calculateQualityScore(updatedChannel)
+      classification: classifyChannel(updatedChannel),
+      score: calculateQualityScore(updatedChannel)
     };
 
     setData(prev => prev.map(channel => {
@@ -185,8 +253,8 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
   const handleImport = (importedChannels: ChannelData[]) => {
     const processedChannels = importedChannels.map(channel => ({
       ...channel,
-      classification: ChannelClassificationService.classifyChannel(channel),
-      score: ChannelClassificationService.calculateQualityScore(channel)
+      classification: classifyChannel(channel),
+      score: calculateQualityScore(channel)
     }));
 
     setData(prev => [...prev, ...processedChannels]);
@@ -267,17 +335,17 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     });
   }
 
-  const columns = useMemo(() => [
+  const columns: ColumnDef<ChannelData>[] = useMemo(() => [
     {
       id: 'select',
-      header: ({ table }: any) => (
+      header: ({ table }) => (
         <Checkbox
           checked={bulkOps.isAllSelected}
           onCheckedChange={() => bulkOps.isAllSelected ? bulkOps.clearSelection() : bulkOps.selectAll()}
           className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000]"
         />
       ),
-      cell: ({ row }: any) => (
+      cell: ({ row }) => (
         <Checkbox
           checked={bulkOps.isSelected(row.original)}
           onCheckedChange={() => bulkOps.toggleSelection(row.original)}
@@ -289,14 +357,14 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     {
       accessorKey: 'photo',
       header: 'Canal',
-      cell: (info: any) => {
-        const channel = info.row.original
+      cell: ({ row }) => {
+        const channel = row.original
         
         return (
           <div className="p-2 min-w-0">
             <div className="flex items-center gap-3 mb-2">
               <img 
-                src={info.getValue()} 
+                src={channel.photo} 
                 alt="foto" 
                 className="w-10 h-10 rounded-full border border-[#525252] flex-shrink-0" 
               />
@@ -308,8 +376,8 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
                   variant="secondary" 
                   className="text-xs"
                   style={{ 
-                    backgroundColor: `${ChannelClassificationService.getClassificationColor(channel.classification)}20`,
-                    color: ChannelClassificationService.getClassificationColor(channel.classification)
+                    backgroundColor: `${getClassificationColor(channel.classification)}20`,
+                    color: getClassificationColor(channel.classification)
                   }}
                 >
                   {channel.classification}
@@ -352,10 +420,10 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     { 
       accessorKey: 'subscribers', 
       header: 'Inscritos',
-      cell: (info: any) => (
+      cell: ({ getValue }) => (
         <div className="text-center p-2">
           <div className="font-bold text-white text-sm mb-1">
-            {formatNumber(info.getValue())}
+            {formatNumber(getValue() as number)}
           </div>
           <div className="text-xs text-[#AAAAAA]">inscritos</div>
         </div>
@@ -364,10 +432,10 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     { 
       accessorKey: 'avgViews', 
       header: 'Média Views',
-      cell: (info: any) => (
+      cell: ({ getValue }) => (
         <div className="text-center p-2">
           <div className="font-bold text-blue-400 text-sm mb-1">
-            {formatNumber(info.getValue())}
+            {formatNumber(getValue() as number)}
           </div>
           <div className="text-xs text-[#AAAAAA]">views médias</div>
         </div>
@@ -376,10 +444,10 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     { 
       accessorKey: 'engagement', 
       header: 'Engajamento',
-      cell: (info: any) => (
+      cell: ({ getValue }) => (
         <div className="text-center p-2">
           <div className="font-bold text-green-400 text-sm mb-1">
-            {info.getValue() || '0.0'}%
+            {getValue() || '0.0'}%
           </div>
           <div className="text-xs text-[#AAAAAA]">engajamento</div>
         </div>
@@ -388,10 +456,10 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     { 
       accessorKey: 'score', 
       header: 'Score',
-      cell: (info: any) => (
+      cell: ({ getValue }) => (
         <div className="text-center p-2">
           <div className="font-bold text-yellow-400 text-lg mb-1">
-            {info.getValue() || 0}
+            {getValue() || 0}
           </div>
           <div className="text-xs text-[#AAAAAA]">pontos</div>
         </div>
@@ -400,8 +468,8 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     {
       id: 'actions',
       header: 'Ações',
-      cell: (info: any) => {
-        const channel = info.row.original
+      cell: ({ row }) => {
+        const channel = row.original
         
         return (
           <div className="flex gap-1 justify-center p-2">
@@ -576,83 +644,4 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
       />
     </div>
   )
-}
-
-export const usePlanilhaData = () => {
-  const [planilhaChannels, setPlanilhaChannels] = useState<ChannelData[]>([])
-
-  const addToPlanilha = (channelData: any) => {
-    const calcularEngajamento = (channel: any) => {
-      if (channel.engagement && typeof channel.engagement === 'string') {
-        return channel.engagement
-      }
-      
-      if (channel.avgLikes && channel.avgComments && channel.avgViews) {
-        const totalInteractions = (channel.avgLikes + channel.avgComments)
-        const engagementRate = (totalInteractions / channel.avgViews) * 100
-        return Math.min(engagementRate, 15).toFixed(1)
-      }
-      
-      const subscribers = channel.subscriberCount || channel.subscribers || 0
-      const avgViews = channel.avgViews || (channel.viewCount / Math.max(channel.videoCount || 10, 1))
-      
-      if (avgViews && subscribers > 0) {
-        const viewRate = avgViews / subscribers
-        
-        let estimatedEngagement
-        if (viewRate > 0.5) estimatedEngagement = 8.5 + Math.random() * 3
-        else if (viewRate > 0.3) estimatedEngagement = 6.0 + Math.random() * 2.5
-        else if (viewRate > 0.15) estimatedEngagement = 3.5 + Math.random() * 2.5
-        else if (viewRate > 0.05) estimatedEngagement = 2.0 + Math.random() * 1.5
-        else estimatedEngagement = 0.5 + Math.random() * 1.5
-        
-        return estimatedEngagement.toFixed(1)
-      }
-      
-      if (subscribers > 1000000) return (1.5 + Math.random() * 1.5).toFixed(1)
-      if (subscribers > 500000) return (2.0 + Math.random() * 2.0).toFixed(1)
-      if (subscribers > 100000) return (2.5 + Math.random() * 2.5).toFixed(1)
-      if (subscribers > 50000) return (3.0 + Math.random() * 3.0).toFixed(1)
-      if (subscribers > 10000) return (3.5 + Math.random() * 3.5).toFixed(1)
-      
-      return (4.0 + Math.random() * 4.0).toFixed(1)
-    }
-
-    const calcularCrescimento = (channel: any) => {
-      if (channel.subGrowth) return channel.subGrowth.toString()
-      
-      const subscribers = channel.subscriberCount || channel.subscribers || 0
-      
-      if (subscribers < 1000) return (15 + Math.random() * 25).toFixed(0)
-      if (subscribers < 10000) return (8 + Math.random() * 17).toFixed(0)
-      if (subscribers < 50000) return (5 + Math.random() * 10).toFixed(0)
-      if (subscribers < 100000) return (3 + Math.random() * 7).toFixed(0)
-      if (subscribers < 500000) return (2 + Math.random() * 6).toFixed(0)
-      if (subscribers < 1000000) return (1 + Math.random() * 4).toFixed(0)
-      return (0.5 + Math.random() * 2.5).toFixed(0)
-    }
-
-    const newChannel: ChannelData = {
-      id: channelData.id || channelData.name,
-      photo: channelData.thumbnail || channelData.photo || 'https://via.placeholder.com/64',
-      name: channelData.title || channelData.name,
-      link: channelData.link || `https://youtube.com/channel/${channelData.id}`,
-      phone: channelData.phone || '',
-      email: channelData.email || '',
-      subscribers: channelData.subscriberCount || channelData.subscribers || 0,
-      avgViews: channelData.avgViews || Math.floor((channelData.viewCount || 0) / Math.max(channelData.videoCount || 10, 1)),
-      monthlyVideos: channelData.monthlyVideos || Math.floor(Math.random() * 15) + 5,
-      engagement: calcularEngajamento(channelData),
-      subGrowth: calcularCrescimento(channelData),
-      score: channelData.score || channelData.pontuacaoGeral || Math.floor(Math.random() * 40) + 30,
-      classification: channelData.classification || channelData.recomendacaoParceria || 'Médio Potencial'
-    }
-    
-    setPlanilhaChannels(prev => [...prev, newChannel])
-  }
-
-  return {
-    planilhaChannels,
-    addToPlanilha
-  }
 }
