@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { useToast } from '@/hooks/use-toast'
 import { Handshake, Edit, ExternalLink, Mail, Phone, BarChart3, Upload, Download, Settings } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { ChannelEditModal } from '@/components/ChannelEditModal'
@@ -11,7 +13,10 @@ import { AdvancedTableFilters } from '@/components/AdvancedTableFilters'
 import { BulkOperationsToolbar } from '@/components/BulkOperationsToolbar'
 import { PlanilhaAnalytics } from '@/components/PlanilhaAnalytics'
 import { DataImportModal } from '@/components/DataImportModal'
+import { TablePagination } from '@/components/TablePagination'
+import { LiveStatsCard } from '@/components/LiveStatsCard'
 import { useBulkOperations } from '@/hooks/useBulkOperations'
+import { ChannelClassificationService } from '@/services/channelClassificationService'
 
 interface ChannelData {
   id?: string
@@ -49,6 +54,10 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('table')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(25)
+  const { toast } = useToast()
+
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     scoreRange: 'all',
@@ -60,7 +69,12 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
 
   // Update local data when savedChannels changes
   React.useEffect(() => {
-    setData(savedChannels)
+    const updatedChannels = savedChannels.map(channel => ({
+      ...channel,
+      classification: ChannelClassificationService.classifyChannel(channel),
+      score: ChannelClassificationService.calculateQualityScore(channel)
+    }));
+    setData(updatedChannels)
   }, [savedChannels])
 
   // Apply filters and sorting
@@ -135,7 +149,14 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     return filtered;
   }, [data, filters]);
 
-  const bulkOps = useBulkOperations(filteredData);
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const bulkOps = useBulkOperations(paginatedData);
 
   const handleEdit = (channel: ChannelData) => {
     setEditingChannel(channel);
@@ -143,15 +164,37 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
   }
 
   const handleSaveEdit = (updatedChannel: ChannelData) => {
+    const reclassifiedChannel = {
+      ...updatedChannel,
+      classification: ChannelClassificationService.classifyChannel(updatedChannel),
+      score: ChannelClassificationService.calculateQualityScore(updatedChannel)
+    };
+
     setData(prev => prev.map(channel => {
       const id = channel.id || channel.name;
-      const updatedId = updatedChannel.id || updatedChannel.name;
-      return id === updatedId ? updatedChannel : channel;
+      const updatedId = reclassifiedChannel.id || reclassifiedChannel.name;
+      return id === updatedId ? reclassifiedChannel : channel;
     }));
+
+    toast({
+      title: "Canal atualizado!",
+      description: `${reclassifiedChannel.name} foi atualizado com sucesso.`,
+    });
   }
 
   const handleImport = (importedChannels: ChannelData[]) => {
-    setData(prev => [...prev, ...importedChannels]);
+    const processedChannels = importedChannels.map(channel => ({
+      ...channel,
+      classification: ChannelClassificationService.classifyChannel(channel),
+      score: ChannelClassificationService.calculateQualityScore(channel)
+    }));
+
+    setData(prev => [...prev, ...processedChannels]);
+
+    toast({
+      title: "Importação concluída!",
+      description: `${processedChannels.length} canais foram importados e classificados automaticamente.`,
+    });
   }
 
   const formatNumber = (num: number | undefined | null) => {
@@ -170,7 +213,11 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
 
   const exportToExcel = (channels: ChannelData[] = filteredData) => {
     if (channels.length === 0) {
-      alert("Não há canais para exportar!")
+      toast({
+        title: "Erro na exportação",
+        description: "Não há canais para exportar!",
+        variant: "destructive",
+      });
       return
     }
 
@@ -192,17 +239,32 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais')
     XLSX.writeFile(workbook, `planilha_canais_${new Date().toISOString().split('T')[0]}.xlsx`)
+
+    toast({
+      title: "Exportação concluída!",
+      description: `${channels.length} canais foram exportados para Excel.`,
+    });
   }
 
   const handleBulkSendToPartners = (channels: ChannelData[]) => {
     channels.forEach(channel => onSendToPartners?.(channel));
     bulkOps.clearSelection();
+
+    toast({
+      title: "Canais enviados!",
+      description: `${channels.length} canais foram enviados para parceiros.`,
+    });
   }
 
   const handleBulkDelete = (channels: ChannelData[]) => {
     const channelsToDelete = new Set(channels.map(c => c.id || c.name));
     setData(prev => prev.filter(channel => !channelsToDelete.has(channel.id || channel.name)));
     bulkOps.clearSelection();
+
+    toast({
+      title: "Canais removidos!",
+      description: `${channels.length} canais foram removidos da planilha.`,
+    });
   }
 
   const columns = useMemo(() => [
@@ -242,6 +304,16 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
                 <div className="font-medium text-white text-sm mb-1 truncate" title={channel.name}>
                   {channel.name}
                 </div>
+                <Badge 
+                  variant="secondary" 
+                  className="text-xs"
+                  style={{ 
+                    backgroundColor: `${ChannelClassificationService.getClassificationColor(channel.classification)}20`,
+                    color: ChannelClassificationService.getClassificationColor(channel.classification)
+                  }}
+                >
+                  {channel.classification}
+                </Badge>
               </div>
             </div>
 
@@ -355,7 +427,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
   ], [bulkOps, onSendToPartners])
 
   const table = useReactTable({
-    data: filteredData,
+    data: paginatedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   })
@@ -382,6 +454,8 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
           </Button>
         </div>
       </div>
+
+      <LiveStatsCard channels={data} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-[#1E1E1E] border border-[#525252]">
@@ -462,6 +536,20 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
                   {data.length === 0 ? 'Adicione canais através da aba de Análise ou importe dados' : 'Tente ajustar os filtros de busca'}
                 </div>
               </div>
+            )}
+
+            {filteredData.length > 0 && (
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                totalItems={filteredData.length}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newItemsPerPage) => {
+                  setItemsPerPage(newItemsPerPage);
+                  setCurrentPage(1);
+                }}
+              />
             )}
           </div>
         </TabsContent>
