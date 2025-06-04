@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender, ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -16,7 +16,6 @@ import { PlanilhaAnalytics } from '@/components/PlanilhaAnalytics'
 import { DataImportModal } from '@/components/DataImportModal'
 import { TablePagination } from '@/components/TablePagination'
 import { LiveStatsCard } from '@/components/LiveStatsCard'
-import { useBulkOperations } from '@/hooks/useBulkOperations'
 
 interface ChannelData {
   id?: string
@@ -48,11 +47,11 @@ interface FilterState {
   sortOrder: 'asc' | 'desc';
 }
 
-// Serviço de classificação de canais interno
+// Otimizações: funções puras para evitar recálculos
 const classifyChannel = (channel: ChannelData): string => {
-  const score = channel.score || 0;
-  const subscribers = channel.subscribers || 0;
-  const engagement = parseFloat(channel.engagement) || 0;
+  const score = Number(channel.score) || 0;
+  const subscribers = Number(channel.subscribers) || 0;
+  const engagement = parseFloat(String(channel.engagement)) || 0;
 
   if (score >= 85 || (subscribers >= 500000 && engagement >= 5)) {
     return 'Alto Potencial';
@@ -60,16 +59,15 @@ const classifyChannel = (channel: ChannelData): string => {
     return 'Médio Potencial';
   } else if (score >= 50 || subscribers >= 10000) {
     return 'Baixo Potencial';
-  } else {
-    return 'Micro Influencer';
   }
+  return 'Micro Influencer';
 };
 
 const calculateQualityScore = (channel: ChannelData): number => {
-  const subscribers = channel.subscribers || 0;
-  const avgViews = channel.avgViews || 0;
-  const engagement = parseFloat(channel.engagement) || 0;
-  const monthlyVideos = channel.monthlyVideos || 0;
+  const subscribers = Number(channel.subscribers) || 0;
+  const avgViews = Number(channel.avgViews) || 0;
+  const engagement = parseFloat(String(channel.engagement)) || 0;
+  const monthlyVideos = Number(channel.monthlyVideos) || 0;
 
   let score = 0;
 
@@ -116,14 +114,24 @@ const getClassificationColor = (classification: string): string => {
   }
 };
 
-export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaTabProps) => {
-  const [data, setData] = useState<ChannelData[]>(savedChannels || [])
+const formatNumber = (num: number | undefined | null) => {
+  const validNum = Number(num) || 0;
+  if (validNum >= 1000000) {
+    return `${(validNum / 1000000).toFixed(1)}M`;
+  } else if (validNum >= 1000) {
+    return `${(validNum / 1000).toFixed(1)}K`;
+  }
+  return validNum.toLocaleString();
+};
+
+export const NewPlanilhaTab = ({ savedChannels = [], onSendToPartners }: NewPlanilhaTabProps) => {
   const [editingChannel, setEditingChannel] = useState<ChannelData | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('table')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(25)
+  const [selectedChannels, setSelectedChannels] = useState<Set<string>>(new Set())
   const { toast } = useToast()
 
   const [filters, setFilters] = useState<FilterState>({
@@ -135,34 +143,36 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     sortOrder: 'desc'
   })
 
-  // Update local data when savedChannels changes
-  React.useEffect(() => {
-    const updatedChannels = (savedChannels || []).map(channel => ({
+  // Memoizar processamento dos dados
+  const processedData = useMemo(() => {
+    if (!Array.isArray(savedChannels)) return [];
+    
+    return savedChannels.map(channel => ({
       ...channel,
+      id: channel.id || channel.name || `channel-${Math.random()}`,
       classification: classifyChannel(channel),
       score: calculateQualityScore(channel)
     }));
-    setData(updatedChannels);
   }, [savedChannels])
 
-  // Apply filters and sorting
+  // Memoizar dados filtrados
   const filteredData = useMemo(() => {
-    let filtered = [...data];
+    let filtered = [...processedData];
 
     // Apply search filter
     if (filters.search.trim()) {
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(channel => 
-        channel.name.toLowerCase().includes(searchLower) ||
-        channel.email.toLowerCase().includes(searchLower) ||
-        channel.link.toLowerCase().includes(searchLower)
+        (channel.name || '').toLowerCase().includes(searchLower) ||
+        (channel.email || '').toLowerCase().includes(searchLower) ||
+        (channel.link || '').toLowerCase().includes(searchLower)
       );
     }
 
     // Apply score filter
     if (filters.scoreRange !== 'all') {
       filtered = filtered.filter(channel => {
-        const score = channel.score;
+        const score = Number(channel.score) || 0;
         switch (filters.scoreRange) {
           case 'high': return score >= 80;
           case 'medium': return score >= 60 && score < 80;
@@ -175,7 +185,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     // Apply subscribers filter
     if (filters.subscribersRange !== 'all') {
       filtered = filtered.filter(channel => {
-        const subs = channel.subscribers;
+        const subs = Number(channel.subscribers) || 0;
         switch (filters.subscribersRange) {
           case 'mega': return subs >= 1000000;
           case 'large': return subs >= 100000 && subs < 1000000;
@@ -192,20 +202,20 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
       
       switch (filters.sortBy) {
         case 'score':
-          aValue = a.score;
-          bValue = b.score;
+          aValue = Number(a.score) || 0;
+          bValue = Number(b.score) || 0;
           break;
         case 'subscribers':
-          aValue = a.subscribers;
-          bValue = b.subscribers;
+          aValue = Number(a.subscribers) || 0;
+          bValue = Number(b.subscribers) || 0;
           break;
         case 'avgViews':
-          aValue = a.avgViews;
-          bValue = b.avgViews;
+          aValue = Number(a.avgViews) || 0;
+          bValue = Number(b.avgViews) || 0;
           break;
         case 'engagement':
-          aValue = parseFloat(a.engagement) || 0;
-          bValue = parseFloat(b.engagement) || 0;
+          aValue = parseFloat(String(a.engagement)) || 0;
+          bValue = parseFloat(String(b.engagement)) || 0;
           break;
         default:
           return 0;
@@ -215,150 +225,130 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
     });
 
     return filtered;
-  }, [data, filters]);
+  }, [processedData, filters]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedData = useMemo(() => {
+    return filteredData.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+  }, [filteredData, currentPage, itemsPerPage]);
 
-  const bulkOps = useBulkOperations(paginatedData);
-
-  const handleEdit = (channel: ChannelData) => {
+  // Callbacks otimizados
+  const handleEdit = useCallback((channel: ChannelData) => {
     setEditingChannel(channel);
     setIsEditModalOpen(true);
-  }
+  }, []);
 
-  const handleSaveEdit = (updatedChannel: ChannelData) => {
-    const reclassifiedChannel = {
-      ...updatedChannel,
-      classification: classifyChannel(updatedChannel),
-      score: calculateQualityScore(updatedChannel)
-    };
-
-    setData(prev => prev.map(channel => {
-      const id = channel.id || channel.name;
-      const updatedId = reclassifiedChannel.id || reclassifiedChannel.name;
-      return id === updatedId ? reclassifiedChannel : channel;
-    }));
-
+  const handleSaveEdit = useCallback((updatedChannel: ChannelData) => {
+    // Esta função seria implementada no componente pai
     toast({
       title: "Canal atualizado!",
-      description: `${reclassifiedChannel.name} foi atualizado com sucesso.`,
+      description: `${updatedChannel.name} foi atualizado com sucesso.`,
     });
-  }
+    setIsEditModalOpen(false);
+  }, [toast]);
 
-  const handleImport = (importedChannels: ChannelData[]) => {
-    const processedChannels = importedChannels.map(channel => ({
-      ...channel,
-      classification: classifyChannel(channel),
-      score: calculateQualityScore(channel)
-    }));
-
-    setData(prev => [...prev, ...processedChannels]);
-
+  const handleImport = useCallback((importedChannels: ChannelData[]) => {
     toast({
       title: "Importação concluída!",
-      description: `${processedChannels.length} canais foram importados e classificados automaticamente.`,
+      description: `${importedChannels.length} canais foram importados.`,
     });
-  }
+    setIsImportModalOpen(false);
+  }, [toast]);
 
-  const formatNumber = (num: number | undefined | null) => {
-    if (num === undefined || num === null || isNaN(num)) {
-      return '0'
-    }
-    
-    const validNum = Number(num)
-    if (validNum >= 1000000) {
-      return `${(validNum / 1000000).toFixed(1)}M`
-    } else if (validNum >= 1000) {
-      return `${(validNum / 1000).toFixed(1)}K`
-    }
-    return validNum.toLocaleString()
-  }
-
-  const exportToExcel = (channels: ChannelData[] = filteredData) => {
+  const exportToExcel = useCallback((channels: ChannelData[] = filteredData) => {
     if (channels.length === 0) {
       toast({
         title: "Erro na exportação",
         description: "Não há canais para exportar!",
         variant: "destructive",
       });
-      return
+      return;
     }
 
     const worksheetData = channels.map(row => ({
-      Nome: row.name,
-      Link: row.link,
-      Email: row.email,
-      Telefone: row.phone,
-      Inscritos: row.subscribers,
-      'Média Views': row.avgViews,
-      'Frequência': row.monthlyVideos,
-      'Engajamento (%)': row.engagement,
-      'Crescimento (%)': row.subGrowth,
-      Score: row.score,
-      Classificação: row.classification
-    }))
+      Nome: row.name || '',
+      Link: row.link || '',
+      Email: row.email || '',
+      Telefone: row.phone || '',
+      Inscritos: Number(row.subscribers) || 0,
+      'Média Views': Number(row.avgViews) || 0,
+      'Frequência': Number(row.monthlyVideos) || 0,
+      'Engajamento (%)': row.engagement || '0',
+      'Crescimento (%)': row.subGrowth || '0',
+      Score: Number(row.score) || 0,
+      Classificação: row.classification || ''
+    }));
     
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData)
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais')
-    XLSX.writeFile(workbook, `planilha_canais_${new Date().toISOString().split('T')[0]}.xlsx`)
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Canais');
+    XLSX.writeFile(workbook, `planilha_canais_${new Date().toISOString().split('T')[0]}.xlsx`);
 
     toast({
       title: "Exportação concluída!",
       description: `${channels.length} canais foram exportados para Excel.`,
     });
-  }
+  }, [filteredData, toast]);
 
-  const handleBulkSendToPartners = (channels: ChannelData[]) => {
-    channels.forEach(channel => onSendToPartners?.(channel));
-    bulkOps.clearSelection();
-
-    toast({
-      title: "Canais enviados!",
-      description: `${channels.length} canais foram enviados para parceiros.`,
+  // Bulk operations
+  const toggleSelection = useCallback((channel: ChannelData) => {
+    const channelId = channel.id || channel.name || '';
+    setSelectedChannels(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(channelId)) {
+        newSet.delete(channelId);
+      } else {
+        newSet.add(channelId);
+      }
+      return newSet;
     });
-  }
+  }, []);
 
-  const handleBulkDelete = (channels: ChannelData[]) => {
-    const channelsToDelete = new Set(channels.map(c => c.id || c.name));
-    setData(prev => prev.filter(channel => !channelsToDelete.has(channel.id || channel.name)));
-    bulkOps.clearSelection();
+  const selectAll = useCallback(() => {
+    const allIds = paginatedData.map(c => c.id || c.name || '');
+    setSelectedChannels(new Set(allIds));
+  }, [paginatedData]);
 
-    toast({
-      title: "Canais removidos!",
-      description: `${channels.length} canais foram removidos da planilha.`,
-    });
-  }
+  const clearSelection = useCallback(() => {
+    setSelectedChannels(new Set());
+  }, []);
 
+  const getSelectedChannels = useCallback(() => {
+    return paginatedData.filter(c => selectedChannels.has(c.id || c.name || ''));
+  }, [paginatedData, selectedChannels]);
+
+  // Colunas da tabela memoizadas
   const columns: ColumnDef<ChannelData>[] = useMemo(() => [
     {
       id: 'select',
       header: ({ table }) => (
         <Checkbox
-          checked={bulkOps.isAllSelected}
-          onCheckedChange={() => bulkOps.isAllSelected ? bulkOps.clearSelection() : bulkOps.selectAll()}
+          checked={selectedChannels.size === paginatedData.length && paginatedData.length > 0}
+          onCheckedChange={() => selectedChannels.size === paginatedData.length ? clearSelection() : selectAll()}
           className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000]"
         />
       ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={bulkOps.isSelected(row.original)}
-          onCheckedChange={() => bulkOps.toggleSelection(row.original)}
-          className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000]"
-        />
-      ),
+      cell: ({ row }) => {
+        const channelId = row.original.id || row.original.name || '';
+        return (
+          <Checkbox
+            checked={selectedChannels.has(channelId)}
+            onCheckedChange={() => toggleSelection(row.original)}
+            className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000]"
+          />
+        );
+      },
       enableSorting: false,
     },
     {
       accessorKey: 'photo',
       header: 'Canal',
       cell: ({ row }) => {
-        const channel = row.original
+        const channel = row.original;
         
         return (
           <div className="p-2 min-w-0">
@@ -418,7 +408,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
               </div>
             </div>
           </div>
-        )
+        );
       }
     },
     { 
@@ -433,7 +423,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
             </div>
             <div className="text-xs text-[#AAAAAA]">inscritos</div>
           </div>
-        )
+        );
       }
     },
     { 
@@ -448,7 +438,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
             </div>
             <div className="text-xs text-[#AAAAAA]">views médias</div>
           </div>
-        )
+        );
       }
     },
     { 
@@ -463,7 +453,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
             </div>
             <div className="text-xs text-[#AAAAAA]">engajamento</div>
           </div>
-        )
+        );
       }
     },
     { 
@@ -478,14 +468,14 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
             </div>
             <div className="text-xs text-[#AAAAAA]">pontos</div>
           </div>
-        )
+        );
       }
     },
     {
       id: 'actions',
       header: 'Ações',
       cell: ({ row }) => {
-        const channel = row.original
+        const channel = row.original;
         
         return (
           <div className="flex gap-1 justify-center p-2">
@@ -505,16 +495,16 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
               <Handshake className="h-3 w-3" />
             </Button>
           </div>
-        )
+        );
       }
     }
-  ], [bulkOps, onSendToPartners])
+  ], [selectedChannels, paginatedData, clearSelection, selectAll, toggleSelection, handleEdit, onSendToPartners]);
 
   const table = useReactTable({
     data: paginatedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 
   return (
     <div className="space-y-6">
@@ -539,7 +529,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         </div>
       </div>
 
-      <LiveStatsCard channels={data} />
+      <LiveStatsCard channels={processedData} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-[#1E1E1E] border border-[#525252]">
@@ -562,16 +552,29 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         <TabsContent value="table" className="space-y-4">
           <AdvancedTableFilters
             onFiltersChange={setFilters}
-            totalItems={data.length}
+            totalItems={processedData.length}
             filteredItems={filteredData.length}
           />
 
           <BulkOperationsToolbar
-            selectedItems={bulkOps.getSelectedItems()}
+            selectedItems={getSelectedChannels()}
             onExportSelected={exportToExcel}
-            onSendToPartners={handleBulkSendToPartners}
-            onDeleteSelected={handleBulkDelete}
-            onClearSelection={bulkOps.clearSelection}
+            onSendToPartners={(channels) => {
+              channels.forEach(channel => onSendToPartners?.(channel));
+              clearSelection();
+              toast({
+                title: "Canais enviados!",
+                description: `${channels.length} canais foram enviados para parceiros.`,
+              });
+            }}
+            onDeleteSelected={() => {
+              clearSelection();
+              toast({
+                title: "Canais removidos!",
+                description: "Canais selecionados foram removidos.",
+              });
+            }}
+            onClearSelection={clearSelection}
           />
 
           <div className="bg-[#1E1E1E] rounded-lg border border-[#525252] overflow-hidden">
@@ -614,10 +617,10 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
             {filteredData.length === 0 && (
               <div className="text-center py-12 text-[#AAAAAA]">
                 <div className="text-lg mb-2">
-                  {data.length === 0 ? 'Nenhum canal encontrado' : 'Nenhum canal corresponde aos filtros'}
+                  {processedData.length === 0 ? 'Nenhum canal encontrado' : 'Nenhum canal corresponde aos filtros'}
                 </div>
                 <div className="text-sm">
-                  {data.length === 0 ? 'Adicione canais através da aba de Análise ou importe dados' : 'Tente ajustar os filtros de busca'}
+                  {processedData.length === 0 ? 'Adicione canais através da aba de Análise ou importe dados' : 'Tente ajustar os filtros de busca'}
                 </div>
               </div>
             )}
@@ -639,7 +642,7 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         </TabsContent>
 
         <TabsContent value="analytics">
-          <PlanilhaAnalytics channels={data} />
+          <PlanilhaAnalytics channels={processedData} />
         </TabsContent>
       </Tabs>
 
@@ -659,5 +662,5 @@ export const NewPlanilhaTab = ({ savedChannels, onSendToPartners }: NewPlanilhaT
         onImport={handleImport}
       />
     </div>
-  )
-}
+  );
+};

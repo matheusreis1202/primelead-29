@@ -26,19 +26,66 @@ interface PlanilhaAnalyticsProps {
 }
 
 export const PlanilhaAnalytics = ({ channels = [] }: PlanilhaAnalyticsProps) => {
-  // Memoizar cálculos para melhor performance
-  const analytics = useMemo(() => {
-    const totalChannels = channels.length;
-    const totalSubscribers = channels.reduce((sum, channel) => sum + (channel.subscribers || 0), 0);
-    const avgScore = totalChannels > 0 ? channels.reduce((sum, channel) => sum + (channel.score || 0), 0) / totalChannels : 0;
-    const totalViews = channels.reduce((sum, channel) => sum + (channel.avgViews || 0), 0);
+  // Validação e limpeza dos dados
+  const validChannels = useMemo(() => {
+    if (!Array.isArray(channels)) return [];
     
-    // Canais com contato
-    const channelsWithEmail = channels.filter(c => c.email && c.email.trim() !== '' && c.email !== 'Não informado').length;
-    const channelsWithPhone = channels.filter(c => c.phone && c.phone.trim() !== '' && c.phone !== 'Não informado').length;
-    const channelsWithBoth = channels.filter(c => 
-      c.email && c.email.trim() !== '' && c.email !== 'Não informado' &&
-      c.phone && c.phone.trim() !== '' && c.phone !== 'Não informado'
+    return channels.filter(channel => 
+      channel && 
+      typeof channel === 'object' && 
+      channel.name
+    ).map(channel => ({
+      ...channel,
+      subscribers: Number(channel.subscribers) || 0,
+      avgViews: Number(channel.avgViews) || 0,
+      monthlyVideos: Number(channel.monthlyVideos) || 0,
+      score: Number(channel.score) || 0,
+      engagement: String(channel.engagement || '0'),
+      subGrowth: String(channel.subGrowth || '0'),
+      classification: channel.classification || 'Não Classificado',
+      email: channel.email || '',
+      phone: channel.phone || ''
+    }));
+  }, [channels]);
+
+  // Cálculos básicos memoizados
+  const analytics = useMemo(() => {
+    const totalChannels = validChannels.length;
+    
+    if (totalChannels === 0) {
+      return {
+        totalChannels: 0,
+        totalSubscribers: 0,
+        avgScore: 0,
+        totalViews: 0,
+        channelsWithEmail: 0,
+        channelsWithPhone: 0,
+        channelsWithBoth: 0
+      };
+    }
+
+    const totalSubscribers = validChannels.reduce((sum, channel) => sum + channel.subscribers, 0);
+    const avgScore = validChannels.reduce((sum, channel) => sum + channel.score, 0) / totalChannels;
+    const totalViews = validChannels.reduce((sum, channel) => sum + channel.avgViews, 0);
+    
+    // Canais com contato válido
+    const channelsWithEmail = validChannels.filter(c => 
+      c.email && 
+      c.email.trim() !== '' && 
+      c.email !== 'Não informado' &&
+      c.email.includes('@')
+    ).length;
+    
+    const channelsWithPhone = validChannels.filter(c => 
+      c.phone && 
+      c.phone.trim() !== '' && 
+      c.phone !== 'Não informado' &&
+      c.phone.length >= 8
+    ).length;
+    
+    const channelsWithBoth = validChannels.filter(c => 
+      c.email && c.email.trim() !== '' && c.email !== 'Não informado' && c.email.includes('@') &&
+      c.phone && c.phone.trim() !== '' && c.phone !== 'Não informado' && c.phone.length >= 8
     ).length;
 
     return {
@@ -50,11 +97,13 @@ export const PlanilhaAnalytics = ({ channels = [] }: PlanilhaAnalyticsProps) => 
       channelsWithPhone,
       channelsWithBoth
     };
-  }, [channels]);
+  }, [validChannels]);
 
-  // Memoizar distribuição por classificação
+  // Distribuição por classificação
   const classificationData = useMemo(() => {
-    const classificationCount = channels.reduce((acc, channel) => {
+    if (analytics.totalChannels === 0) return [];
+
+    const classificationCount = validChannels.reduce((acc, channel) => {
       const classification = channel.classification || 'Não Classificado';
       acc[classification] = (acc[classification] || 0) + 1;
       return acc;
@@ -63,47 +112,55 @@ export const PlanilhaAnalytics = ({ channels = [] }: PlanilhaAnalyticsProps) => 
     return Object.entries(classificationCount).map(([name, value]) => ({
       name,
       value,
-      percentage: analytics.totalChannels > 0 ? ((value / analytics.totalChannels) * 100).toFixed(1) : '0'
+      percentage: ((value / analytics.totalChannels) * 100).toFixed(1)
     }));
-  }, [channels, analytics.totalChannels]);
+  }, [validChannels, analytics.totalChannels]);
 
-  // Memoizar distribuição por score
+  // Distribuição por score
   const scoreData = useMemo(() => {
+    if (analytics.totalChannels === 0) return [];
+
     const scoreRanges = {
-      'Alto (80+)': channels.filter(c => (c.score || 0) >= 80).length,
-      'Médio (60-79)': channels.filter(c => (c.score || 0) >= 60 && (c.score || 0) < 80).length,
-      'Baixo (<60)': channels.filter(c => (c.score || 0) < 60).length
+      'Alto (80+)': validChannels.filter(c => c.score >= 80).length,
+      'Médio (60-79)': validChannels.filter(c => c.score >= 60 && c.score < 80).length,
+      'Baixo (<60)': validChannels.filter(c => c.score < 60).length
     };
 
-    return Object.entries(scoreRanges).map(([name, value]) => ({
-      name,
-      value,
-      percentage: analytics.totalChannels > 0 ? ((value / analytics.totalChannels) * 100).toFixed(1) : '0'
-    }));
-  }, [channels, analytics.totalChannels]);
+    return Object.entries(scoreRanges)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({
+        name,
+        value,
+        percentage: ((value / analytics.totalChannels) * 100).toFixed(1)
+      }));
+  }, [validChannels, analytics.totalChannels]);
 
-  // Memoizar distribuição por tamanho
+  // Distribuição por tamanho
   const sizeData = useMemo(() => {
+    if (analytics.totalChannels === 0) return [];
+
     const sizeRanges = {
-      '1M+': channels.filter(c => (c.subscribers || 0) >= 1000000).length,
-      '100K-1M': channels.filter(c => (c.subscribers || 0) >= 100000 && (c.subscribers || 0) < 1000000).length,
-      '10K-100K': channels.filter(c => (c.subscribers || 0) >= 10000 && (c.subscribers || 0) < 100000).length,
-      '<10K': channels.filter(c => (c.subscribers || 0) < 10000).length
+      '1M+': validChannels.filter(c => c.subscribers >= 1000000).length,
+      '100K-1M': validChannels.filter(c => c.subscribers >= 100000 && c.subscribers < 1000000).length,
+      '10K-100K': validChannels.filter(c => c.subscribers >= 10000 && c.subscribers < 100000).length,
+      '<10K': validChannels.filter(c => c.subscribers < 10000).length
     };
 
-    return Object.entries(sizeRanges).map(([name, value]) => ({
-      name,
-      value,
-      percentage: analytics.totalChannels > 0 ? ((value / analytics.totalChannels) * 100).toFixed(1) : '0'
-    }));
-  }, [channels, analytics.totalChannels]);
+    return Object.entries(sizeRanges)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({
+        name,
+        value,
+        percentage: ((value / analytics.totalChannels) * 100).toFixed(1)
+      }));
+  }, [validChannels, analytics.totalChannels]);
 
-  // Memoizar top performers
+  // Top performers
   const topChannels = useMemo(() => {
-    return [...channels]
-      .sort((a, b) => (b.score || 0) - (a.score || 0))
+    return [...validChannels]
+      .sort((a, b) => b.score - a.score)
       .slice(0, 5);
-  }, [channels]);
+  }, [validChannels]);
 
   const COLORS = ['#FF0000', '#FF3333', '#FF6666', '#FF9999', '#FFCCCC'];
 
@@ -197,7 +254,7 @@ export const PlanilhaAnalytics = ({ channels = [] }: PlanilhaAnalyticsProps) => 
                 <p className="text-[#AAAAAA] text-sm">Com Email</p>
                 <p className="text-xl font-bold text-green-400">{analytics.channelsWithEmail}</p>
                 <p className="text-xs text-[#AAAAAA]">
-                  {analytics.totalChannels > 0 ? ((analytics.channelsWithEmail / analytics.totalChannels) * 100).toFixed(1) : 0}% do total
+                  {((analytics.channelsWithEmail / analytics.totalChannels) * 100).toFixed(1)}% do total
                 </p>
               </div>
               <Mail className="h-6 w-6 text-green-400" />
@@ -212,7 +269,7 @@ export const PlanilhaAnalytics = ({ channels = [] }: PlanilhaAnalyticsProps) => 
                 <p className="text-[#AAAAAA] text-sm">Com Telefone</p>
                 <p className="text-xl font-bold text-blue-400">{analytics.channelsWithPhone}</p>
                 <p className="text-xs text-[#AAAAAA]">
-                  {analytics.totalChannels > 0 ? ((analytics.channelsWithPhone / analytics.totalChannels) * 100).toFixed(1) : 0}% do total
+                  {((analytics.channelsWithPhone / analytics.totalChannels) * 100).toFixed(1)}% do total
                 </p>
               </div>
               <Phone className="h-6 w-6 text-blue-400" />
@@ -310,7 +367,7 @@ export const PlanilhaAnalytics = ({ channels = [] }: PlanilhaAnalyticsProps) => 
           <CardContent>
             <div className="space-y-3">
               {topChannels.map((channel, index) => (
-                <div key={channel.id || channel.name} className="flex items-center justify-between p-3 bg-[#0D0D0D] rounded-lg">
+                <div key={channel.id || channel.name || index} className="flex items-center justify-between p-3 bg-[#0D0D0D] rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-[#FF0000] rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {index + 1}
