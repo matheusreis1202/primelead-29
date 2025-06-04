@@ -77,6 +77,39 @@ export const PartnersTab = ({ partnershipsData = [] }: PartnersTabProps) => {
     { status: 'Rejeitado' as const, title: 'Rejeitados', color: 'bg-red-500', bgColor: 'bg-red-50/10' }
   ]
 
+  // Communication handlers
+  const handleAddCommunication = (communication: Omit<CommunicationEntry, 'id' | 'date'>) => {
+    const newCommunication: CommunicationEntry = {
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      ...communication
+    }
+    setCommunications(prev => [...prev, newCommunication])
+  }
+
+  // Follow-up handlers
+  const handleAddFollowUp = (followUp: Omit<FollowUp, 'id'>) => {
+    const newFollowUp: FollowUp = {
+      id: Date.now().toString(),
+      ...followUp
+    }
+    setFollowUps(prev => [...prev, newFollowUp])
+  }
+
+  const handleUpdateFollowUp = (id: string, updates: Partial<FollowUp>) => {
+    setFollowUps(prev => prev.map(followUp => 
+      followUp.id === id ? { ...followUp, ...updates } : followUp
+    ))
+  }
+
+  const handleDeleteFollowUp = (id: string) => {
+    setFollowUps(prev => prev.filter(followUp => followUp.id !== id))
+    toast({
+      title: "Follow-up removido",
+      description: "Tarefa removida com sucesso",
+    })
+  }
+
   const handleStatusChange = (partnerId: string, newStatus: PartnerData['status']) => {
     setPartners(prev => prev.map(partner => 
       partner.id === partnerId ? { ...partner, status: newStatus } : partner
