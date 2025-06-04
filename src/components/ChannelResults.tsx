@@ -2,8 +2,11 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ExternalLink, Users, Eye, TrendingUp, Target, Play, Award, BarChart3, Crown, User, Contact } from 'lucide-react';
 import { Channel } from '@/pages/Index';
+import { useMultiSelection } from '@/hooks/useMultiSelection';
+import { BatchOperations } from '@/components/BatchOperations';
 
 interface ChannelResultsProps {
   channels: Channel[];
@@ -15,6 +18,19 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
 
   // Ensure channels is always an array
   const safeChannels = channels || [];
+
+  // Initialize multi-selection hook
+  const {
+    selectedIds,
+    isSelected,
+    toggleSelection,
+    selectAll,
+    clearSelection,
+    getSelectedItems,
+    selectedCount,
+    isAllSelected,
+    isPartiallySelected
+  } = useMultiSelection(safeChannels);
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -47,6 +63,28 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
     return TrendingUp;
   };
 
+  // Batch operations handlers
+  const handleAnalyzeSelected = () => {
+    const selectedChannels = getSelectedItems();
+    selectedChannels.forEach(channel => onSendToAnalysis(channel));
+    clearSelection();
+  };
+
+  const handleRemoveSelected = () => {
+    // This would need to be implemented in the parent component
+    console.log('Remove selected channels:', getSelectedItems());
+    clearSelection();
+  };
+
+  const handleSendToSpreadsheet = () => {
+    console.log('Send to spreadsheet:', getSelectedItems());
+    clearSelection();
+  };
+
+  const handleCompareSelected = () => {
+    console.log('Compare selected channels:', getSelectedItems());
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -56,25 +94,63 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
           </h2>
           <p className="text-[#AAAAAA] text-xs">Ranqueados por algoritmo de performance avançado</p>
         </div>
-        <Badge 
-          variant="secondary" 
-          className="text-xs px-3 py-1 bg-[#FF0000] text-white border-0 rounded-lg"
-        >
-          {safeChannels.length} canais descobertos
-        </Badge>
+        <div className="flex items-center gap-3">
+          {safeChannels.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={(checked) => checked ? selectAll() : clearSelection()}
+                className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000]"
+              />
+              <span className="text-[#AAAAAA] text-sm">
+                {isAllSelected ? 'Desmarcar todos' : 'Selecionar todos'}
+              </span>
+            </div>
+          )}
+          <Badge 
+            variant="secondary" 
+            className="text-xs px-3 py-1 bg-[#FF0000] text-white border-0 rounded-lg"
+          >
+            {safeChannels.length} canais descobertos
+          </Badge>
+        </div>
       </div>
+
+      {/* Batch Operations */}
+      <BatchOperations
+        selectedChannels={getSelectedItems()}
+        onAnalyzeSelected={handleAnalyzeSelected}
+        onRemoveSelected={handleRemoveSelected}
+        onSendToSpreadsheet={handleSendToSpreadsheet}
+        onCompareSelected={handleCompareSelected}
+        onClearSelection={clearSelection}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {safeChannels.map((channel, index) => {
           const ScoreIcon = getScoreIcon(channel.score);
           const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
+          const selected = isSelected(channel.id);
           
           return (
             <Card 
               key={channel.id} 
-              className="bg-[#1E1E1E] border border-[#525252] hover:border-[#FF0000] transition-all duration-300 group relative overflow-hidden"
+              className={`bg-[#1E1E1E] border transition-all duration-300 group relative overflow-hidden ${
+                selected 
+                  ? 'border-[#FF0000] ring-2 ring-[#FF0000]/20' 
+                  : 'border-[#525252] hover:border-[#FF0000]'
+              }`}
             >
               <CardContent className="p-4 h-full flex flex-col">
+                {/* Selection Checkbox */}
+                <div className="absolute top-2 left-2 z-10">
+                  <Checkbox
+                    checked={selected}
+                    onCheckedChange={() => toggleSelection(channel.id)}
+                    className="border-[#525252] data-[state=checked]:bg-[#FF0000] data-[state=checked]:border-[#FF0000] bg-[#1E1E1E]"
+                  />
+                </div>
+
                 {/* Ranking Badge */}
                 {index < 3 && (
                   <div className="absolute top-2 right-2 bg-[#FF0000] text-white text-xs font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
@@ -84,7 +160,7 @@ export const ChannelResults = ({ channels, onSendToAnalysis }: ChannelResultsPro
                 )}
 
                 {/* Channel Photo */}
-                <div className="flex justify-center mb-3">
+                <div className="flex justify-center mb-3 mt-2">
                   <div className="relative">
                     {channel.thumbnail ? (
                       <img 

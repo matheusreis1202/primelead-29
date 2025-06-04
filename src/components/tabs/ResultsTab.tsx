@@ -1,5 +1,7 @@
 
+import React, { useState } from 'react';
 import { ChannelResults } from '@/components/ChannelResults';
+import { ResultsFilters } from '@/components/ResultsFilters';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Search, Target, Play } from 'lucide-react';
 import { Channel } from '@/pages/Index';
@@ -12,6 +14,14 @@ interface ResultsTabProps {
 }
 
 export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: ResultsTabProps) => {
+  const [filteredChannels, setFilteredChannels] = useState<Channel[]>(channels);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Update filtered channels when original channels change
+  React.useEffect(() => {
+    setFilteredChannels(channels);
+  }, [channels]);
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
@@ -35,7 +45,20 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
   }
 
   if (channels.length > 0) {
-    return <ChannelResults channels={channels} onSendToAnalysis={onSendToAnalysis} />;
+    return (
+      <div className="space-y-4">
+        <ResultsFilters
+          channels={channels}
+          onFiltersChange={setFilteredChannels}
+          onViewModeChange={setViewMode}
+          viewMode={viewMode}
+        />
+        <ChannelResults 
+          channels={filteredChannels} 
+          onSendToAnalysis={onSendToAnalysis} 
+        />
+      </div>
+    );
   }
 
   return (
