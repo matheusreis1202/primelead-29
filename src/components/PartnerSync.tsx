@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sync, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
+import { RotateCw, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface SyncData {
@@ -76,7 +76,7 @@ export const PartnerSync = ({ onDataSync, lastSyncTime }: PartnerSyncProps) => {
       case 'syncing': return <Clock className="h-4 w-4 text-yellow-400 animate-spin" />;
       case 'success': return <CheckCircle className="h-4 w-4 text-green-400" />;
       case 'error': return <AlertTriangle className="h-4 w-4 text-red-400" />;
-      default: return <Sync className="h-4 w-4 text-[#AAAAAA]" />;
+      default: return <RotateCw className="h-4 w-4 text-[#AAAAAA]" />;
     }
   };
 
@@ -104,7 +104,7 @@ export const PartnerSync = ({ onDataSync, lastSyncTime }: PartnerSyncProps) => {
             size="sm"
             className="bg-[#FF0000] hover:bg-[#CC0000]"
           >
-            <Sync className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+            <RotateCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
             {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
           </Button>
         </div>
@@ -116,7 +116,7 @@ export const PartnerSync = ({ onDataSync, lastSyncTime }: PartnerSyncProps) => {
             </Badge>
           </div>
           <div className="text-center">
-            <Badge className="bg-purple-500/20 text-purple-400 text-xs">
+            <Badge className="bg-red-500/20 text-red-400 text-xs">
               Email Marketing
             </Badge>
           </div>

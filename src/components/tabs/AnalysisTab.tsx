@@ -488,8 +488,8 @@ export const AnalysisTab = ({
         onClearSelection={multiSelection.clearSelection}
       />
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Cards Grid - Grid com 3 colunas para cards menores */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredAndSortedChannels.map(channel => {
           const analysisData = analyzedChannels.get(channel.id);
           const isAnalyzing = analyzingChannels.has(channel.id);
@@ -501,7 +501,7 @@ export const AnalysisTab = ({
           
           return (
             <div key={channel.id} className="animate-fade-in relative">
-              <div className="absolute top-4 left-4 z-10">
+              <div className="absolute top-3 left-3 z-10">
                 <Checkbox
                   checked={isSelected}
                   onCheckedChange={() => multiSelection.toggleSelection(channel.id)}

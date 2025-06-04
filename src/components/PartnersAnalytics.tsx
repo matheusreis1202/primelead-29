@@ -71,15 +71,15 @@ export const PartnersAnalytics = ({ partners }: PartnersAnalyticsProps) => {
       title: 'Score Médio',
       value: avgScore,
       icon: TrendingUp,
-      color: 'text-purple-400',
-      bgColor: 'bg-purple-500/20'
+      color: 'text-red-400',
+      bgColor: 'bg-red-500/20'
     },
     {
       title: 'Alto Potencial',
       value: highPotential,
       icon: Target,
-      color: 'text-orange-400',
-      bgColor: 'bg-orange-500/20'
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/20'
     }
   ];
 
