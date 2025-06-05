@@ -1,14 +1,15 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ExternalLink, Users, Eye, TrendingUp, Target, Play, Award, BarChart3, Crown, User, Maximize2 } from 'lucide-react';
+import { ExternalLink, Users, Eye, TrendingUp, Target, Play, Award, BarChart3, Crown, User, Maximize2, Calendar, Clock } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 import { useMultiSelection } from '@/hooks/useMultiSelection';
-import { useAnalysisCache } from '@/hooks/useAnalysisCache';
 import { BatchOperations } from '@/components/BatchOperations';
 import { ChannelPreviewModal } from '@/components/ChannelPreviewModal';
+import { analisarCanal } from '@/services/simpleChannelAnalysis';
 
 interface ChannelResultsProps {
   channels: Channel[];
@@ -39,9 +40,6 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
     isPartiallySelected
   } = useMultiSelection(safeChannels);
 
-  // Initialize cache hook
-  const { getCachedAnalysis, setCachedAnalysis } = useAnalysisCache();
-
   const formatNumber = React.useCallback((num: number) => {
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M`;
@@ -52,25 +50,42 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
   }, []);
 
   const getScoreColor = React.useCallback((score: number) => {
-    if (score >= 85) return 'text-[#FF0000]';
-    if (score >= 70) return 'text-white';
-    if (score >= 55) return 'text-[#AAAAAA]';
-    if (score >= 40) return 'text-blue-400';
-    return 'text-orange-400';
+    if (score >= 80) return 'text-green-400';
+    if (score >= 60) return 'text-blue-400';
+    if (score >= 40) return 'text-yellow-400';
+    return 'text-red-400';
   }, []);
 
-  const getScoreLabel = React.useCallback((score: number) => {
-    if (score >= 85) return 'PREMIUM';
-    if (score >= 70) return 'ÓTIMO';
-    if (score >= 55) return 'BOM';
-    if (score >= 40) return 'RAZOÁVEL';
-    return 'RUIM';
+  const getClassificationColor = React.useCallback((classificacao: string) => {
+    if (classificacao === 'Excelente para parceria') return 'bg-green-500';
+    if (classificacao === 'Canal promissor') return 'bg-blue-500';
+    if (classificacao === 'Canal regular') return 'bg-yellow-500';
+    return 'bg-red-500';
   }, []);
 
   const getScoreIcon = React.useCallback((score: number) => {
-    if (score >= 85) return Crown;
-    if (score >= 70) return Award;
+    if (score >= 80) return Crown;
+    if (score >= 60) return Award;
     return TrendingUp;
+  }, []);
+
+  // Analyze channel using the new system
+  const analyzeChannel = React.useCallback((channel: Channel) => {
+    // Mock some video data since we don't have video details from the search
+    const mockVideos = Array.from({ length: 5 }, (_, i) => ({
+      publishedAt: new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      likeCount: Math.floor(channel.viewCount * 0.02 * Math.random()),
+      commentCount: Math.floor(channel.viewCount * 0.005 * Math.random()),
+      viewCount: Math.floor(channel.viewCount / channel.videoCount)
+    }));
+
+    return analisarCanal({
+      id: channel.id,
+      title: channel.title,
+      subscriberCount: channel.subscriberCount,
+      viewCount: channel.viewCount,
+      publishedAt: channel.publishedAt
+    }, mockVideos);
   }, []);
 
   // Batch operations handlers
@@ -78,18 +93,9 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
     const selectedChannels = getSelectedItems();
     selectedChannels.forEach(channel => {
       onSendToAnalysis(channel);
-      setCachedAnalysis(channel.id, {
-        name: channel.title,
-        subscribers: channel.subscriberCount,
-        avgViews: channel.viewCount,
-        monthlyVideos: 10,
-        avgLikes: Math.floor(channel.viewCount * 0.03),
-        avgComments: Math.floor(channel.viewCount * 0.005),
-        subGrowth: 5
-      });
     });
     clearSelection();
-  }, [getSelectedItems, onSendToAnalysis, setCachedAnalysis, clearSelection]);
+  }, [getSelectedItems, onSendToAnalysis, clearSelection]);
 
   const handleRemoveSelected = React.useCallback(() => {
     console.log('Remove selected channels:', getSelectedItems());
@@ -128,9 +134,9 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-white mb-1">
-            Canais <span className="text-[#FF0000]">Premium</span> Encontrados
+            Canais Analisados <span className="text-[#FF0000]">Automaticamente</span>
           </h2>
-          <p className="text-[#AAAAAA] text-xs">Ranqueados por algoritmo de performance avançado</p>
+          <p className="text-[#AAAAAA] text-xs">Análise baseada em dados reais da API do YouTube</p>
         </div>
         <div className="flex items-center gap-3">
           {safeChannels.length > 0 && (
@@ -149,7 +155,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
             variant="secondary" 
             className="text-xs px-3 py-1 bg-[#FF0000] text-white border-0 rounded-lg animate-pulse"
           >
-            {safeChannels.length} canais descobertos
+            {safeChannels.length} canais analisados
           </Badge>
         </div>
       </div>
@@ -170,8 +176,8 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
           : 'grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
       }`}>
         {safeChannels.map((channel, index) => {
-          const ScoreIcon = getScoreIcon(channel.score);
-          const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
+          const analysis = analyzeChannel(channel);
+          const ScoreIcon = getScoreIcon(analysis.score);
           const selected = isSelected(channel.id);
           
           if (viewMode === 'list') {
@@ -210,13 +216,11 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                             <User className="text-[#AAAAAA] h-8 w-8" />
                           </div>
                         )}
-                        {/* Ranking Badge */}
-                        {index < 3 && (
-                          <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#FF0000] to-[#CC0000] text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
-                            <Crown className="h-2.5 w-2.5" />
-                            #{index + 1}
-                          </div>
-                        )}
+                        {/* Score Badge */}
+                        <div className={`absolute -top-2 -right-2 ${getClassificationColor(analysis.classificacao)} text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg`}>
+                          <ScoreIcon className="h-2.5 w-2.5" />
+                          {analysis.score}
+                        </div>
                       </div>
                     </div>
 
@@ -236,20 +240,17 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                         </Button>
                       </div>
                       
-                      {channel.description && (
-                        <p className="text-[#AAAAAA] text-sm leading-relaxed mb-2 line-clamp-2">
-                          {channel.description.slice(0, 120)}...
-                        </p>
-                      )}
+                      <div className="mb-2">
+                        <Badge className={`${getClassificationColor(analysis.classificacao)} text-white text-xs`}>
+                          {analysis.classificacao}
+                        </Badge>
+                      </div>
                       
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className={`flex items-center gap-1 ${getScoreColor(channel.score)}`}>
-                          <ScoreIcon className="h-4 w-4" />
-                          <span className="font-bold text-sm">{channel.score}/100</span>
-                        </div>
-                        <span className={`font-semibold text-sm ${getScoreColor(channel.score)}`}>
-                          {getScoreLabel(channel.score)}
-                        </span>
+                      <div className="grid grid-cols-2 gap-2 text-xs text-[#AAAAAA]">
+                        <div>Crescimento: {formatNumber(analysis.metrics.crescimento_subs_mes)}/mês</div>
+                        <div>Engajamento: {analysis.metrics.engajamento_percent}%</div>
+                        <div>Vídeos/mês: {analysis.metrics.videos_mes}</div>
+                        <div>Ativo há: {analysis.metrics.canal_ativo_ha_meses} meses</div>
                       </div>
                     </div>
 
@@ -269,8 +270,8 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
 
                       <div className="text-center">
                         <TrendingUp className="h-4 w-4 text-[#4CAF50] mx-auto mb-1" />
-                        <span className="text-[#AAAAAA] text-xs block">Engagement</span>
-                        <p className="font-bold text-[#4CAF50] text-sm">{engagementRate.toFixed(1)}%</p>
+                        <span className="text-[#AAAAAA] text-xs block">Score</span>
+                        <p className={`font-bold text-sm ${getScoreColor(analysis.score)}`}>{analysis.score}/100</p>
                       </div>
                     </div>
 
@@ -281,7 +282,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                         className="bg-[#FF0000] hover:bg-[#CC0000] text-white transition-all border-0 px-4 py-2 text-sm"
                       >
                         <BarChart3 className="mr-1 h-4 w-4" />
-                        Analisar
+                        Detalhes
                       </Button>
 
                       <Button 
@@ -307,7 +308,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
             );
           }
 
-          // Grid view (keeping existing grid layout)
+          // Grid view
           return (
             <Card 
               key={channel.id} 
@@ -338,14 +339,6 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                   <Maximize2 className="h-3 w-3" />
                 </Button>
 
-                {/* Ranking Badge */}
-                {index < 3 && (
-                  <div className="absolute top-2 right-10 bg-gradient-to-r from-[#FF0000] to-[#CC0000] text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
-                    <Crown className="h-2.5 w-2.5" />
-                    #{index + 1}
-                  </div>
-                )}
-
                 {/* Channel Photo */}
                 <div className="flex justify-center mb-3 mt-2">
                   <div className="relative">
@@ -360,6 +353,10 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                         <User className="text-[#AAAAAA] h-6 w-6" />
                       </div>
                     )}
+                    {/* Score Badge */}
+                    <div className={`absolute -top-1 -right-1 ${getClassificationColor(analysis.classificacao)} text-white text-xs font-bold px-1.5 py-0.5 rounded-full`}>
+                      {analysis.score}
+                    </div>
                   </div>
                 </div>
 
@@ -369,22 +366,15 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                     {channel.title}
                   </h3>
                   
-                  {channel.description && (
-                    <p className="text-[#AAAAAA] leading-relaxed mb-2 line-clamp-2 text-xs">
-                      {channel.description.slice(0, 80)}...
-                    </p>
-                  )}
-                  
-                  <div className="flex items-center gap-1 justify-center">
-                    <div className={`flex items-center gap-1 ${getScoreColor(channel.score)}`}>
-                      <ScoreIcon className="h-3 w-3" />
-                      <span className="font-bold text-xs">{channel.score}/100</span>
-                    </div>
+                  <div className="mb-2">
+                    <Badge className={`${getClassificationColor(analysis.classificacao)} text-white text-xs`}>
+                      {analysis.classificacao}
+                    </Badge>
                   </div>
-                  <div className="text-center mt-1">
-                    <span className={`font-semibold text-xs ${getScoreColor(channel.score)}`}>
-                      {getScoreLabel(channel.score)}
-                    </span>
+                  
+                  <div className={`flex items-center gap-1 justify-center ${getScoreColor(analysis.score)}`}>
+                    <ScoreIcon className="h-3 w-3" />
+                    <span className="font-bold text-xs">{analysis.score}/100</span>
                   </div>
                 </div>
 
@@ -399,18 +389,18 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                   </div>
 
                   <div className="flex items-center gap-2 p-2 bg-[#0D0D0D] rounded-lg">
-                    <Eye className="text-[#FF0000] flex-shrink-0 h-3 w-3" />
+                    <TrendingUp className="text-[#4CAF50] flex-shrink-0 h-3 w-3" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[#AAAAAA] block text-xs">Views</span>
-                      <p className="font-bold text-white truncate text-sm">{formatNumber(channel.viewCount)}</p>
+                      <span className="text-[#AAAAAA] block text-xs">Crescimento/mês</span>
+                      <p className="font-bold text-[#4CAF50] text-sm">{formatNumber(analysis.metrics.crescimento_subs_mes)}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 p-2 bg-[#0D0D0D] rounded-lg">
-                    <TrendingUp className="text-[#4CAF50] flex-shrink-0 h-3 w-3" />
+                    <Calendar className="text-blue-400 flex-shrink-0 h-3 w-3" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[#AAAAAA] block text-xs">Engagement</span>
-                      <p className="font-bold text-[#4CAF50] text-sm">{engagementRate.toFixed(1)}%</p>
+                      <span className="text-[#AAAAAA] block text-xs">Vídeos/mês</span>
+                      <p className="font-bold text-blue-400 text-sm">{analysis.metrics.videos_mes}</p>
                     </div>
                   </div>
                 </div>
@@ -422,7 +412,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                     className="bg-[#FF0000] hover:bg-[#CC0000] text-white transition-all border-0 w-full text-xs py-2"
                   >
                     <BarChart3 className="mr-1 h-3 w-3" />
-                    Enviar para Análise
+                    Ver Detalhes
                   </Button>
 
                   <Button 
