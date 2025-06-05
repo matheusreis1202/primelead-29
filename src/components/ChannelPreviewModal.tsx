@@ -3,7 +3,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Users, Eye, TrendingUp, Calendar, Video, Heart, MessageSquare, Crown, Award, BarChart3, Play, User } from 'lucide-react';
+import { ExternalLink, Users, Eye, TrendingUp, Calendar, Video, Heart, MessageSquare, Play, User, BarChart3 } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
 interface ChannelPreviewModalProps {
@@ -30,25 +30,18 @@ export const ChannelPreviewModal = React.memo(({
     return num.toLocaleString();
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-400';
-    if (score >= 60) return 'text-blue-400';
-    return 'text-red-400';
+  const getClassificationColor = (score: number) => {
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 60) return 'bg-blue-500';
+    return 'bg-red-500';
   };
 
-  const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'PREMIUM';
-    if (score >= 60) return 'BOM';
-    return 'MÉDIO';
+  const getClassificationLabel = (score: number) => {
+    if (score >= 80) return 'Excelente para parceria';
+    if (score >= 60) return 'Canal promissor';
+    return 'Canal fraco para parcerias';
   };
 
-  const getScoreIcon = (score: number) => {
-    if (score >= 80) return Crown;
-    if (score >= 60) return Award;
-    return TrendingUp;
-  };
-
-  const ScoreIcon = getScoreIcon(channel.score);
   const engagementRate = ((channel.viewCount / channel.subscriberCount) * 100);
 
   return (
@@ -80,16 +73,11 @@ export const ChannelPreviewModal = React.memo(({
             <div className="flex-1 min-w-0">
               <h3 className="text-xl font-bold text-white mb-2">{channel.title}</h3>
               
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`flex items-center gap-2 ${getScoreColor(channel.score)}`}>
-                  <ScoreIcon className="h-5 w-5" />
-                  <span className="text-lg font-bold">{channel.score}/100</span>
-                </div>
+              <div className="mb-3">
                 <Badge 
-                  variant="secondary" 
-                  className={`${getScoreColor(channel.score)} bg-transparent border border-current`}
+                  className={`${getClassificationColor(channel.score)} text-white`}
                 >
-                  {getScoreLabel(channel.score)}
+                  {getClassificationLabel(channel.score)}
                 </Badge>
               </div>
 

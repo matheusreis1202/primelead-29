@@ -23,7 +23,7 @@ export const ResultsFilters = React.memo(({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'score' | 'subscribers' | 'views' | 'engagement'>('score');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [scoreFilter, setScoreFilter] = useState<'all' | 'premium' | 'bom' | 'medio'>('all');
+  const [classificationFilter, setClassificationFilter] = useState<'all' | 'excelente' | 'promissor' | 'fraco'>('all');
 
   // Apply filters and sorting (memoized for performance)
   const filteredChannels = useMemo(() => {
@@ -38,17 +38,22 @@ export const ResultsFilters = React.memo(({
       );
     }
 
-    // Apply score filter - usando novo sistema
-    switch (scoreFilter) {
-      case 'premium':
-        filtered = filtered.filter(channel => channel.score >= 80);
-        break;
-      case 'bom':
-        filtered = filtered.filter(channel => channel.score >= 60 && channel.score < 80);
-        break;
-      case 'medio':
-        filtered = filtered.filter(channel => channel.score < 60);
-        break;
+    // Apply classification filter
+    if (classificationFilter !== 'all') {
+      filtered = filtered.filter(channel => {
+        // Use the score to determine classification
+        const score = channel.score;
+        switch (classificationFilter) {
+          case 'excelente':
+            return score >= 80;
+          case 'promissor':
+            return score >= 60 && score < 80;
+          case 'fraco':
+            return score < 60;
+          default:
+            return true;
+        }
+      });
     }
 
     // Apply sorting
@@ -80,7 +85,7 @@ export const ResultsFilters = React.memo(({
     });
 
     return filtered;
-  }, [channels, searchTerm, sortBy, sortOrder, scoreFilter]);
+  }, [channels, searchTerm, sortBy, sortOrder, classificationFilter]);
 
   // Update filtered channels when filters change
   React.useEffect(() => {
@@ -131,16 +136,16 @@ export const ResultsFilters = React.memo(({
             </Button>
           </div>
 
-          {/* Score Filter - Novo sistema */}
-          <Select value={scoreFilter} onValueChange={(value: any) => setScoreFilter(value)}>
-            <SelectTrigger className="w-32 bg-[#0D0D0D] border-[#333] text-white">
+          {/* Classification Filter */}
+          <Select value={classificationFilter} onValueChange={(value: any) => setClassificationFilter(value)}>
+            <SelectTrigger className="w-48 bg-[#0D0D0D] border-[#333] text-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-[#1e1e1e] border-[#333]">
               <SelectItem value="all" className="text-white hover:bg-[#333]">Todos</SelectItem>
-              <SelectItem value="premium" className="text-white hover:bg-[#333]">Premium</SelectItem>
-              <SelectItem value="bom" className="text-white hover:bg-[#333]">Bom</SelectItem>
-              <SelectItem value="medio" className="text-white hover:bg-[#333]">Médio</SelectItem>
+              <SelectItem value="excelente" className="text-white hover:bg-[#333]">Excelente para parceria</SelectItem>
+              <SelectItem value="promissor" className="text-white hover:bg-[#333]">Canal promissor</SelectItem>
+              <SelectItem value="fraco" className="text-white hover:bg-[#333]">Canal fraco para parcerias</SelectItem>
             </SelectContent>
           </Select>
 
@@ -174,16 +179,20 @@ export const ResultsFilters = React.memo(({
         </div>
 
         {/* Active Filters */}
-        {(searchTerm || scoreFilter !== 'all') && (
+        {(searchTerm || classificationFilter !== 'all') && (
           <div className="flex flex-wrap gap-2 mt-3">
             {searchTerm && (
               <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
                 Busca: {searchTerm}
               </Badge>
             )}
-            {scoreFilter !== 'all' && (
+            {classificationFilter !== 'all' && (
               <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
-                Nível: {scoreFilter === 'premium' ? 'Premium' : scoreFilter === 'bom' ? 'Bom' : 'Médio'}
+                Classificação: {
+                  classificationFilter === 'excelente' ? 'Excelente para parceria' :
+                  classificationFilter === 'promissor' ? 'Canal promissor' :
+                  'Canal fraco para parcerias'
+                }
               </Badge>
             )}
           </div>
