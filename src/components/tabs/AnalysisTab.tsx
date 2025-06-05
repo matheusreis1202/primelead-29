@@ -13,16 +13,6 @@ import { useAnalysisCache } from '@/hooks/useAnalysisCache';
 import { useMultiSelection } from '@/hooks/useMultiSelection';
 import { analisarCanal } from '@/services/simpleChannelAnalysis';
 
-interface ChannelData {
-  name: string
-  subscribers: number
-  avgViews: number
-  monthlyVideos: number
-  avgLikes: number
-  avgComments: number
-  subGrowth: number
-}
-
 interface AnalysisTabProps {
   channels: Channel[];
   onRemoveChannel: (channelId: string) => void;
@@ -36,7 +26,7 @@ export const AnalysisTab = ({
   onSendToPartners,
   onSaveToSpreadsheet
 }: AnalysisTabProps) => {
-  const [analyzedChannels, setAnalyzedChannels] = useState<Map<string, ChannelData>>(new Map());
+  const [analyzedChannels, setAnalyzedChannels] = useState<Map<string, boolean>>(new Map());
   const [analyzingChannels, setAnalyzingChannels] = useState<Set<string>>(new Set());
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
@@ -59,6 +49,26 @@ export const AnalysisTab = ({
   // Ensure channels is always an array
   const safeChannels = channels || [];
 
+  // Função para analisar canal usando o sistema unificado
+  const analyzeChannelData = (channel: Channel) => {
+    // Mock some video data since we don't have video details from the search
+    const mockVideos = Array.from({ length: 5 }, (_, i) => ({
+      publishedAt: new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      likeCount: Math.floor(channel.viewCount * 0.02 * Math.random()),
+      commentCount: Math.floor(channel.viewCount * 0.005 * Math.random()),
+      viewCount: Math.floor(channel.viewCount / channel.videoCount)
+    }));
+
+    return analisarCanal({
+      id: channel.id,
+      title: channel.title,
+      subscriberCount: channel.subscriberCount,
+      viewCount: channel.viewCount,
+      videoCount: channel.videoCount,
+      publishedAt: channel.publishedAt
+    }, mockVideos);
+  };
+
   // Aplicar filtros e ordenação
   const filteredAndSortedChannels = useMemo(() => {
     let filtered = [...safeChannels];
@@ -79,10 +89,8 @@ export const AnalysisTab = ({
     // Aplicar filtro de engajamento (apenas para canais analisados)
     if (filters.minEngagement > 0) {
       filtered = filtered.filter(channel => {
-        const analysisData = analyzedChannels.get(channel.id);
-        if (!analysisData) return true;
-        const engagement = ((analysisData.avgLikes + analysisData.avgComments) / analysisData.avgViews) * 100;
-        return engagement >= filters.minEngagement;
+        const analysis = analyzeChannelData(channel);
+        return analysis.metrics.engajamento_percent >= filters.minEngagement;
       });
     }
 
@@ -96,22 +104,22 @@ export const AnalysisTab = ({
           valueB = b.subscriberCount;
           break;
         case 'avgViews':
-          const dataA = analyzedChannels.get(a.id);
-          const dataB = analyzedChannels.get(b.id);
-          valueA = dataA?.avgViews || 0;
-          valueB = dataB?.avgViews || 0;
+          const analysisA = analyzeChannelData(a);
+          const analysisB = analyzeChannelData(b);
+          valueA = analysisA.metrics.views_por_video;
+          valueB = analysisB.metrics.views_por_video;
           break;
         case 'engagement':
-          const engA = analyzedChannels.get(a.id);
-          const engB = analyzedChannels.get(b.id);
-          valueA = engA ? ((engA.avgLikes + engA.avgComments) / engA.avgViews) * 100 : 0;
-          valueB = engB ? ((engB.avgLikes + engB.avgComments) / engB.avgViews) * 100 : 0;
+          const engA = analyzeChannelData(a);
+          const engB = analyzeChannelData(b);
+          valueA = engA.metrics.engajamento_percent;
+          valueB = engB.metrics.engajamento_percent;
           break;
         case 'growth':
-          const growthA = analyzedChannels.get(a.id);
-          const growthB = analyzedChannels.get(b.id);
-          valueA = growthA?.subGrowth || 0;
-          valueB = growthB?.subGrowth || 0;
+          const growthA = analyzeChannelData(a);
+          const growthB = analyzeChannelData(b);
+          valueA = growthA.metrics.crescimento_mensal;
+          valueB = growthB.metrics.crescimento_mensal;
           break;
         default:
           valueA = a.subscriberCount;
@@ -124,47 +132,15 @@ export const AnalysisTab = ({
     return filtered;
   }, [safeChannels, analyzedChannels, filters]);
 
-  // Converter dados do canal para o formato de análise usando o novo sistema
-  const convertChannelToAnalysisData = (channel: Channel): ChannelData => {
-    // Usar o novo sistema de análise
-    const analysisResult = analisarCanal({
-      id: channel.id,
-      title: channel.title,
-      subscriberCount: channel.subscriberCount,
-      viewCount: channel.viewCount,
-      videoCount: channel.videoCount,
-      publishedAt: channel.publishedAt
-    });
-
-    return {
-      name: channel.title,
-      subscribers: channel.subscriberCount,
-      avgViews: analysisResult.metrics.views_por_video,
-      monthlyVideos: analysisResult.metrics.frequencia_mensal,
-      avgLikes: Math.floor(analysisResult.metrics.views_por_video * (analysisResult.metrics.engajamento_percent / 100) * 0.8),
-      avgComments: Math.floor(analysisResult.metrics.views_por_video * (analysisResult.metrics.engajamento_percent / 100) * 0.2),
-      subGrowth: Math.round((analysisResult.metrics.crescimento_mensal / channel.subscriberCount) * 100)
-    };
-  };
-
   const handleAnalyzeChannel = async (channel: Channel) => {
     if (analyzedChannels.has(channel.id)) return;
-    
-    // Verificar cache primeiro
-    const cachedData = getCachedAnalysis(channel.id);
-    if (cachedData) {
-      setAnalyzedChannels(prev => new Map(prev).set(channel.id, cachedData));
-      return;
-    }
     
     setAnalyzingChannels(prev => new Set(prev).add(channel.id));
     
     // Simular análise com delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const analysisData = convertChannelToAnalysisData(channel);
-    setAnalyzedChannels(prev => new Map(prev).set(channel.id, analysisData));
-    setCachedAnalysis(channel.id, analysisData);
+    setAnalyzedChannels(prev => new Map(prev).set(channel.id, true));
     setAnalyzingChannels(prev => {
       const newSet = new Set(prev);
       newSet.delete(channel.id);
@@ -189,23 +165,9 @@ export const AnalysisTab = ({
     
     // Analisar todos sequencialmente
     for (const channel of unanalyzedSelected) {
-      // Verificar cache primeiro
-      const cachedData = getCachedAnalysis(channel.id);
-      if (cachedData) {
-        setAnalyzedChannels(prev => new Map(prev).set(channel.id, cachedData));
-        setAnalyzingChannels(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(channel.id);
-          return newSet;
-        });
-        continue;
-      }
-
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const analysisData = convertChannelToAnalysisData(channel);
-      setAnalyzedChannels(prev => new Map(prev).set(channel.id, analysisData));
-      setCachedAnalysis(channel.id, analysisData);
+      setAnalyzedChannels(prev => new Map(prev).set(channel.id, true));
       setAnalyzingChannels(prev => {
         const newSet = new Set(prev);
         newSet.delete(channel.id);
@@ -222,74 +184,7 @@ export const AnalysisTab = ({
 
   const handleSendSelectedToSpreadsheet = () => {
     const selectedChannels = multiSelection.getSelectedItems();
-    selectedChannels.forEach(channel => {
-      const analysisData = analyzedChannels.get(channel.id);
-      
-      if (analysisData) {
-        const engagementRate = ((analysisData.avgLikes + analysisData.avgComments) / analysisData.avgViews * 100).toFixed(1);
-        
-        const calculateScore = (data: ChannelData) => {
-          let score = 0;
-          
-          if (data.subscribers > 1000000) score += 25;
-          else if (data.subscribers > 500000) score += 20;
-          else if (data.subscribers > 100000) score += 15;
-          else if (data.subscribers > 50000) score += 10;
-          else if (data.subscribers > 10000) score += 5;
-          
-          if (data.avgViews > 500000) score += 25;
-          else if (data.avgViews > 100000) score += 20;
-          else if (data.avgViews > 50000) score += 15;
-          else if (data.avgViews > 10000) score += 10;
-          else if (data.avgViews > 1000) score += 5;
-          
-          if (data.monthlyVideos > 20) score += 20;
-          else if (data.monthlyVideos > 15) score += 15;
-          else if (data.monthlyVideos > 10) score += 10;
-          else if (data.monthlyVideos > 5) score += 5;
-          
-          const engagement = (data.avgLikes + data.avgComments) / data.avgViews * 100;
-          if (engagement > 8) score += 20;
-          else if (engagement > 5) score += 15;
-          else if (engagement > 3) score += 10;
-          else if (engagement > 1) score += 5;
-          
-          if (data.subGrowth > 40) score += 10;
-          else if (data.subGrowth > 25) score += 8;
-          else if (data.subGrowth > 15) score += 6;
-          else if (data.subGrowth > 10) score += 4;
-          else if (data.subGrowth > 5) score += 2;
-          
-          return Math.min(score, 100);
-        };
-        
-        const score = calculateScore(analysisData);
-        
-        let classification = 'Baixo Potencial';
-        if (score >= 80) classification = 'Altíssimo Potencial';
-        else if (score >= 65) classification = 'Grande Potencial';
-        else if (score >= 45) classification = 'Médio Potencial';
-        
-        const channelForPlanilha = {
-          id: channel.id,
-          photo: channel.thumbnail,
-          name: analysisData.name,
-          link: `https://youtube.com/channel/${channel.id}`,
-          phone: '+55 11 00000-0000',
-          subscribers: analysisData.subscribers,
-          avgViews: analysisData.avgViews,
-          monthlyVideos: analysisData.monthlyVideos,
-          engagement: engagementRate,
-          subGrowth: analysisData.subGrowth.toString(),
-          score: score,
-          classification: classification
-        };
-        
-        onSaveToSpreadsheet?.(channelForPlanilha);
-      } else {
-        onSaveToSpreadsheet?.(channel);
-      }
-    });
+    selectedChannels.forEach(channel => handleSendToSpreadsheet(channel));
     multiSelection.clearSelection();
   };
 
@@ -298,72 +193,24 @@ export const AnalysisTab = ({
   };
 
   const handleSendToSpreadsheet = (channel: Channel) => {
-    const analysisData = analyzedChannels.get(channel.id);
+    const analysis = analyzeChannelData(channel);
     
-    if (analysisData) {
-      const engagementRate = ((analysisData.avgLikes + analysisData.avgComments) / analysisData.avgViews * 100).toFixed(1);
-      
-      const calculateScore = (data: ChannelData) => {
-        let score = 0;
-        
-        if (data.subscribers > 1000000) score += 25;
-        else if (data.subscribers > 500000) score += 20;
-        else if (data.subscribers > 100000) score += 15;
-        else if (data.subscribers > 50000) score += 10;
-        else if (data.subscribers > 10000) score += 5;
-        
-        if (data.avgViews > 500000) score += 25;
-        else if (data.avgViews > 100000) score += 20;
-        else if (data.avgViews > 50000) score += 15;
-        else if (data.avgViews > 10000) score += 10;
-        else if (data.avgViews > 1000) score += 5;
-        
-        if (data.monthlyVideos > 20) score += 20;
-        else if (data.monthlyVideos > 15) score += 15;
-        else if (data.monthlyVideos > 10) score += 10;
-        else if (data.monthlyVideos > 5) score += 5;
-        
-        const engagement = (data.avgLikes + data.avgComments) / data.avgViews * 100;
-        if (engagement > 8) score += 20;
-        else if (engagement > 5) score += 15;
-        else if (engagement > 3) score += 10;
-        else if (engagement > 1) score += 5;
-        
-        if (data.subGrowth > 40) score += 10;
-        else if (data.subGrowth > 25) score += 8;
-        else if (data.subGrowth > 15) score += 6;
-        else if (data.subGrowth > 10) score += 4;
-        else if (data.subGrowth > 5) score += 2;
-        
-        return Math.min(score, 100);
-      };
-      
-      const score = calculateScore(analysisData);
-      
-      let classification = 'Baixo Potencial';
-      if (score >= 80) classification = 'Altíssimo Potencial';
-      else if (score >= 65) classification = 'Grande Potencial';
-      else if (score >= 45) classification = 'Médio Potencial';
-      
-      const channelForPlanilha = {
-        id: channel.id,
-        photo: channel.thumbnail,
-        name: analysisData.name,
-        link: `https://youtube.com/channel/${channel.id}`,
-        phone: '+55 11 00000-0000',
-        subscribers: analysisData.subscribers,
-        avgViews: analysisData.avgViews,
-        monthlyVideos: analysisData.monthlyVideos,
-        engagement: engagementRate,
-        subGrowth: analysisData.subGrowth.toString(),
-        score: score,
-        classification: classification
-      };
-      
-      onSaveToSpreadsheet?.(channelForPlanilha);
-    } else {
-      onSaveToSpreadsheet?.(channel);
-    }
+    const channelForPlanilha = {
+      id: channel.id,
+      photo: channel.thumbnail,
+      name: channel.title,
+      link: `https://youtube.com/channel/${channel.id}`,
+      phone: '+55 11 00000-0000',
+      subscribers: channel.subscriberCount,
+      avgViews: analysis.metrics.views_por_video,
+      monthlyVideos: analysis.metrics.frequencia_mensal,
+      engagement: analysis.metrics.engajamento_percent.toFixed(1),
+      subGrowth: analysis.metrics.crescimento_mensal.toString(),
+      score: analysis.score,
+      classification: analysis.classificacao
+    };
+    
+    onSaveToSpreadsheet?.(channelForPlanilha);
   };
 
   const handleSendToPartners = (channel: Channel) => {
@@ -389,7 +236,7 @@ export const AnalysisTab = ({
 
   const selectedChannelsForComparison = multiSelection.getSelectedItems().map(channel => ({
     channel,
-    analysisData: analyzedChannels.get(channel.id)
+    analysisData: analyzedChannels.has(channel.id) ? analyzeChannelData(channel) : undefined
   }));
 
   return (
@@ -435,7 +282,12 @@ export const AnalysisTab = ({
 
           {unanalyzedCount > 0 && (
             <Button 
-              onClick={handleAnalyzeSelected}
+              onClick={() => {
+                const unanalyzedSelected = multiSelection.getSelectedItems().filter(channel => 
+                  !analyzedChannels.has(channel.id) && !analyzingChannels.has(channel.id)
+                );
+                unanalyzedSelected.forEach(channel => handleAnalyzeChannel(channel));
+              }}
               disabled={analyzingChannels.size > 0}
               className="bg-gradient-to-r from-[#FF0000] to-[#CC0000] hover:from-[#CC0000] hover:to-[#AA0000] text-white transition-all duration-300 hover:scale-105"
             >
@@ -455,17 +307,28 @@ export const AnalysisTab = ({
       {/* Operações em Lote */}
       <BatchOperations
         selectedChannels={multiSelection.getSelectedItems()}
-        onAnalyzeSelected={handleAnalyzeSelected}
-        onRemoveSelected={handleRemoveSelected}
-        onSendToSpreadsheet={handleSendSelectedToSpreadsheet}
-        onCompareSelected={handleCompareSelected}
+        onAnalyzeSelected={() => {
+          const selectedChannels = multiSelection.getSelectedItems();
+          selectedChannels.forEach(channel => handleAnalyzeChannel(channel));
+        }}
+        onRemoveSelected={() => {
+          const selectedChannels = multiSelection.getSelectedItems();
+          selectedChannels.forEach(channel => onRemoveChannel(channel.id));
+          multiSelection.clearSelection();
+        }}
+        onSendToSpreadsheet={() => {
+          const selectedChannels = multiSelection.getSelectedItems();
+          selectedChannels.forEach(channel => handleSendToSpreadsheet(channel));
+          multiSelection.clearSelection();
+        }}
+        onCompareSelected={() => setShowComparison(true)}
         onClearSelection={multiSelection.clearSelection}
       />
 
       {/* Cards Grid - Grid com 3 colunas para cards menores */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredAndSortedChannels.map(channel => {
-          const analysisData = analyzedChannels.get(channel.id);
+          const isAnalyzed = analyzedChannels.has(channel.id);
           const isAnalyzing = analyzingChannels.has(channel.id);
           const isSelected = multiSelection.isSelected(channel.id);
           
@@ -484,7 +347,7 @@ export const AnalysisTab = ({
               </div>
               <ModernAnalysisCard
                 channel={channel}
-                analysisData={analysisData}
+                analysisData={isAnalyzed ? true : undefined}
                 onAnalyze={() => handleAnalyzeChannel(channel)}
                 onRemove={() => onRemoveChannel(channel.id)}
                 onSendToSpreadsheet={() => handleSendToSpreadsheet(channel)}

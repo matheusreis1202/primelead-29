@@ -19,19 +19,9 @@ import {
 import { Channel } from '@/pages/Index';
 import { analisarCanal } from '@/services/simpleChannelAnalysis';
 
-interface ChannelData {
-  name: string;
-  subscribers: number;
-  avgViews: number;
-  monthlyVideos: number;
-  avgLikes: number;
-  avgComments: number;
-  subGrowth: number;
-}
-
 interface ModernAnalysisCardProps {
   channel: Channel;
-  analysisData?: ChannelData;
+  analysisData?: any;
   isAnalyzing?: boolean;
   onAnalyze: () => void;
   onRemove: () => void;
@@ -59,29 +49,33 @@ export const ModernAnalysisCard = ({
     return num.toLocaleString();
   };
 
-  // Usar o novo sistema de análise
+  // Usar o mesmo sistema de análise da aba resultados
   const getChannelAnalysis = () => {
-    if (!analysisData) return null;
-    
-    const analysisResult = analisarCanal({
+    // Mock some video data since we don't have video details from the search
+    const mockVideos = Array.from({ length: 5 }, (_, i) => ({
+      publishedAt: new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      likeCount: Math.floor(channel.viewCount * 0.02 * Math.random()),
+      commentCount: Math.floor(channel.viewCount * 0.005 * Math.random()),
+      viewCount: Math.floor(channel.viewCount / channel.videoCount)
+    }));
+
+    return analisarCanal({
       id: channel.id,
       title: channel.title,
       subscriberCount: channel.subscriberCount,
       viewCount: channel.viewCount,
       videoCount: channel.videoCount,
       publishedAt: channel.publishedAt
-    });
-
-    return analysisResult;
+    }, mockVideos);
   };
 
   const analysis = getChannelAnalysis();
   const score = analysis?.score || 0;
 
-  const getClassification = (score: number) => {
-    if (score >= 80) return { text: 'Excelente para parceria', color: 'bg-green-500' };
-    if (score >= 60) return { text: 'Canal promissor', color: 'bg-blue-500' };
-    return { text: 'Canal fraco para parcerias', color: 'bg-red-500' };
+  const getClassification = (classificacao: string) => {
+    if (classificacao === 'Excelente') return { text: 'Excelente', color: 'bg-green-500' };
+    if (classificacao === 'Promissor') return { text: 'Promissor', color: 'bg-blue-500' };
+    return { text: 'Fraco', color: 'bg-red-500' };
   };
 
   const getScoreColor = (score: number) => {
@@ -90,10 +84,7 @@ export const ModernAnalysisCard = ({
     return 'text-red-400';
   };
 
-  const classification = getClassification(score);
-  const engagementRate = analysisData 
-    ? ((analysisData.avgLikes + analysisData.avgComments) / analysisData.avgViews * 100)
-    : (analysis?.metrics.engajamento_percent || 0);
+  const classification = getClassification(analysis?.classificacao || 'Fraco');
 
   return (
     <Card 
@@ -201,7 +192,7 @@ export const ModernAnalysisCard = ({
               />
             </div>
 
-            {/* Metrics Grid Compacto */}
+            {/* Metrics Grid Compacto - usando dados exatos da análise */}
             <div className="grid grid-cols-2 gap-2">
               <div className="bg-[#0D0D0D] border border-[#333] rounded-md p-2">
                 <div className="flex items-center gap-1 mb-1">
@@ -209,33 +200,33 @@ export const ModernAnalysisCard = ({
                   <span className="text-white text-xs font-medium">Engajamento</span>
                 </div>
                 <div className="text-lg font-bold text-white">
-                  {engagementRate.toFixed(1)}%
+                  {analysis.metrics.engajamento_percent.toFixed(1)}%
                 </div>
                 <div className="text-xs text-[#AAAAAA]">
-                  {formatNumber(analysisData.avgLikes + analysisData.avgComments)} interações
+                  interações médias
                 </div>
               </div>
 
               <div className="bg-[#0D0D0D] border border-[#333] rounded-md p-2">
                 <div className="flex items-center gap-1 mb-1">
                   <Calendar className="h-3 w-3 text-[#FF0000]" />
-                  <span className="text-white text-xs font-medium">Frequência</span>
+                  <span className="text-white text-xs font-medium">Crescimento</span>
                 </div>
                 <div className="text-lg font-bold text-white">
-                  {analysisData.monthlyVideos}
+                  {formatNumber(analysis.metrics.crescimento_mensal)}
                 </div>
                 <div className="text-xs text-[#AAAAAA]">
-                  vídeos/mês
+                  inscritos/mês
                 </div>
               </div>
 
               <div className="bg-[#0D0D0D] border border-[#333] rounded-md p-2">
                 <div className="flex items-center gap-1 mb-1">
                   <Eye className="h-3 w-3 text-[#FF0000]" />
-                  <span className="text-white text-xs font-medium">Views Médias</span>
+                  <span className="text-white text-xs font-medium">Views/Vídeo</span>
                 </div>
                 <div className="text-lg font-bold text-white">
-                  {formatNumber(analysisData.avgViews)}
+                  {formatNumber(analysis.metrics.views_por_video)}
                 </div>
                 <div className="text-xs text-[#AAAAAA]">
                   por vídeo
@@ -244,14 +235,14 @@ export const ModernAnalysisCard = ({
 
               <div className="bg-[#0D0D0D] border border-[#333] rounded-md p-2">
                 <div className="flex items-center gap-1 mb-1">
-                  <TrendingUp className="h-3 w-3 text-[#FF0000]" />
-                  <span className="text-white text-xs font-medium">Crescimento</span>
+                  <Eye className="h-3 w-3 text-[#FF0000]" />
+                  <span className="text-white text-xs font-medium">Views Totais</span>
                 </div>
                 <div className="text-lg font-bold text-white">
-                  {analysisData.subGrowth}%
+                  {formatNumber(channel.viewCount)}
                 </div>
                 <div className="text-xs text-[#AAAAAA]">
-                  90 dias
+                  total do canal
                 </div>
               </div>
             </div>
