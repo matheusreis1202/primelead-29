@@ -23,14 +23,7 @@ export const ResultsFilters = React.memo(({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'score' | 'subscribers' | 'views' | 'engagement'>('score');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [scoreFilter, setScoreFilter] = useState<'all' | 'premium' | 'good' | 'average'>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-
-  // Get unique categories from channels (memoized for performance)
-  const categories = useMemo(() => 
-    Array.from(new Set(channels.map(c => c.category).filter(Boolean))), 
-    [channels]
-  );
+  const [scoreFilter, setScoreFilter] = useState<'all' | 'premium' | 'bom' | 'medio'>('all');
 
   // Apply filters and sorting (memoized for performance)
   const filteredChannels = useMemo(() => {
@@ -45,22 +38,17 @@ export const ResultsFilters = React.memo(({
       );
     }
 
-    // Apply score filter
+    // Apply score filter - usando novo sistema
     switch (scoreFilter) {
       case 'premium':
-        filtered = filtered.filter(channel => channel.score >= 85);
+        filtered = filtered.filter(channel => channel.score >= 80);
         break;
-      case 'good':
-        filtered = filtered.filter(channel => channel.score >= 70 && channel.score < 85);
+      case 'bom':
+        filtered = filtered.filter(channel => channel.score >= 60 && channel.score < 80);
         break;
-      case 'average':
-        filtered = filtered.filter(channel => channel.score >= 55 && channel.score < 70);
+      case 'medio':
+        filtered = filtered.filter(channel => channel.score < 60);
         break;
-    }
-
-    // Apply category filter
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(channel => channel.category === categoryFilter);
     }
 
     // Apply sorting
@@ -92,7 +80,7 @@ export const ResultsFilters = React.memo(({
     });
 
     return filtered;
-  }, [channels, searchTerm, sortBy, sortOrder, scoreFilter, categoryFilter]);
+  }, [channels, searchTerm, sortBy, sortOrder, scoreFilter]);
 
   // Update filtered channels when filters change
   React.useEffect(() => {
@@ -143,35 +131,18 @@ export const ResultsFilters = React.memo(({
             </Button>
           </div>
 
-          {/* Score Filter */}
+          {/* Score Filter - Novo sistema */}
           <Select value={scoreFilter} onValueChange={(value: any) => setScoreFilter(value)}>
             <SelectTrigger className="w-32 bg-[#0D0D0D] border-[#333] text-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-[#1e1e1e] border-[#333]">
               <SelectItem value="all" className="text-white hover:bg-[#333]">Todos</SelectItem>
-              <SelectItem value="premium" className="text-white hover:bg-[#333]">Premium (85+)</SelectItem>
-              <SelectItem value="good" className="text-white hover:bg-[#333]">Bom (70-84)</SelectItem>
-              <SelectItem value="average" className="text-white hover:bg-[#333]">Médio (55-69)</SelectItem>
+              <SelectItem value="premium" className="text-white hover:bg-[#333]">Premium</SelectItem>
+              <SelectItem value="bom" className="text-white hover:bg-[#333]">Bom</SelectItem>
+              <SelectItem value="medio" className="text-white hover:bg-[#333]">Médio</SelectItem>
             </SelectContent>
           </Select>
-
-          {/* Category Filter */}
-          {categories.length > 0 && (
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-40 bg-[#0D0D0D] border-[#333] text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#1e1e1e] border-[#333]">
-                <SelectItem value="all" className="text-white hover:bg-[#333]">Todas Categorias</SelectItem>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category} className="text-white hover:bg-[#333]">
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
 
           {/* View Mode Toggle */}
           <div className="flex items-center border border-[#333] rounded-lg overflow-hidden">
@@ -203,7 +174,7 @@ export const ResultsFilters = React.memo(({
         </div>
 
         {/* Active Filters */}
-        {(searchTerm || scoreFilter !== 'all' || categoryFilter !== 'all') && (
+        {(searchTerm || scoreFilter !== 'all') && (
           <div className="flex flex-wrap gap-2 mt-3">
             {searchTerm && (
               <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
@@ -212,12 +183,7 @@ export const ResultsFilters = React.memo(({
             )}
             {scoreFilter !== 'all' && (
               <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
-                Score: {scoreFilter === 'premium' ? 'Premium' : scoreFilter === 'good' ? 'Bom' : 'Médio'}
-              </Badge>
-            )}
-            {categoryFilter !== 'all' && (
-              <Badge variant="secondary" className="bg-[#FF0000]/20 text-[#FF0000] border border-[#FF0000]/30">
-                Categoria: {categoryFilter}
+                Nível: {scoreFilter === 'premium' ? 'Premium' : scoreFilter === 'bom' ? 'Bom' : 'Médio'}
               </Badge>
             )}
           </div>

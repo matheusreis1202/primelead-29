@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,7 +51,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
 
   const getScoreColor = React.useCallback((score: number) => {
     if (score >= 80) return 'text-green-400';
-    if (score >= 60) return 'text-orange-400';
+    if (score >= 60) return 'text-blue-400'; // Mudou para azul para canais promissores
     return 'text-red-400';
   }, []);
 

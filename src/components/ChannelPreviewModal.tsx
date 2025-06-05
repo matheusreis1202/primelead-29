@@ -31,24 +31,20 @@ export const ChannelPreviewModal = React.memo(({
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-[#FF0000]';
-    if (score >= 70) return 'text-white';
-    if (score >= 55) return 'text-[#AAAAAA]';
-    if (score >= 40) return 'text-blue-400';
-    return 'text-orange-400';
+    if (score >= 80) return 'text-green-400';
+    if (score >= 60) return 'text-blue-400';
+    return 'text-red-400';
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 85) return 'PREMIUM';
-    if (score >= 70) return 'ÓTIMO';
-    if (score >= 55) return 'BOM';
-    if (score >= 40) return 'RAZOÁVEL';
-    return 'RUIM';
+    if (score >= 80) return 'PREMIUM';
+    if (score >= 60) return 'BOM';
+    return 'MÉDIO';
   };
 
   const getScoreIcon = (score: number) => {
-    if (score >= 85) return Crown;
-    if (score >= 70) return Award;
+    if (score >= 80) return Crown;
+    if (score >= 60) return Award;
     return TrendingUp;
   };
 
@@ -106,7 +102,7 @@ export const ChannelPreviewModal = React.memo(({
           </div>
 
           {/* Métricas Principais */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="p-4 bg-[#0D0D0D] rounded-lg text-center">
               <Users className="h-6 w-6 text-[#FF0000] mx-auto mb-2" />
               <p className="text-[#AAAAAA] text-sm">Inscritos</p>
@@ -123,14 +119,6 @@ export const ChannelPreviewModal = React.memo(({
               <TrendingUp className="h-6 w-6 text-[#4CAF50] mx-auto mb-2" />
               <p className="text-[#AAAAAA] text-sm">Engajamento</p>
               <p className="text-[#4CAF50] font-bold text-lg">{engagementRate.toFixed(1)}%</p>
-            </div>
-
-            <div className="p-4 bg-[#0D0D0D] rounded-lg text-center">
-              <BarChart3 className="h-6 w-6 text-blue-400 mx-auto mb-2" />
-              <p className="text-[#AAAAAA] text-sm">Score IA</p>
-              <p className={`font-bold text-lg ${getScoreColor(channel.score)}`}>
-                {channel.score}
-              </p>
             </div>
           </div>
 
