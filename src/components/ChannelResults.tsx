@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,15 +50,13 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
 
   const getScoreColor = React.useCallback((score: number) => {
     if (score >= 80) return 'text-green-400';
-    if (score >= 60) return 'text-blue-400';
-    if (score >= 40) return 'text-yellow-400';
+    if (score >= 60) return 'text-orange-400';
     return 'text-red-400';
   }, []);
 
   const getClassificationColor = React.useCallback((classificacao: string) => {
     if (classificacao === 'Excelente para parceria') return 'bg-green-500';
-    if (classificacao === 'Canal promissor') return 'bg-blue-500';
-    if (classificacao === 'Canal regular') return 'bg-yellow-500';
+    if (classificacao === 'Canal promissor') return 'bg-orange-500';
     return 'bg-red-500';
   }, []);
 
@@ -84,6 +81,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
       title: channel.title,
       subscriberCount: channel.subscriberCount,
       viewCount: channel.viewCount,
+      videoCount: channel.videoCount,
       publishedAt: channel.publishedAt
     }, mockVideos);
   }, []);
@@ -247,10 +245,10 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                       </div>
                       
                       <div className="grid grid-cols-2 gap-2 text-xs text-[#AAAAAA]">
-                        <div>Views totais: {formatNumber(analysis.metrics.views_totais)}</div>
+                        <div>Views/vídeo: {formatNumber(analysis.metrics.views_por_video)}</div>
                         <div>Engajamento: {analysis.metrics.engajamento_percent}%</div>
-                        <div>Crescimento/mês: {formatNumber(analysis.metrics.crescimento_subs_mes)}</div>
-                        <div>Ativo há: {analysis.metrics.canal_ativo_ha_meses} meses</div>
+                        <div>Frequência: {analysis.metrics.frequencia_mensal} vídeos/mês</div>
+                        <div>Crescimento: {formatNumber(analysis.metrics.crescimento_mensal)}/mês</div>
                       </div>
                     </div>
 
@@ -264,8 +262,8 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
 
                       <div className="text-center">
                         <Eye className="h-4 w-4 text-[#FF0000] mx-auto mb-1" />
-                        <span className="text-[#AAAAAA] text-xs block">Views</span>
-                        <p className="font-bold text-white text-sm">{formatNumber(channel.viewCount)}</p>
+                        <span className="text-[#AAAAAA] text-xs block">Views/vídeo</span>
+                        <p className="font-bold text-white text-sm">{formatNumber(analysis.metrics.views_por_video)}</p>
                       </div>
 
                       <div className="text-center">
@@ -384,15 +382,15 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                     <Users className="text-[#FF0000] flex-shrink-0 h-3 w-3" />
                     <div className="flex-1 min-w-0">
                       <span className="text-[#AAAAAA] block text-xs">Inscritos</span>
-                      <p className="font-bold text-white truncate text-sm">{formatNumber(channel.subscriberCount)}</p>
+                      <p className="font-bold text-white truncate text-sm">{formatNumber(analysis.metrics.inscritos)}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 p-2 bg-[#0D0D0D] rounded-lg">
                     <Eye className="text-blue-400 flex-shrink-0 h-3 w-3" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[#AAAAAA] block text-xs">Views totais</span>
-                      <p className="font-bold text-blue-400 text-sm">{formatNumber(analysis.metrics.views_totais)}</p>
+                      <span className="text-[#AAAAAA] block text-xs">Views/vídeo</span>
+                      <p className="font-bold text-blue-400 text-sm">{formatNumber(analysis.metrics.views_por_video)}</p>
                     </div>
                   </div>
 
@@ -400,7 +398,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                     <TrendingUp className="text-[#4CAF50] flex-shrink-0 h-3 w-3" />
                     <div className="flex-1 min-w-0">
                       <span className="text-[#AAAAAA] block text-xs">Crescimento/mês</span>
-                      <p className="font-bold text-[#4CAF50] text-sm">{formatNumber(analysis.metrics.crescimento_subs_mes)}</p>
+                      <p className="font-bold text-[#4CAF50] text-sm">{formatNumber(analysis.metrics.crescimento_mensal)}</p>
                     </div>
                   </div>
                 </div>

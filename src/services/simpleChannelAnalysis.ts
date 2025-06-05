@@ -11,6 +11,7 @@ interface ChannelData {
   title: string;
   subscriberCount: number;
   viewCount: number;
+  videoCount: number;
   publishedAt: string;
 }
 
@@ -20,79 +21,111 @@ interface AnalysisResult {
   score: number;
   classificacao: string;
   metrics: {
-    crescimento_subs_mes: number;
-    views_totais: number;
+    views_por_video: number;
     engajamento_percent: number;
-    videos_mes: number;
-    canal_ativo_ha_meses: number;
+    frequencia_mensal: number;
+    inscritos: number;
+    crescimento_mensal: number;
   };
+}
+
+function calcularScore(canal: {
+  viewsPorVideo: number;
+  engajamento: number;
+  frequenciaMensal: number;
+  inscritos: number;
+  crescimentoMensal: number;
+}) {
+  let score = 0;
+
+  // 📈 Views por Vídeo (30 pts)
+  if (canal.viewsPorVideo >= 30000) score += 30;
+  else if (canal.viewsPorVideo >= 10000) score += 20;
+  else if (canal.viewsPorVideo >= 5000) score += 10;
+  else if (canal.viewsPorVideo < 3000) score += 5;
+
+  // ❤️ Engajamento (25 pts)
+  if (canal.engajamento >= 0.10) score += 25;
+  else if (canal.engajamento >= 0.05) score += 15;
+  else if (canal.engajamento < 0.03) score += 5;
+
+  // 📅 Frequência de Publicação (20 pts)
+  if (canal.frequenciaMensal >= 4) score += 20;
+  else if (canal.frequenciaMensal >= 2) score += 10;
+  else if (canal.frequenciaMensal < 1) score += 5;
+
+  // 👥 Inscritos (15 pts)
+  if (canal.inscritos >= 1000000) score += 15;
+  else if (canal.inscritos >= 500000) score += 12;
+  else if (canal.inscritos >= 100000) score += 10;
+  else if (canal.inscritos >= 10000) score += 5;
+  else if (canal.inscritos < 5000) score += 2;
+
+  // 🚀 Crescimento Mensal de Inscritos (10 pts)
+  if (canal.crescimentoMensal >= 10000) score += 10;
+  else if (canal.crescimentoMensal >= 1000) score += 5;
+  else if (canal.crescimentoMensal < 500) score += 0;
+
+  return score;
+}
+
+function gerarTag(score: number) {
+  if (score >= 80) return { tag: "Excelente", cor: "green" };
+  else if (score >= 60) return { tag: "Promissor", cor: "orange" };
+  else return { tag: "Fraco", cor: "red" };
 }
 
 export function analisarCanal(dadosCanal: ChannelData, videosRecentes: VideoData[] = []): AnalysisResult {
   const hoje = new Date();
   const dataCriacao = new Date(dadosCanal.publishedAt);
-  const diasAtivo = Math.floor((hoje.getTime() - dataCriacao.getTime()) / (1000 * 60 * 60 * 24));
-  const mesesAtivo = Math.max(diasAtivo / 30, 1); // evita divisão por zero
+  const mesesAtivo = Math.max((hoje.getTime() - dataCriacao.getTime()) / (1000 * 60 * 60 * 24 * 30), 1);
 
-  // Crescimento
-  const crescimentoSubs = dadosCanal.subscriberCount / mesesAtivo;
-  const crescimentoViews = dadosCanal.viewCount / mesesAtivo;
-
-  // Frequência de postagem
-  const ultimos30Dias = new Date();
-  ultimos30Dias.setDate(ultimos30Dias.getDate() - 30);
-  const videos30Dias = videosRecentes.filter(video => new Date(video.publishedAt) > ultimos30Dias);
-  const videosPorMes = videos30Dias.length;
-
-  // Engajamento médio nos últimos vídeos
+  // Calcular métricas baseadas nos dados disponíveis
+  const viewsPorVideo = dadosCanal.videoCount > 0 ? dadosCanal.viewCount / dadosCanal.videoCount : 0;
+  
+  // Frequência de postagem estimada
+  const frequenciaMensal = dadosCanal.videoCount / mesesAtivo;
+  
+  // Engajamento médio estimado (mock baseado em dados típicos)
   const ultimosVideos = videosRecentes.slice(0, 5);
   let totalLikes = 0;
   let totalComments = 0;
   let totalViews = 0;
 
-  ultimosVideos.forEach(video => {
-    totalLikes += video.likeCount || 0;
-    totalComments += video.commentCount || 0;
-    totalViews += video.viewCount || 1; // evita divisão por zero
-  });
+  if (ultimosVideos.length > 0) {
+    ultimosVideos.forEach(video => {
+      totalLikes += video.likeCount || 0;
+      totalComments += video.commentCount || 0;
+      totalViews += video.viewCount || 1;
+    });
+  } else {
+    // Estimativa baseada em dados típicos do YouTube
+    totalViews = viewsPorVideo * 5;
+    totalLikes = totalViews * 0.03; // ~3% de like rate típico
+    totalComments = totalViews * 0.005; // ~0.5% de comment rate típico
+  }
 
-  const likeRate = totalViews > 0 ? totalLikes / totalViews : 0;
-  const commentRate = totalViews > 0 ? totalComments / totalViews : 0;
-  const engajamentoPercent = (likeRate + commentRate) * 100;
+  const engajamento = totalViews > 0 ? (totalLikes + totalComments) / totalViews : 0.03;
+  
+  // Crescimento mensal estimado
+  const crescimentoMensal = dadosCanal.subscriberCount / mesesAtivo;
 
-  // Score
-  let score = 0;
+  // Usar o novo sistema de scoring
+  const dadosParaScore = {
+    viewsPorVideo: Math.round(viewsPorVideo),
+    engajamento: engajamento,
+    frequenciaMensal: Math.round(frequenciaMensal),
+    inscritos: dadosCanal.subscriberCount,
+    crescimentoMensal: Math.round(crescimentoMensal)
+  };
 
-  // Crescimento (25%)
-  if (crescimentoSubs >= 1000) score += 25;
-  else if (crescimentoSubs >= 500) score += 20;
-  else if (crescimentoSubs >= 200) score += 15;
-  else score += 5;
+  const score = calcularScore(dadosParaScore);
+  const resultado = gerarTag(score);
 
-  // Frequência (20%)
-  if (videosPorMes >= 4) score += 20;
-  else if (videosPorMes >= 2) score += 10;
-  else score += 5;
-
-  // Engajamento (30%)
-  if (engajamentoPercent >= 2) score += 30;
-  else if (engajamentoPercent >= 1) score += 20;
-  else score += 10;
-
-  // Views totais (15%)
-  if (dadosCanal.viewCount >= 1000000) score += 15;
-  else if (dadosCanal.viewCount >= 500000) score += 10;
-  else score += 5;
-
-  // Antiguidade (10%)
-  if (mesesAtivo >= 12) score += 10;
-  else if (mesesAtivo >= 6) score += 5;
-
-  // Classificação
+  // Mapear as tags para as classificações existentes
   let classificacao = "";
-  if (score >= 80) classificacao = "Excelente para parceria";
-  else if (score >= 60) classificacao = "Canal promissor";
-  else if (score >= 40) classificacao = "Canal regular";
+  if (resultado.tag === "Excelente") classificacao = "Excelente para parceria";
+  else if (resultado.tag === "Promissor") classificacao = "Canal promissor";
   else classificacao = "Canal fraco para parcerias";
 
   return {
@@ -101,11 +134,11 @@ export function analisarCanal(dadosCanal: ChannelData, videosRecentes: VideoData
     score,
     classificacao,
     metrics: {
-      crescimento_subs_mes: Math.round(crescimentoSubs),
-      views_totais: dadosCanal.viewCount,
-      engajamento_percent: parseFloat(engajamentoPercent.toFixed(2)),
-      videos_mes: videosPorMes,
-      canal_ativo_ha_meses: Math.floor(mesesAtivo)
+      views_por_video: Math.round(viewsPorVideo),
+      engajamento_percent: parseFloat((engajamento * 100).toFixed(2)),
+      frequencia_mensal: Math.round(frequenciaMensal),
+      inscritos: dadosCanal.subscriberCount,
+      crescimento_mensal: Math.round(crescimentoMensal)
     }
   };
 }
