@@ -56,7 +56,7 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
 
   const getClassificationColor = React.useCallback((classificacao: string) => {
     if (classificacao === 'Excelente para parceria') return 'bg-green-500';
-    if (classificacao === 'Canal promissor') return 'bg-orange-500';
+    if (classificacao === 'Canal promissor') return 'bg-blue-500';
     return 'bg-red-500';
   }, []);
 

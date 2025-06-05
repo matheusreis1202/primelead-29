@@ -71,7 +71,7 @@ function calcularScore(canal: {
 
 function gerarTag(score: number) {
   if (score >= 80) return { tag: "Excelente", cor: "green" };
-  else if (score >= 60) return { tag: "Promissor", cor: "orange" };
+  else if (score >= 60) return { tag: "Promissor", cor: "blue" };
   else return { tag: "Fraco", cor: "red" };
 }
 

@@ -11,6 +11,7 @@ import { ChannelComparison } from '@/components/ChannelComparison';
 import { BatchOperations } from '@/components/BatchOperations';
 import { useAnalysisCache } from '@/hooks/useAnalysisCache';
 import { useMultiSelection } from '@/hooks/useMultiSelection';
+import { analisarCanal } from '@/services/simpleChannelAnalysis';
 
 interface ChannelData {
   name: string
@@ -123,53 +124,26 @@ export const AnalysisTab = ({
     return filtered;
   }, [safeChannels, analyzedChannels, filters]);
 
-  // Função para gerar dados consistentes baseados no ID do canal
-  const generateConsistentData = (channelId: string, baseValue: number): number => {
-    let hash = 0;
-    const str = channelId + baseValue.toString();
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return Math.abs(hash);
-  };
-
+  // Converter dados do canal para o formato de análise usando o novo sistema
   const convertChannelToAnalysisData = (channel: Channel): ChannelData => {
-    const hashBase = generateConsistentData(channel.id, channel.subscriberCount);
-    
-    const avgViews = Math.max(
-      Math.floor(channel.viewCount / Math.max(1, Math.floor(channel.subscriberCount / 100))),
-      Math.floor(channel.subscriberCount * 0.1)
-    );
-    
-    const monthlyVideos = channel.subscriberCount > 1000000 ? 
-      Math.floor((hashBase % 10) + 15) :
-      channel.subscriberCount > 100000 ? 
-      Math.floor((hashBase % 8) + 8) :
-      Math.floor((hashBase % 6) + 4);
-    
-    const engagementMultiplier = channel.subscriberCount > 1000000 ? 0.02 : 
-                                channel.subscriberCount > 100000 ? 0.035 : 0.05;
-    
-    const avgLikes = Math.floor(avgViews * engagementMultiplier);
-    const avgComments = Math.floor(avgLikes * 0.1);
-    
-    const activityRatio = avgViews / channel.subscriberCount;
-    const subGrowth = activityRatio > 0.5 ? 
-      Math.floor((hashBase % 30) + 20) :
-      activityRatio > 0.2 ? 
-      Math.floor((hashBase % 20) + 10) :
-      Math.floor((hashBase % 15) + 5);
-    
+    // Usar o novo sistema de análise
+    const analysisResult = analisarCanal({
+      id: channel.id,
+      title: channel.title,
+      subscriberCount: channel.subscriberCount,
+      viewCount: channel.viewCount,
+      videoCount: channel.videoCount,
+      publishedAt: channel.publishedAt
+    });
+
     return {
       name: channel.title,
       subscribers: channel.subscriberCount,
-      avgViews: avgViews,
-      monthlyVideos: monthlyVideos,
-      avgLikes: avgLikes,
-      avgComments: avgComments,
-      subGrowth: subGrowth
+      avgViews: analysisResult.metrics.views_por_video,
+      monthlyVideos: analysisResult.metrics.frequencia_mensal,
+      avgLikes: Math.floor(analysisResult.metrics.views_por_video * (analysisResult.metrics.engajamento_percent / 100) * 0.8),
+      avgComments: Math.floor(analysisResult.metrics.views_por_video * (analysisResult.metrics.engajamento_percent / 100) * 0.2),
+      subGrowth: Math.round((analysisResult.metrics.crescimento_mensal / channel.subscriberCount) * 100)
     };
   };
 

@@ -17,6 +17,7 @@ import {
   Zap
 } from 'lucide-react';
 import { Channel } from '@/pages/Index';
+import { analisarCanal } from '@/services/simpleChannelAnalysis';
 
 interface ChannelData {
   name: string;
@@ -58,65 +59,41 @@ export const ModernAnalysisCard = ({
     return num.toLocaleString();
   };
 
-  const calculateScore = (data: ChannelData) => {
-    let score = 0;
+  // Usar o novo sistema de análise
+  const getChannelAnalysis = () => {
+    if (!analysisData) return null;
     
-    // Frequência (0-20 pontos)
-    if (data.monthlyVideos > 20) score += 20;
-    else if (data.monthlyVideos >= 10) score += 15;
-    else if (data.monthlyVideos >= 5) score += 10;
-    else score += 5;
+    const analysisResult = analisarCanal({
+      id: channel.id,
+      title: channel.title,
+      subscriberCount: channel.subscriberCount,
+      viewCount: channel.viewCount,
+      videoCount: channel.videoCount,
+      publishedAt: channel.publishedAt
+    });
 
-    // Views médias (0-25 pontos)
-    if (data.avgViews > 100000) score += 25;
-    else if (data.avgViews >= 50000) score += 20;
-    else if (data.avgViews >= 10000) score += 15;
-    else if (data.avgViews >= 1000) score += 10;
-    else score += 5;
-
-    // Inscritos (0-25 pontos)
-    if (data.subscribers > 1000000) score += 25;
-    else if (data.subscribers >= 500000) score += 20;
-    else if (data.subscribers >= 100000) score += 15;
-    else if (data.subscribers >= 10000) score += 10;
-    else score += 5;
-
-    // Engajamento (0-20 pontos)
-    const engagementRate = (data.avgLikes + data.avgComments) / data.avgViews;
-    if (engagementRate > 0.10) score += 20;
-    else if (engagementRate >= 0.05) score += 15;
-    else if (engagementRate >= 0.02) score += 10;
-    else score += 5;
-
-    // Crescimento (0-10 pontos)
-    if (data.subGrowth > 50) score += 10;
-    else if (data.subGrowth >= 20) score += 8;
-    else if (data.subGrowth >= 10) score += 6;
-    else if (data.subGrowth >= 5) score += 4;
-    else score += 2;
-
-    return Math.min(score, 100);
+    return analysisResult;
   };
 
+  const analysis = getChannelAnalysis();
+  const score = analysis?.score || 0;
+
   const getClassification = (score: number) => {
-    if (score >= 80) return { text: 'Altíssimo Potencial', color: 'bg-green-500' };
-    if (score >= 65) return { text: 'Grande Potencial', color: 'bg-blue-500' };
-    if (score >= 45) return { text: 'Médio Potencial', color: 'bg-yellow-500' };
-    return { text: 'Baixo Potencial', color: 'bg-gray-500' };
+    if (score >= 80) return { text: 'Excelente para parceria', color: 'bg-green-500' };
+    if (score >= 60) return { text: 'Canal promissor', color: 'bg-blue-500' };
+    return { text: 'Canal fraco para parcerias', color: 'bg-red-500' };
   };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-400';
-    if (score >= 65) return 'text-blue-400';
-    if (score >= 45) return 'text-yellow-400';
+    if (score >= 60) return 'text-blue-400';
     return 'text-red-400';
   };
 
-  const score = analysisData ? calculateScore(analysisData) : 0;
   const classification = getClassification(score);
   const engagementRate = analysisData 
     ? ((analysisData.avgLikes + analysisData.avgComments) / analysisData.avgViews * 100)
-    : 0;
+    : (analysis?.metrics.engajamento_percent || 0);
 
   return (
     <Card 
@@ -219,8 +196,7 @@ export const ModernAnalysisCard = ({
                 className="h-1.5 bg-[#333]"
                 style={{
                   '--progress-foreground': score >= 80 ? '#10b981' : 
-                                         score >= 65 ? '#3b82f6' : 
-                                         score >= 45 ? '#f59e0b' : '#ef4444'
+                                         score >= 60 ? '#3b82f6' : '#ef4444'
                 } as React.CSSProperties}
               />
             </div>
