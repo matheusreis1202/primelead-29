@@ -247,9 +247,9 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                       </div>
                       
                       <div className="grid grid-cols-2 gap-2 text-xs text-[#AAAAAA]">
-                        <div>Crescimento: {formatNumber(analysis.metrics.crescimento_subs_mes)}/mês</div>
+                        <div>Views totais: {formatNumber(analysis.metrics.views_totais)}</div>
                         <div>Engajamento: {analysis.metrics.engajamento_percent}%</div>
-                        <div>Vídeos/mês: {analysis.metrics.videos_mes}</div>
+                        <div>Crescimento/mês: {formatNumber(analysis.metrics.crescimento_subs_mes)}</div>
                         <div>Ativo há: {analysis.metrics.canal_ativo_ha_meses} meses</div>
                       </div>
                     </div>
@@ -389,18 +389,18 @@ export const ChannelResults = React.memo(({ channels, onSendToAnalysis, viewMode
                   </div>
 
                   <div className="flex items-center gap-2 p-2 bg-[#0D0D0D] rounded-lg">
-                    <TrendingUp className="text-[#4CAF50] flex-shrink-0 h-3 w-3" />
+                    <Eye className="text-blue-400 flex-shrink-0 h-3 w-3" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[#AAAAAA] block text-xs">Crescimento/mês</span>
-                      <p className="font-bold text-[#4CAF50] text-sm">{formatNumber(analysis.metrics.crescimento_subs_mes)}</p>
+                      <span className="text-[#AAAAAA] block text-xs">Views totais</span>
+                      <p className="font-bold text-blue-400 text-sm">{formatNumber(analysis.metrics.views_totais)}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 p-2 bg-[#0D0D0D] rounded-lg">
-                    <Calendar className="text-blue-400 flex-shrink-0 h-3 w-3" />
+                    <TrendingUp className="text-[#4CAF50] flex-shrink-0 h-3 w-3" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[#AAAAAA] block text-xs">Vídeos/mês</span>
-                      <p className="font-bold text-blue-400 text-sm">{analysis.metrics.videos_mes}</p>
+                      <span className="text-[#AAAAAA] block text-xs">Crescimento/mês</span>
+                      <p className="font-bold text-[#4CAF50] text-sm">{formatNumber(analysis.metrics.crescimento_subs_mes)}</p>
                     </div>
                   </div>
                 </div>
