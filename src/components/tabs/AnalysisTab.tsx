@@ -69,6 +69,20 @@ export const AnalysisTab = ({
     }, mockVideos);
   };
 
+  // Converter AnalysisResult para ChannelData para compatibilidade
+  const convertToChannelData = (channel: Channel) => {
+    const analysis = analyzeChannelData(channel);
+    return {
+      name: channel.title,
+      subscribers: channel.subscriberCount,
+      avgViews: analysis.metrics.views_por_video,
+      monthlyVideos: analysis.metrics.frequencia_mensal,
+      avgLikes: Math.floor(analysis.metrics.views_por_video * 0.02),
+      avgComments: Math.floor(analysis.metrics.views_por_video * 0.005),
+      subGrowth: analysis.metrics.crescimento_mensal
+    };
+  };
+
   // Aplicar filtros e ordenação
   const filteredAndSortedChannels = useMemo(() => {
     let filtered = [...safeChannels];
@@ -234,9 +248,10 @@ export const AnalysisTab = ({
     !analyzedChannels.has(channel.id) && !analyzingChannels.has(channel.id)
   ).length;
 
+  // Corrigir o tipo aqui - usar convertToChannelData
   const selectedChannelsForComparison = multiSelection.getSelectedItems().map(channel => ({
     channel,
-    analysisData: analyzedChannels.has(channel.id) ? analyzeChannelData(channel) : undefined
+    analysisData: analyzedChannels.has(channel.id) ? convertToChannelData(channel) : undefined
   }));
 
   return (
@@ -327,7 +342,7 @@ export const AnalysisTab = ({
 
       {/* Cards Grid - Grid com 3 colunas para cards menores */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredAndSortedChannels.map(channel => {
+        {safeChannels.map(channel => {
           const isAnalyzed = analyzedChannels.has(channel.id);
           const isAnalyzing = analyzingChannels.has(channel.id);
           const isSelected = multiSelection.isSelected(channel.id);
@@ -351,7 +366,10 @@ export const AnalysisTab = ({
                 onAnalyze={() => handleAnalyzeChannel(channel)}
                 onRemove={() => onRemoveChannel(channel.id)}
                 onSendToSpreadsheet={() => handleSendToSpreadsheet(channel)}
-                onViewContacts={() => handleViewContacts(channel)}
+                onViewContacts={() => {
+                  const channelSearchUrl = `https://www.youtube.com/@${channel.title.replace(/\s+/g, '')}/about`;
+                  window.open(channelSearchUrl, '_blank');
+                }}
               />
             </div>
           );

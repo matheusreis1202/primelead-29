@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { ChannelResults } from '@/components/ChannelResults';
-import { ResultsFilters } from '@/components/ResultsFilters';
-import { ChannelCardSkeleton } from '@/components/ChannelCardSkeleton';
+import { OptimizedResultsFilters } from '@/components/OptimizedResultsFilters';
+import { EnhancedChannelSkeleton } from '@/components/EnhancedChannelSkeleton';
 import { Search, Target, Play } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
@@ -38,7 +38,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
             : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
         }`}>
           {Array.from({ length: 8 }).map((_, index) => (
-            <ChannelCardSkeleton key={index} viewMode={viewMode} />
+            <EnhancedChannelSkeleton key={index} viewMode={viewMode} index={index} />
           ))}
         </div>
       </div>
@@ -61,7 +61,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
   if (channels.length > 0) {
     return (
       <div className="space-y-4 animate-fade-in">
-        <ResultsFilters
+        <OptimizedResultsFilters
           channels={channels}
           onFiltersChange={setFilteredChannels}
           onViewModeChange={setViewMode}
