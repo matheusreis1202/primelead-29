@@ -27,7 +27,7 @@ export const UltraFastResultsFilters = React.memo(({
   const [classificationFilter, setClassificationFilter] = useState<'all' | 'excelente' | 'promissor' | 'fraco'>('all');
 
   // Ultra fast debounce - 50ms apenas
-  const [debouncedSearchTerm, isSearching, instantUpdate] = useUltraFastDebounce(searchTerm, 50);
+  const [debouncedSearchTerm, isSearching] = useUltraFastDebounce(searchTerm, 50);
 
   // Cache dos índices de busca para performance extrema
   const searchIndexes = useMemo(() => {
@@ -118,12 +118,7 @@ export const UltraFastResultsFilters = React.memo(({
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    
-    // Se o usuário limpar a busca, atualizar instantaneamente
-    if (!value) {
-      instantUpdate('');
-    }
-  }, [instantUpdate]);
+  }, []);
 
   return (
     <Card className="bg-[#1e1e1e] border-[#333] mb-4 transition-all duration-200">

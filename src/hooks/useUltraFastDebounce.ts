@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function useUltraFastDebounce<T>(value: T, delay: number = 100): [T, boolean] {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -37,13 +37,5 @@ export function useUltraFastDebounce<T>(value: T, delay: number = 100): [T, bool
     };
   }, [value, delay, debouncedValue]);
 
-  const instantUpdate = useCallback((newValue: T) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setDebouncedValue(newValue);
-    setIsDebouncing(false);
-  }, []);
-
-  return [debouncedValue, isDebouncing, instantUpdate];
+  return [debouncedValue, isDebouncing];
 }
