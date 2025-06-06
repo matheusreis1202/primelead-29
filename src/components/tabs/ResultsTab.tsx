@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { ChannelResults } from '@/components/ChannelResults';
-import { OptimizedResultsFilters } from '@/components/OptimizedResultsFilters';
-import { EnhancedChannelSkeleton } from '@/components/EnhancedChannelSkeleton';
+import { SuperOptimizedResultsFilters } from '@/components/SuperOptimizedResultsFilters';
+import { FastChannelSkeleton } from '@/components/FastChannelSkeleton';
 import { Search, Target, Play } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
@@ -27,7 +27,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
       <div className="space-y-4">
         <div className="animate-fade-in">
           <h2 className="text-xl font-bold text-white mb-1">
-            Carregando Canais <span className="text-[#FF0000]">Premium</span>
+            Processando Canais <span className="text-blue-400">Premium</span>
           </h2>
           <p className="text-[#AAAAAA] text-xs mb-4">Analisando canais com IA avançada...</p>
         </div>
@@ -38,7 +38,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
             : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
         }`}>
           {Array.from({ length: 8 }).map((_, index) => (
-            <EnhancedChannelSkeleton key={index} viewMode={viewMode} index={index} />
+            <FastChannelSkeleton key={index} viewMode={viewMode} index={index} />
           ))}
         </div>
       </div>
@@ -47,12 +47,12 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
 
   if (error) {
     return (
-      <div className="bg-youtube-red/10 border border-youtube-red/30 rounded-lg p-8 mb-8 animate-fade-in">
+      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 mb-8 animate-fade-in">
         <div className="flex items-center gap-4">
-          <div className="bg-youtube-red p-3 rounded-full futuristic-glow">
-            <Search className="h-6 w-6 text-youtube-white" />
+          <div className="bg-red-500 p-3 rounded-full">
+            <Search className="h-6 w-6 text-white" />
           </div>
-          <p className="text-youtube-red font-semibold text-lg font-roboto">{error}</p>
+          <p className="text-red-400 font-semibold text-lg">{error}</p>
         </div>
       </div>
     );
@@ -61,7 +61,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
   if (channels.length > 0) {
     return (
       <div className="space-y-4 animate-fade-in">
-        <OptimizedResultsFilters
+        <SuperOptimizedResultsFilters
           channels={channels}
           onFiltersChange={setFilteredChannels}
           onViewModeChange={setViewMode}
@@ -78,16 +78,16 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
 
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
-      <div className="bg-youtube-red p-8 rounded-full mb-8 shadow-xl futuristic-glow">
-        <Target className="h-16 w-16 text-youtube-white" />
+      <div className="bg-blue-500 p-8 rounded-full mb-8 shadow-xl">
+        <Target className="h-16 w-16 text-white animate-spin" style={{ animationDuration: '3s' }} />
       </div>
-      <h3 className="text-3xl font-bold text-youtube-white mb-4 font-roboto">Nenhum Resultado Ainda</h3>
-      <p className="text-youtube-gray max-w-lg text-lg leading-relaxed font-roboto">
+      <h3 className="text-3xl font-bold text-white mb-4">Nenhum Resultado Ainda</h3>
+      <p className="text-[#AAAAAA] max-w-lg text-lg leading-relaxed">
         Use a aba Dashboard para configurar seus filtros de busca e encontrar canais premium do YouTube.
       </p>
-      <div className="mt-6 flex items-center gap-2 text-youtube-red">
+      <div className="mt-6 flex items-center gap-2 text-blue-400">
         <Play className="h-5 w-5 fill-current" />
-        <span className="font-semibold font-roboto">Powered by YouTube Data API</span>
+        <span className="font-semibold">Powered by YouTube Data API</span>
       </div>
     </div>
   );
