@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { ChannelResults } from '@/components/ChannelResults';
-import { SuperOptimizedResultsFilters } from '@/components/SuperOptimizedResultsFilters';
-import { FastChannelSkeleton } from '@/components/FastChannelSkeleton';
+import { UltraFastResultsFilters } from '@/components/UltraFastResultsFilters';
+import { MinimalChannelSkeleton } from '@/components/MinimalChannelSkeleton';
 import { Search, Target, Play } from 'lucide-react';
 import { Channel } from '@/pages/Index';
 
@@ -27,9 +27,9 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
       <div className="space-y-4">
         <div className="animate-fade-in">
           <h2 className="text-xl font-bold text-white mb-1">
-            Processando Canais <span className="text-blue-400">Premium</span>
+            Processando Canais <span className="text-[#AAAAAA]">Premium</span>
           </h2>
-          <p className="text-[#AAAAAA] text-xs mb-4">Analisando canais com IA avançada...</p>
+          <p className="text-[#AAAAAA] text-xs mb-4">Analisando canais com alta performance...</p>
         </div>
         
         <div className={`grid gap-4 ${
@@ -38,7 +38,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
             : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
         }`}>
           {Array.from({ length: 8 }).map((_, index) => (
-            <FastChannelSkeleton key={index} viewMode={viewMode} index={index} />
+            <MinimalChannelSkeleton key={index} viewMode={viewMode} index={index} />
           ))}
         </div>
       </div>
@@ -47,12 +47,12 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
 
   if (error) {
     return (
-      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 mb-8 animate-fade-in">
+      <div className="bg-[#1E1E1E] border border-[#333] rounded-lg p-8 mb-8 animate-fade-in">
         <div className="flex items-center gap-4">
-          <div className="bg-red-500 p-3 rounded-full">
-            <Search className="h-6 w-6 text-white" />
+          <div className="bg-[#333] p-3 rounded-full">
+            <Search className="h-6 w-6 text-[#AAAAAA]" />
           </div>
-          <p className="text-red-400 font-semibold text-lg">{error}</p>
+          <p className="text-[#AAAAAA] font-semibold text-lg">{error}</p>
         </div>
       </div>
     );
@@ -61,7 +61,7 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
   if (channels.length > 0) {
     return (
       <div className="space-y-4 animate-fade-in">
-        <SuperOptimizedResultsFilters
+        <UltraFastResultsFilters
           channels={channels}
           onFiltersChange={setFilteredChannels}
           onViewModeChange={setViewMode}
@@ -78,14 +78,14 @@ export const ResultsTab = ({ channels, isLoading, error, onSendToAnalysis }: Res
 
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
-      <div className="bg-blue-500 p-8 rounded-full mb-8 shadow-xl">
-        <Target className="h-16 w-16 text-white animate-spin" style={{ animationDuration: '3s' }} />
+      <div className="bg-[#333] p-8 rounded-full mb-8 shadow-xl">
+        <Target className="h-16 w-16 text-[#AAAAAA] animate-spin" style={{ animationDuration: '3s' }} />
       </div>
       <h3 className="text-3xl font-bold text-white mb-4">Nenhum Resultado Ainda</h3>
       <p className="text-[#AAAAAA] max-w-lg text-lg leading-relaxed">
         Use a aba Dashboard para configurar seus filtros de busca e encontrar canais premium do YouTube.
       </p>
-      <div className="mt-6 flex items-center gap-2 text-blue-400">
+      <div className="mt-6 flex items-center gap-2 text-[#AAAAAA]">
         <Play className="h-5 w-5 fill-current" />
         <span className="font-semibold">Powered by YouTube Data API</span>
       </div>
