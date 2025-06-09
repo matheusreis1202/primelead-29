@@ -1,273 +1,226 @@
-import React, { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { ModernHeader } from '@/components/ModernHeader';
-import { EnhancedNavigation } from '@/components/EnhancedNavigation';
-import { EnhancedSidebar } from '@/components/EnhancedSidebar';
-import { ResultsTab } from '@/components/tabs/ResultsTab';
-import { AnalysisTab } from '@/components/tabs/AnalysisTab';
-import { NewPlanilhaTab } from '@/components/tabs/NewPlanilhaTab';
-import { EmailMarketingTab } from '@/components/tabs/EmailMarketingTab';
-import { PartnersTab, usePartnersData } from '@/components/tabs/PartnersTab';
-import { EnhancedLoading } from '@/components/EnhancedLoading';
+import {
+  ArrowRight,
+  Check,
+  ChevronRight,
+  Cpu,
+  Database,
+  Rocket,
+  Sparkles,
+  Target,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
-export interface SearchFilters {
-  apiKey: string;
-  nicho: string;
-  pais: string;
-  idioma: string;
-  minInscritos: number;
-  maxInscritos: number;
-  minViews: number;
-  freqMinima: number;
-}
-
-export interface Channel {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  subscriberCount: number;
-  viewCount: number;
-  videoCount: number;
-  publishedAt: string;
-  country: string;
-  language: string;
-  score: number;
-  category: string;
-}
-
-const Index = () => {
-  const [activeTab, setActiveTab] = useState('results');
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [channelsForAnalysis, setChannelsForAnalysis] = useState<Channel[]>([]);
-  const [savedChannels, setSavedChannels] = useState<any[]>([]);
-  const [emailCampaigns, setEmailCampaigns] = useState<any[]>([]);
-  const { partnerships, addPartnership } = usePartnersData();
-
-  console.log('Index component render:', {
-    channels: (channels || []).length,
-    channelsForAnalysis: (channelsForAnalysis || []).length,
-    savedChannels: (savedChannels || []).length,
-    emailCampaigns: (emailCampaigns || []).length,
-    partnerships: (partnerships || []).length,
-    activeTab
-  });
-
-  const handleSearch = async (filters: SearchFilters) => {
-    setIsLoading(true);
-    setError(null);
-    setChannels([]);
-    
-    try {
-      console.log('Searching with filters:', filters);
-      
-      const canaisUnicos = new Set();
-      let nextPageToken = '';
-      const foundChannels: Channel[] = [];
-      
-      while (canaisUnicos.size < 100) {
-        const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(filters.nicho)}&regionCode=${filters.pais}&relevanceLanguage=${filters.idioma}&maxResults=50&pageToken=${nextPageToken}&key=${filters.apiKey}`;
-        
-        const searchResp = await fetch(searchUrl);
-        const searchData = await searchResp.json();
-
-        if (!searchData.items) break;
-
-        for (const item of searchData.items) {
-          const channelId = item.snippet.channelId;
-          if (canaisUnicos.has(channelId)) continue;
-          canaisUnicos.add(channelId);
-
-          const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${channelId}&key=${filters.apiKey}`;
-          const channelResp = await fetch(channelUrl);
-          const channelData = await channelResp.json();
-
-          if (!channelData.items || channelData.items.length === 0) continue;
-
-          const canal = channelData.items[0];
-          const inscritoCount = parseInt(canal.statistics.subscriberCount || '0');
-          const viewCount = parseInt(canal.statistics.viewCount || '0');
-          const videoCount = parseInt(canal.statistics.videoCount || '0');
-
-          if (inscritoCount >= filters.minInscritos && inscritoCount <= filters.maxInscritos && viewCount >= filters.minViews) {
-            const uploadsPlaylistId = canal.contentDetails?.relatedPlaylists?.uploads;
-            let atendeFrequencia = true;
-
-            if (filters.freqMinima > 0 && uploadsPlaylistId) {
-              const playlistUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=10&key=${filters.apiKey}`;
-              const playlistResp = await fetch(playlistUrl);
-              const playlistData = await playlistResp.json();
-
-              if (playlistData.items && playlistData.items.length > 0) {
-                const datas = playlistData.items.map((p: any) => new Date(p.snippet.publishedAt));
-                datas.sort((a: Date, b: Date) => b.getTime() - a.getTime());
-
-                if (datas.length >= 2) {
-                  const dias = (datas[0].getTime() - datas[datas.length - 1].getTime()) / (1000 * 60 * 60 * 24);
-                  const freqAtual = datas.length / (dias / 7);
-                  atendeFrequencia = freqAtual >= filters.freqMinima;
-                }
-              }
-            }
-
-            if (atendeFrequencia) {
-              // Calcular score baseado no engajamento
-              const engagementRate = videoCount > 0 ? (viewCount / videoCount / inscritoCount) * 100 : 0;
-              const score = Math.min(100, Math.max(60, 70 + engagementRate * 5));
-
-              const channel: Channel = {
-                id: canal.id,
-                title: canal.snippet.title,
-                description: canal.snippet.description || '',
-                thumbnail: canal.snippet.thumbnails?.high?.url || canal.snippet.thumbnails?.default?.url || '',
-                subscriberCount: inscritoCount,
-                viewCount: viewCount,
-                videoCount: videoCount,
-                publishedAt: canal.snippet.publishedAt,
-                country: canal.snippet.country || filters.pais,
-                language: canal.snippet.defaultLanguage || filters.idioma,
-                score: Math.round(score),
-                category: filters.nicho
-              };
-
-              foundChannels.push(channel);
-              console.log('Canal encontrado:', channel);
-            }
-          }
-
-          if (canaisUnicos.size >= 100) break;
-        }
-
-        if (!searchData.nextPageToken) break;
-        nextPageToken = searchData.nextPageToken;
-      }
-
-      // Ordenar por score e número de inscritos
-      foundChannels.sort((a, b) => {
-        if (a.score !== b.score) return b.score - a.score;
-        return b.subscriberCount - a.subscriberCount;
-      });
-
-      console.log('Canais encontrados:', foundChannels);
-      setChannels(foundChannels);
-
-      if (foundChannels.length === 0) {
-        setError('Nenhum canal encontrado com os filtros selecionados.');
-      }
-      
-    } catch (err: any) {
-      console.error('Search error:', err);
-      if (err.message?.includes('403') || err.message?.includes('API key')) {
-        setError('Chave da API inválida ou sem permissões. Verifique sua chave da API do YouTube.');
-      } else if (err.message?.includes('quota')) {
-        setError('Cota da API excedida. Tente novamente mais tarde.');
-      } else {
-        setError('Erro ao buscar canais. Verifique sua conexão e tente novamente.');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSendToAnalysis = (channel: Channel) => {
-    setChannelsForAnalysis(prev => [...(prev || []), channel]);
-    setActiveTab('analysis');
-  };
-
-  const handleSaveToSpreadsheet = (channelData: any) => {
-    console.log('Salvando canal na planilha:', channelData);
-    
-    // Converter dados do canal para o formato da planilha
-    const planilhaChannel = {
-      id: channelData.id,
-      photo: channelData.photo || channelData.thumbnail || 'https://via.placeholder.com/64',
-      name: channelData.name || channelData.title,
-      link: channelData.link || `https://youtube.com/channel/${channelData.id}`,
-      phone: channelData.phone || '+55 11 00000-0000',
-      email: channelData.email || `contato@${(channelData.name || channelData.title || 'canal').replace(/\s+/g, '').toLowerCase()}.com`,
-      subscribers: channelData.subscribers || channelData.subscriberCount || 0,
-      avgViews: channelData.avgViews || Math.floor((channelData.viewCount || 0) / Math.max(channelData.videoCount || 10, 1)),
-      monthlyVideos: channelData.monthlyVideos || Math.floor(Math.random() * 15) + 5,
-      engagement: channelData.engagement || ((Math.random() * 5) + 2).toFixed(1),
-      subGrowth: channelData.subGrowth || Math.floor(Math.random() * 20) + 5,
-      score: channelData.score || Math.floor(Math.random() * 40) + 60,
-      classification: channelData.classification || 'Médio Potencial'
-    };
-    
-    setSavedChannels(prev => [...(prev || []), planilhaChannel]);
-    console.log('Canal salvo na planilha:', planilhaChannel);
-  };
-
-  const handleSendToPartners = (channelData: any) => {
-    addPartnership(channelData);
-    setActiveTab('partners');
-  };
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'results':
-        return (
-          <ResultsTab
-            channels={channels || []}
-            isLoading={isLoading}
-            error={error}
-            onSendToAnalysis={handleSendToAnalysis}
-          />
-        );
-      case 'analysis':
-        return (
-          <AnalysisTab
-            channels={channelsForAnalysis || []}
-            onRemoveChannel={(id) => setChannelsForAnalysis(prev => (prev || []).filter(c => c.id !== id))}
-            onSendToPartners={handleSendToPartners}
-            onSaveToSpreadsheet={handleSaveToSpreadsheet}
-          />
-        );
-      case 'planilha':
-        return (
-          <NewPlanilhaTab
-            savedChannels={savedChannels || []}
-            onSendToPartners={handleSendToPartners}
-          />
-        );
-      case 'email':
-        return (
-          <EmailMarketingTab
-            contacts={savedChannels || []}
-          />
-        );
-      case 'partners':
-        return <PartnersTab partnershipsData={partnerships || []} />;
-      default:
-        return null;
-    }
-  };
+// Componente para seção, para manter consistência
+const Section = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <section className={`py-20 sm:py-28 <span class="math-inline">\{className\}\`\}\>
+<div className\="container mx\-auto px\-6 lg\:px\-8"\>\{children\}</div\>
+</section\>
+\);
+// Componente para os cards de destaque
+const FeatureCard \= \(\{
+icon\: Icon,
+title,
+description,
+\}\: \{
+icon\: React\.ElementType;
+title\: string;
+description\: string;
+\}\) \=\> \(
+<div className\="bg\-gray\-900/50 border border\-white/10 p\-6 rounded\-2xl backdrop\-blur\-sm transition\-all duration\-300 hover\:border\-blue\-500/50 hover\:bg\-gray\-900 hover\:scale\-\[1\.02\]"\>
+<div className\="flex items\-start gap\-4"\>
+<div className\="bg\-blue\-500/10 text\-blue\-400 p\-3 rounded\-lg border border\-blue\-500/20"\>
+<Icon className\="h\-6 w\-6" /\>
+</div\>
+<div\>
+<h3 className\="text\-lg font\-bold text\-white mb\-2"\>\{title\}</h3\>
+<p className\="text\-gray\-400 leading\-relaxed"\>\{description\}</p\>
+</div\>
+</div\>
+</div\>
+\);
+const Sales \= \(\) \=\> \{
+const plans \= \[
+\{
+name\: "Pro",
+price\: "R</span> 97",
+      period: "/mês",
+      description: "Ideal para empreendedores e agências que buscam crescimento acelerado.",
+      features: [
+        "Até 500 canais por dia",
+        "Filtros avançados de prospecção",
+        "Análise de engajamento e score",
+        "Gestão de parcerias (CRM)",
+        "Suporte prioritário via chat",
+      ],
+      link: "https://pay.kiwify.com.br/ITTB1iC",
+      popular: true,
+    },
+    {
+      name: "Starter",
+      price: "R$ 49",
+      period: "/mês",
+      description: "Perfeito para quem está começando a prospectar.",
+      features: [
+        "Até 100 canais por dia",
+        "Filtros básicos de nicho",
+        "Análise de inscritos e views",
+        "Suporte via e-mail",
+      ],
+      link: "https://pay.kiwify.com.br/QtSaOUj",
+      popular: false,
+    },
+  ];
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-[#0D0D0D]">
-        <EnhancedSidebar onSearch={handleSearch} isLoading={isLoading} />
-        
-        <div className="flex-1 flex flex-col">
-          <ModernHeader />
-          <EnhancedNavigation
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            analysisCount={(channelsForAnalysis || []).length}
-            planilhaCount={(savedChannels || []).length}
-            emailCampaignsCount={(emailCampaigns || []).length}
-            partnersCount={(partnerships || []).length}
-          />
-          
-          <main className="flex-1 p-6 overflow-auto">
-            {renderTabContent()}
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
-  );
-};
+    <div className="bg-[#0A0A0A] text-gray-300 font-inter antialiased">
+      {/* ===== Hero Section ===== */}
+      <section className="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28">
+        <div
+          className="absolute inset-0 z-0 opacity-[0.15]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 50% 0, #1d4ed8 0%, transparent 50%), radial-gradient(circle at 100% 100%, #0a0a0a, #0369a1 50%, transparent 90%)",
+          }}
+        ></div>
 
-export default Index;
+        <div className="absolute inset-0 z-0 bg-[url('https://res.cloudinary.com/delba/image/upload/v1699703299/folio/gradient-background.png')] bg-cover bg-center opacity-10"></div>
+        <div className="absolute inset-0 z-0 bg-black/50"></div>
+
+
+        <div className="container mx-auto px-6 lg:px-8 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-4 py-1.5 rounded-full text-sm font-semibold mb-6">
+            <Sparkles className="h-4 w-4 text-blue-400" />
+            <span>Lançamento Oficial PrimeLead</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+            A Prospecção no YouTube,
+            <span className="block bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mt-2">
+              Reinventada com IA.
+            </span>
+          </h1>
+
+          <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 mb-10 leading-relaxed">
+            Pare de perder horas em buscas manuais. O PrimeLead é a plataforma
+            definitiva que automatiza a captação de canais qualificados,
+            entregando parcerias de alto impacto para o seu negócio.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#planos">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-7 text-lg font-bold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-600/30"
+              >
+                Começar Agora
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </a>
+            <Link to="/login">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto text-gray-300 border-white/20 hover:bg-white/10 hover:text-white px-8 py-7 text-lg font-semibold rounded-xl"
+                >
+                  Fazer Login
+                </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== O Método Tradicional é Ineficaz ===== */}
+      <Section className="bg-[#0A0A0A]">
+        <div className="text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            O Método Tradicional é Lento e Ineficaz
+          </h2>
+          <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-12">
+            A busca manual por parceiros no YouTube consome seu tempo e energia,
+            com resultados muitas vezes decepcionantes.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="text-center p-8 bg-gray-900/30 border border-white/10 rounded-2xl">
+            <h3 className="text-5xl font-bold text-blue-400 mb-3">5+</h3>
+            <p className="text-gray-400">Horas por dia gastas em prospecção manual</p>
+          </div>
+          <div className="text-center p-8 bg-gray-900/30 border border-white/10 rounded-2xl">
+            <h3 className="text-5xl font-bold text-blue-400 mb-3">80%</h3>
+            <p className="text-gray-400">Das parcerias não geram o resultado esperado</p>
+          </div>
+          <div className="text-center p-8 bg-gray-900/30 border border-white/10 rounded-2xl">
+            <h3 className="text-5xl font-bold text-blue-400 mb-3">Inúmeras</h3>
+            <p className="text-gray-400">Oportunidades de ouro perdidas para a concorrência</p>
+          </div>
+        </div>
+      </Section>
+      
+      {/* ===== A Revolução PrimeLead ===== */}
+      <Section>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            A Revolução PrimeLead
+          </h2>
+          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+            Transformamos o caos da prospecção em um processo simples,
+            automatizado e orientado por dados.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <FeatureCard
+            icon={Cpu}
+            title="IA de Prospecção"
+            description="Nossa inteligência artificial varre o YouTube 24/7, aplicando filtros complexos para encontrar os canais com o perfil exato do seu público."
+          />
+          <FeatureCard
+            icon={Database}
+            title="Dados, Não Achismos"
+            description="Tome decisões baseadas em métricas reais. Analisamos score de engajamento, consistência e potencial de parceria de cada canal."
+          />
+          <FeatureCard
+            icon={Target}
+            title="Foco em Conversão"
+            description="Economize tempo e dinheiro focando apenas em parcerias com alto potencial de retorno sobre o investimento (ROI)."
+          />
+        </div>
+      </Section>
+
+      {/* ===== Mockup UI Section ===== */}
+      <Section>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Interface Intuitiva e Poderosa
+          </h2>
+          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+            Visualize o poder do PrimeLead. Encontre canais premium em segundos.
+          </p>
+        </div>
+
+        <div className="relative bg-gray-900/80 border border-white/10 rounded-2xl p-4 sm:p-8 backdrop-blur-xl shadow-2xl shadow-blue-900/20">
+            <div className="absolute top-4 left-6 flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+
+            <div className="mt-8 flex flex-col md:flex-row gap-8">
+                <div className="md:w-1/3 space-y-4">
+                    <h3 className="text-white font-bold text-xl">Filtros Ativos</h3>
+                    <div className="space-y-3">
+                        <p className="text-sm text-gray-400 flex justify-between">Nicho: <span className="font-semibold text-white">Marketing Digital</span></p>
+                        <p className="text-sm text-gray-400 flex justify-between">Inscritos: <span className="font-semibold text-white">50k - 500k</span></p>
+                        <p className="text-sm text-gray-400 flex justify-between">Score Mínimo: <span className="font-semibold text-blue-400">85</span></p>
+                        <p className="text-sm text-gray-400 flex justify-between">País: <span className="font-semibold text-white">Brasil</span></p>
+                    </div>
+                </div>
+                <div className="md:w-2/3 bg-black/30 border border-white/10 p-6 rounded-xl">
+                    <div className="
